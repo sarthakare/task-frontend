@@ -38,13 +38,19 @@ export default function LoginPage() {
     setIsLoading(true);
 
     if (!email || !password) {
-      toast.error("Please fill in all fields");
+      toast.error("Please fill in all fields",{
+        icon: <CircleAlert  className="text-red-600" />,
+        style: { color: "red" },
+      });
       setIsLoading(false);
       return;
     }
 
     if (!email.includes("@")) {
-      toast.error("Please enter a valid email address");
+      toast.error("Please enter a valid email address",{
+        icon: <CircleAlert  className="text-red-600" />,
+        style: { color: "red" },
+      });
       setIsLoading(false);
       return;
     }
@@ -55,6 +61,7 @@ export default function LoginPage() {
 
       toast.success("Login successful", {
         icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       router.push("/");
@@ -65,6 +72,7 @@ export default function LoginPage() {
           : "Login failed";
       toast.error(errorMessage || "Login failed", {
         icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsLoading(false);

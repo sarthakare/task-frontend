@@ -1,32 +1,31 @@
 export interface User {
-  id: string
-  name: string
-  email: string
-  role: "ADMIN" | "CEO" | "MANAGER" | "TEAM_LEAD" | "EXECUTIVE"
-  parentId?: string
-  department: string
-  avatar?: string
-  isActive: boolean
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
 }
 
 export interface Task {
-  id: string
+  id: number
   title: string
   description: string
-  createdBy: string
-  assignedTo: string
-  observers: string[]
+  created_by: number
+  creator: User
+  assigned_to: number
+  assignee: User
+  observers?: string[]
   status: "NEW" | "IN_PROGRESS" | "PENDING" | "FINISHED" | "STOPPED" | "CANCELLED"
   priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
-  dueDate: string
+  follow_up_date: string
+  due_date: string
   followUpDate?: string
   createdAt: string
-  updatedAt: string
+  updatedAt?: string
   completedAt?: string
   tags: string[]
-  comments: TaskComment[]
-  escalationLevel: number
-  lastReminderSent?: string
+  created_at: string
+  updated_at?: string | null
 }
 
 export interface TaskComment {

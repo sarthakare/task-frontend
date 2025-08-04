@@ -15,13 +15,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { CircleAlert, X } from "lucide-react";
 import type { Task, User } from "@/types";
+import { getToken } from "@/utils/auth";
+import { toast } from "sonner";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 interface TaskCreationFormProps {
   currentUser: User;
   onTaskCreated: (task: Task) => void;
 }
+
+type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export function TaskCreationForm({
   currentUser,
@@ -31,32 +36,39 @@ export function TaskCreationForm({
     title: "",
     description: "",
     assignedTo: currentUser.id,
-    priority: "MEDIUM" as const,
+    priority: "MEDIUM" as TaskPriority,
     dueDate: "",
     followUpDate: "",
     tags: [] as string[],
   });
   const [newTag, setNewTag] = useState("");
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
 
   // Fetch users that current user can assign tasks to
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:8000/users/users/all");
+        setIsLoadingUsers(true);
+        const res = await fetch("http://localhost:8000/users/all");
         if (!res.ok) throw new Error("Failed to fetch users");
         const usersData = await res.json();
         setUsers(usersData);
       } catch (err) {
         console.error("Error fetching users:", err);
+        toast.error("Failed to load users",{
+          icon: <CircleAlert  className="text-red-600" />,
+          style: { color: "red" },
+        });
+      } finally {
+        setIsLoadingUsers(false);
       }
     };
 
     fetchUsers();
   }, []);
 
-  const token = localStorage.getItem("token"); 
-  
+  const token = getToken();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +84,7 @@ export function TaskCreationForm({
     };
 
     try {
+      console.log("Sending payload:", payload);
       const response = await fetch("http://localhost:8000/tasks/create", {
         method: "POST",
         headers: {
@@ -88,9 +101,11 @@ export function TaskCreationForm({
 
       const newTask: Task = await response.json();
       onTaskCreated(newTask);
-    } catch (error) {
-      console.error("Task creation failed:", error);
-      // Optionally show a toast or alert here
+    } catch {
+      toast.error("Task creation failed. Please try again.", {
+        icon: <CircleAlert  className="text-red-600" />,
+        style: { color: "red" },
+      });
     }
   };
 
@@ -113,138 +128,146 @@ export function TaskCreationForm({
 
   return (
     <div className="max-h-[80vh] overflow-y-auto p-4">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="title">Task Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              placeholder="Enter task title..."
-              required
-            />
-          </div>
-
-          <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Enter task description..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="assignedTo">Assign To *</Label>
-            <Select
-              value={formData.assignedTo.toString()}
-              onValueChange={(value) =>
-                setFormData({ ...formData, assignedTo: parseInt(value) })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select user" />
-              </SelectTrigger>
-              <SelectContent>
-                {users.map((user) => (
-                  <SelectItem key={user.id} value={user.id.toString()}>
-                    {user.name} ({user.role})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="priority">Priority</Label>
-            <Select
-              value={formData.priority}
-              onValueChange={(value: any) =>
-                setFormData({ ...formData, priority: value })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="LOW">Low</SelectItem>
-                <SelectItem value="MEDIUM">Medium</SelectItem>
-                <SelectItem value="HIGH">High</SelectItem>
-                <SelectItem value="CRITICAL">Critical</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="dueDate">Due Date *</Label>
-            <Input
-              id="dueDate"
-              type="date"
-              value={formData.dueDate}
-              onChange={(e) =>
-                setFormData({ ...formData, dueDate: e.target.value })
-              }
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="followUpDate">Follow-up Date</Label>
-            <Input
-              id="followUpDate"
-              type="date"
-              value={formData.followUpDate}
-              onChange={(e) =>
-                setFormData({ ...formData, followUpDate: e.target.value })
-              }
-            />
-          </div>
+      {isLoadingUsers ? (
+        <div className="mt-2">
+          <LoadingSpinner size={16} message="Loading users..." />
         </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="title">Task Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="Enter task title..."
+                required
+              />
+            </div>
 
-        {/* Tags */}
-        <div className="space-y-2">
-          <Label>Tags</Label>
-          <div className="flex gap-2 mb-2">
-            <Input
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              placeholder="Add tag..."
-              onKeyPress={(e) =>
-                e.key === "Enter" && (e.preventDefault(), addTag())
-              }
-            />
-            <Button type="button" onClick={addTag} variant="outline">
-              Add
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="flex items-center gap-1"
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="Enter task description..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="assignedTo">Assign To *</Label>
+              <Select
+                value={formData.assignedTo.toString()}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, assignedTo: parseInt(value) })
+                }
+                disabled={isLoadingUsers}
               >
-                {tag}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => removeTag(tag)}
-                />
-              </Badge>
-            ))}
-          </div>
-        </div>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={isLoadingUsers ? "Loading users..." : "Select user"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.name} ({user.department} - {user.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="flex justify-end gap-2">
-          <Button type="submit">Create Task</Button>
-        </div>
-      </form>
+            <div className="space-y-2">
+              <Label htmlFor="priority">Priority</Label>
+              <Select
+                value={formData.priority}
+                onValueChange={(value: TaskPriority) =>
+                  setFormData({ ...formData, priority: value })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="LOW">Low</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="CRITICAL">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dueDate">Due Date *</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, dueDate: e.target.value })
+                }
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="followUpDate">Follow-up Date</Label>
+              <Input
+                id="followUpDate"
+                type="date"
+                value={formData.followUpDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, followUpDate: e.target.value })
+                }
+              />
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <div className="flex gap-2 mb-2">
+              <Input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="Add tag..."
+                onKeyPress={(e) =>
+                  e.key === "Enter" && (e.preventDefault(), addTag())
+                }
+              />
+              <Button type="button" onClick={addTag} variant="outline">
+                Add
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {tag}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => removeTag(tag)}
+                  />
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button type="submit">Create Task</Button>
+          </div>
+        </form>
+      )}
+
     </div>
   );
 }

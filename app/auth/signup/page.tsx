@@ -135,6 +135,7 @@ export default function SignupPage() {
 
       toast.success("Login successful", {
         icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       router.push("/");
@@ -145,6 +146,7 @@ export default function SignupPage() {
           : "Login failed";
       toast.error(errorMessage || "Login failed", {
         icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsLoading(false);
