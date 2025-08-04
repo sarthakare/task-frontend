@@ -15,6 +15,8 @@ import {
   Pause,
   X,
   FileText,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +37,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const isOverdue =
     new Date(task.due_date) < new Date() &&
@@ -118,21 +121,36 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <h3
-              className={`text-base font-semibold truncate ${
+              className={`text-base font-semibold ${
                 task.status === "FINISHED"
                   ? "line-through text-gray-500"
                   : "text-gray-900"
-              }`}
+              } ${isExpanded ? "" : "truncate"} cursor-pointer hover:underline`}
+              onClick={() => setIsExpanded((prev) => !prev)}
             >
               {task.title}
             </h3>
             {task.description && (
-              <p className="text-gray-600 text-xs mt-1 line-clamp-1">
+              <p
+                className={`text-gray-600 text-xs mt-1 ${isExpanded ? "" : "line-clamp-1"} cursor-pointer hover:underline`}
+                onClick={() => setIsExpanded((prev) => !prev)}
+              >
                 {task.description}
               </p>
             )}
           </div>
-          
+          <button
+            type="button"
+            className="ml-2 p-1 rounded hover:bg-gray-100"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            aria-label={isExpanded ? "Collapse" : "Expand"}
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
           <div className="flex items-center gap-2 ml-3">
             {isOverdue && (
               <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -153,7 +171,7 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
             <div className="flex items-center gap-1 flex-1">
               <Tag className="h-3 w-3 text-gray-400" />
               <div className="flex flex-wrap gap-1">
-                {task.tags.slice(0, 2).map((tag) => (
+                {task.tags.map((tag) => (
                   <Badge
                     key={tag}
                     variant="secondary"
@@ -162,11 +180,6 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
                     {tag}
                   </Badge>
                 ))}
-                {task.tags.length > 2 && (
-                  <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                    +{task.tags.length - 2}
-                  </Badge>
-                )}
               </div>
             </div>
           )}
@@ -229,7 +242,7 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
         </div>
 
         {/* Footer with Creator and Status Update */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-2 border-t border-gray-400">
           <div className="flex items-center gap-2">
             <Avatar className="h-5 w-5">
               <AvatarImage src="" />

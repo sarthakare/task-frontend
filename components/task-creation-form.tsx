@@ -20,6 +20,7 @@ import type { Task, User } from "@/types";
 import { getToken } from "@/utils/auth";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { apiFetch } from "@/lib/api";
 
 interface TaskCreationFormProps {
   currentUser: User;
@@ -44,13 +45,14 @@ export function TaskCreationForm({
   const [newTag, setNewTag] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const maxTags = 10;
 
   // Fetch users that current user can assign tasks to
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setIsLoadingUsers(true);
-        const res = await fetch("http://localhost:8000/users/all");
+        const res = await apiFetch("http://localhost:8000/users/all");
         if (!res.ok) throw new Error("Failed to fetch users");
         const usersData = await res.json();
         setUsers(usersData);
@@ -85,7 +87,7 @@ export function TaskCreationForm({
 
     try {
       console.log("Sending payload:", payload);
-      const response = await fetch("http://localhost:8000/tasks/create", {
+      const response = await apiFetch("http://localhost:8000/tasks/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +95,7 @@ export function TaskCreationForm({
         },
         body: JSON.stringify(payload),
       });
-
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to create task");
@@ -110,7 +112,11 @@ export function TaskCreationForm({
   };
 
   const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+    if (
+      newTag.trim() &&
+      !formData.tags.includes(newTag.trim()) &&
+      formData.tags.length < maxTags
+    ) {
       setFormData({
         ...formData,
         tags: [...formData.tags, newTag.trim()],
@@ -238,10 +244,16 @@ export function TaskCreationForm({
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add tag..."
                 onKeyPress={(e) =>
-                  e.key === "Enter" && (e.preventDefault(), addTag())
+                  e.key === "Enter" && (e.preventDefault(), formData.tags.length < maxTags && addTag())
                 }
+                disabled={formData.tags.length >= maxTags}
               />
-              <Button type="button" onClick={addTag} variant="outline">
+              <Button
+                type="button"
+                onClick={addTag}
+                variant="outline"
+                disabled={formData.tags.length >= maxTags}
+              >
                 Add
               </Button>
             </div>
@@ -260,6 +272,9 @@ export function TaskCreationForm({
                 </Badge>
               ))}
             </div>
+            {formData.tags.length >= maxTags && (
+              <div className="text-xs text-red-500 mt-1">Max 10 tags are allowed.</div>
+            )}
           </div>
 
           <div className="flex justify-end gap-2">

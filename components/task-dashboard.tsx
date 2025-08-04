@@ -37,6 +37,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { TaskCard } from "./task-card";
+import { apiFetch } from "@/lib/api";
 
 interface TaskMetrics {
   total: number;
@@ -76,7 +77,7 @@ export function TaskDashboard() {
     try {
       const token = getToken();
 
-      const response = await fetch("http://localhost:8000/tasks/all", {
+      const response = await apiFetch("http://localhost:8000/tasks/all", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
