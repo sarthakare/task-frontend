@@ -41,14 +41,14 @@ import { apiFetch } from "@/lib/api";
 
 interface TaskMetrics {
   total: number;
-  completed: number;
+  finished: number;
   overdue: number;
   upcoming: number;
 }
 
 interface TaskResponse {
   total: number;
-  completed: number;
+  finished: number;
   overdue: number;
   upcoming: number;
   tasks: Task[];
@@ -61,7 +61,7 @@ export function TaskDashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [metrics, setMetrics] = useState<TaskMetrics>({
     total: 0,
-    completed: 0,
+    finished: 0,
     overdue: 0,
     upcoming: 0,
   });
@@ -91,7 +91,7 @@ export function TaskDashboard() {
       setTasks(data.tasks);
       setMetrics({
         total: data.total,
-        completed: data.completed,
+        finished: data.finished,
         overdue: data.overdue,
         upcoming: data.upcoming,
       });
@@ -117,7 +117,7 @@ export function TaskDashboard() {
   }
 
   const handleTaskCreated = (newTask: Task) => {
-    toast.success("Task created successfully!", {
+    toast.success(`${newTask}Task created successfully!`, {
       icon: <CheckCircle2 className="text-green-600" />,
       style: { color: "green" },
     });
@@ -125,7 +125,7 @@ export function TaskDashboard() {
     fetchTasks(); // Refresh the task list to include the new task
   };
 
-  const completionRate = metrics.total > 0 ? Math.round((metrics.completed / metrics.total) * 100) : 0;
+  const completionRate = metrics.total > 0 ? Math.round((metrics.finished / metrics.total) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
