@@ -26,6 +26,7 @@ export interface Task {
   tags: string[]
   created_at: string
   updated_at?: string | null
+  logs: TaskLog[];
 }
 
 export interface TaskComment {
@@ -55,4 +56,13 @@ export interface Report {
   completionRate: number
   avgResponseTime: number
   escalatedTasks: number
+}
+
+export interface TaskLog {
+  id: number;
+  task_id: number;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
 }

@@ -26,9 +26,18 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Eye, EyeOff, Loader2, CheckCircle2, Check, X, CircleAlert } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  CheckCircle2,
+  Check,
+  X,
+  CircleAlert,
+} from "lucide-react";
 import { toast } from "sonner";
 import { saveAuth } from "@/utils/auth";
+import { signupUser } from "@/lib/api";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -110,25 +119,15 @@ export default function SignupPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          department: formData.department,
-          role: formData.role,
-        }),
-      });
+      const data = await signupUser(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.department,
+        formData.role
+      );
 
-      const data = await res.json();
       console.log("Signup response:", data);
-      if (!res.ok) {
-        throw new Error(data.detail || "Signup failed");
-      }
 
       // NEW: Set cookies
       saveAuth(data, true); // Assuming rememberMe is true for simplicity

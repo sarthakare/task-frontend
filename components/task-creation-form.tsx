@@ -52,7 +52,7 @@ export function TaskCreationForm({
     const fetchUsers = async () => {
       try {
         setIsLoadingUsers(true);
-        const res = await apiFetch("http://localhost:8000/users/all");
+        const res = await apiFetch("/users/all");
         if (!res.ok) throw new Error("Failed to fetch users");
         const usersData = await res.json();
         setUsers(usersData);
@@ -87,7 +87,7 @@ export function TaskCreationForm({
 
     try {
       console.log("Sending payload:", payload);
-      const response = await apiFetch("http://localhost:8000/tasks/create", {
+      const response = await apiFetch("/tasks/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

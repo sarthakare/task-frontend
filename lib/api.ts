@@ -1,8 +1,21 @@
-// lib/api.ts or services/auth.ts
 import { clearAuth } from "@/utils/auth";
 
+// Define the base URL once
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+
+/**
+ * Builds a full URL by prepending BASE_URL to relative paths.
+ */
+function buildUrl(endpoint: string): string {
+  if (endpoint.startsWith("http")) return endpoint; // already a full URL
+  return `${BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+}
+
+/**
+ * Login endpoint (used for manual login).
+ */
 export async function loginUser(email: string, password: string) {
-  const res = await fetch("http://127.0.0.1:8000/auth/login", {
+  const res = await fetch(buildUrl("/auth/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,11 +28,42 @@ export async function loginUser(email: string, password: string) {
     throw new Error(error.detail || "Login failed");
   }
 
-  return await res.json(); // { access_token: string, token_type: "bearer" }
+  return await res.json(); // { access_token, token_type }
 }
 
-export async function apiFetch(input: RequestInfo, init?: RequestInit) {
-  const res = await fetch(input, init);
+/**
+ * Signup user (used for manual signup).
+ */
+export async function signupUser(
+  name: string,
+  email: string,
+  password: string,
+  department: string,
+  role: string
+) {
+  const res = await fetch(buildUrl("/auth/signup"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password, department, role }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || "Signup failed");
+  }
+
+  return await res.json(); // { access_token, token_type }
+}
+
+
+/**
+ * Generic API fetch that handles 401, error handling, and base URL prefixing.
+ */
+export async function apiFetch(input: string | Request, init?: RequestInit) {
+  const url = typeof input === "string" ? buildUrl(input) : input;
+  const res = await fetch(url, init);
 
   if (res.status === 401) {
     clearAuth();

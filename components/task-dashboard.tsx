@@ -77,7 +77,7 @@ export function TaskDashboard() {
     try {
       const token = getToken();
 
-      const response = await apiFetch("http://localhost:8000/tasks/all", {
+      const response = await apiFetch("/tasks/all", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -117,7 +117,7 @@ export function TaskDashboard() {
   }
 
   const handleTaskCreated = (newTask: Task) => {
-    toast.success(`${newTask}Task created successfully!`, {
+    toast.success(`"${newTask.title}" Task created successfully!`, {
       icon: <CheckCircle2 className="text-green-600" />,
       style: { color: "green" },
     });
