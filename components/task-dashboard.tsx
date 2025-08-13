@@ -247,9 +247,7 @@ export function TaskDashboard() {
                       <TaskCard
                         key={task.id}
                         task={task}
-                        onTaskUpdate={(updatedTask) => {
-                          setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)))
-                        }}
+                        fetchTasks={fetchTasks}
                       />
                     ))}
                   </div>
@@ -318,13 +316,7 @@ export function TaskDashboard() {
                   <TaskCard
                     key={task.id}
                     task={task}
-                    onTaskUpdate={(updatedTask) => {
-                      setTasks(
-                        tasks.map((t) =>
-                          t.id === updatedTask.id ? updatedTask : t
-                        )
-                      );
-                    }}
+                    fetchTasks={fetchTasks}
                   />
                 ))}
               </div>

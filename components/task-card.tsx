@@ -13,17 +13,12 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
+  List,
+  RefreshCw,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { Task } from "@/types";
 import {
   Dialog,
@@ -34,16 +29,27 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { TaskLogManager } from "./task-logs-creation-form";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import { TaskStatusManager } from "./task-status-update-form";
 
 interface TaskCardProps {
   task: Task;
-  onTaskUpdate: (task: Task) => void;
+  fetchTasks: () => void; // new prop
 }
 
-export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
-  const [isUpdating, setIsUpdating] = useState(false);
+export function TaskCard({ task, fetchTasks }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isChangeStatusOpen, setIsChangeStatusOpen] = useState(false);
   const [isTaskLogOpen, setIsTaskLogOpen] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
 
   const isOverdue =
     new Date(task.due_date) < new Date() &&
@@ -88,19 +94,6 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
     CANCELLED: <X className="h-4 w-4 text-red-500" />,
   };
 
-  const handleStatusChange = async (newStatus: string) => {
-    setIsUpdating(true);
-    const updatedTask = {
-      ...task,
-      status: newStatus as Task["status"],
-      updatedAt: new Date().toISOString(),
-      completedAt:
-        newStatus === "FINISHED" ? new Date().toISOString() : task.completedAt,
-    };
-    onTaskUpdate(updatedTask);
-    setIsUpdating(false);
-  };
-
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -111,227 +104,251 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
   };
 
   return (
-  <Card
-    className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${
-      cardBackgroundColors[task.status]
-    } ${
-      isOverdue
-        ? "border-red-300 bg-red-50/30"
-        : isDueToday
-        ? "border-yellow-300 bg-yellow-50/30"
-        : isDueSoon
-        ? "border-orange-300 bg-orange-50/30"
-        : "border-gray-200"
-    }`}
-  >
-    <CardContent className="p-4 space-y-4">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div className="flex-1 min-w-0">
-          <h3
-            className={`text-base font-semibold ${
-              task.status === "FINISHED"
-                ? "line-through text-gray-500"
-                : "text-gray-900"
-            } ${isExpanded ? "" : "truncate"} cursor-pointer hover:underline`}
-            onClick={() => setIsExpanded((prev) => !prev)}
-          >
-            {task.title}
-          </h3>
-          {task.description && (
-            <p
-              className={`text-sm text-gray-600 mt-1 ${
-                isExpanded ? "" : "line-clamp-1"
-              } cursor-pointer hover:underline`}
+    <Card
+      className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${
+        cardBackgroundColors[task.status]
+      } ${
+        isOverdue
+          ? "border-red-300 bg-red-50/30"
+          : isDueToday
+          ? "border-yellow-300 bg-yellow-50/30"
+          : isDueSoon
+          ? "border-orange-300 bg-orange-50/30"
+          : "border-gray-200"
+      }`}
+    >
+      <CardContent className="p-4 space-y-4">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <div className="flex-1 min-w-0">
+            <h3
+              className={`text-base font-semibold ${
+                task.status === "FINISHED"
+                  ? "line-through text-gray-500"
+                  : "text-gray-900"
+              } ${isExpanded ? "" : "truncate"} cursor-pointer hover:underline`}
               onClick={() => setIsExpanded((prev) => !prev)}
             >
-              {task.description}
-            </p>
-          )}
-        </div>
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className="hover:bg-gray-100 p-1 rounded"
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-          {isOverdue && <AlertTriangle className="h-4 w-4 text-red-500" />}
-          {statusIcons[task.status]}
-          <Badge
-            variant="outline"
-            className={`text-xs font-medium ${statusStyles[task.status]}`}
-          >
-            {task.status.replace("_", " ")}
-          </Badge>
-        </div>
-      </div>
-
-      {/* Tags and Priority */}
-      <div className="flex justify-between items-center flex-wrap gap-y-2">
-        {task.tags?.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <Tag className="h-3 w-3 text-gray-400" />
-            {task.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5"
+              {task.title}
+            </h3>
+            {task.description && (
+              <p
+                className={`text-sm text-gray-600 mt-1 ${
+                  isExpanded ? "" : "line-clamp-1"
+                } cursor-pointer hover:underline`}
+                onClick={() => setIsExpanded((prev) => !prev)}
               >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-        <Badge
-          variant="outline"
-          className={`text-xs font-medium ${priorityColors[task.priority]}`}
-        >
-          {task.priority}
-        </Badge>
-      </div>
-
-      {/* Dates & Assignee */}
-      <div className="flex justify-between items-center text-sm flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src="" />
-            <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
-              {getInitials(task.assignee?.name || `User ${task.assigned_to}`)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-xs text-gray-500">Assigned to</p>
-            <p className="text-sm font-medium text-gray-900">
-              {task.assignee?.name || `User ${task.assigned_to}`}
-            </p>
-            {task.assignee?.role && (
-              <p className="text-xs text-gray-500">
-                {task.assignee.role} • {task.assignee.department}
+                {task.description}
               </p>
             )}
           </div>
-        </div>
-        <div className="text-right">
-          {task.follow_up_date && (
-            <p className="text-xs text-gray-500">
-              Follow-up:{" "}
-              <span className="text-gray-700">
-                {new Date(task.follow_up_date).toLocaleDateString()}
-              </span>
-            </p>
-          )}
-          <p className="text-xs text-gray-500">
-            Due:{" "}
-            <span
-              className={`font-medium ${
-                isOverdue
-                  ? "text-red-600"
-                  : isDueToday
-                  ? "text-yellow-600"
-                  : isDueSoon
-                  ? "text-orange-600"
-                  : "text-gray-700"
-              }`}
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => setIsExpanded((prev) => !prev)}
+              className="hover:bg-gray-100 p-1 rounded"
             >
-              {new Date(task.due_date).toLocaleDateString()}
-            </span>
-          </p>
-        </div>
-      </div>
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+            {isOverdue && <AlertTriangle className="h-4 w-4 text-red-500" />}
+            {statusIcons[task.status]}
 
-      {/* Footer: Creator, Status Select, Add Log */}
-      <div className="flex flex-wrap justify-between items-center gap-4 pt-3 border-t border-gray-200">
-        {/* Creator Info */}
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src="" />
-            <AvatarFallback className="text-xs bg-gray-100 text-gray-700">
-              {getInitials(task.creator?.name || `User ${task.created_by}`)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-xs text-gray-500">Created by</p>
-            <p className="text-xs text-gray-700">
-              {task.creator?.name || `User ${task.created_by}`} •{" "}
-              {new Date(task.created_at).toLocaleDateString()}
+            {/* Current Status + Change Button */}
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                className={`text-xs font-medium ${statusStyles[task.status]}`}
+              >
+                Status: {task.status.replace("_", " ")}
+              </Badge>
+              {/* status change Button */}
+              <div className="flex gap-3">
+                <Dialog
+                  open={isChangeStatusOpen}
+                  onOpenChange={setIsChangeStatusOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="text-xs">
+                      <RefreshCw className="" />
+                      Change Status
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[50vh] min-w-[30vw] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Change Status</DialogTitle>
+                    </DialogHeader>
+                    <TaskStatusManager
+                      currentTaskId={task.id}
+                      currentStatus={task.status}
+                      reloadTasks={fetchTasks}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tags and Priority */}
+        <div className="flex justify-between items-center flex-wrap gap-y-2 w-full">
+          {/* Left: Tags */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {task.tags?.length > 0 && (
+              <>
+                <Tag className="h-3 w-3 text-gray-400" />
+                {task.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* Right: Priority (always fixed at right) */}
+          <Badge
+            variant="outline"
+            className={`text-xs font-medium ${priorityColors[task.priority]}`}
+          >
+            {task.priority}
+          </Badge>
+        </div>
+
+        {/* Dates & Assignee */}
+        <div className="flex justify-between items-center text-sm flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src="" />
+              <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
+                {getInitials(task.assignee?.name || `User ${task.assigned_to}`)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-xs text-gray-500">Assigned to</p>
+              <p className="text-sm font-medium text-gray-900">
+                {task.assignee?.name || `User ${task.assigned_to}`}
+              </p>
+              {task.assignee?.role && (
+                <p className="text-xs text-gray-500">
+                  {task.assignee.role} • {task.assignee.department}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="text-right">
+            {task.follow_up_date && (
+              <p className="text-xs text-gray-500">
+                Follow-up:{" "}
+                <span className="text-gray-700">
+                  {new Date(task.follow_up_date).toLocaleDateString()}
+                </span>
+              </p>
+            )}
+            <p className="text-xs text-gray-500">
+              Due:{" "}
+              <span
+                className={`font-medium ${
+                  isOverdue
+                    ? "text-red-600"
+                    : isDueToday
+                    ? "text-yellow-600"
+                    : isDueSoon
+                    ? "text-orange-600"
+                    : "text-gray-700"
+                }`}
+              >
+                {new Date(task.due_date).toLocaleDateString()}
+              </span>
             </p>
           </div>
         </div>
 
-        {/* Status Update */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">Status:</span>
-          <Select
-            value={task.status}
-            onValueChange={handleStatusChange}
-            disabled={isUpdating}
-          >
-            <SelectTrigger className="w-32 h-8 text-xs">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="NEW">New</SelectItem>
-              <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="FINISHED">Finished</SelectItem>
-              <SelectItem value="STOPPED">Stopped</SelectItem>
-              <SelectItem value="CANCELLED">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Footer: Creator, Status Select, Add Log */}
+        <div className="flex flex-wrap justify-between items-center gap-4 pt-3 border-t border-gray-200">
+          {/* Creator Info */}
+          <div className="flex items-center gap-2">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src="" />
+              <AvatarFallback className="text-xs bg-gray-100 text-gray-700">
+                {getInitials(task.creator?.name || `User ${task.created_by}`)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-xs text-gray-500">Created by</p>
+              <p className="text-xs text-gray-700">
+                {task.creator?.name || `User ${task.created_by}`} •{" "}
+                {new Date(task.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
 
-        {/* Add Log Button */}
-        <Dialog open={isTaskLogOpen} onOpenChange={setIsTaskLogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="text-xs">
-              <Plus className="h-4 w-4 mr-1" />
-              Add Log
+          {/* Add Log Button */}
+          <div className="flex gap-3">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={() => setShowLogs((prev) => !prev)}
+            >
+              <List className="h-4 w-4 mr-1" />
+              {showLogs ? "Hide Logs" : "Show Logs"}
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90vh] min-w-[70vw] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Create New Log</DialogTitle>
-            </DialogHeader>
-            <TaskLogManager currentTaskId={task.id} />
-          </DialogContent>
-        </Dialog>
-      </div>
 
-      {/* Task Logs Section */}
-      {task.logs && task.logs.length > 0 && (
-        <div className="pt-4 border-t border-gray-200">
-          <h4 className="text-sm font-semibold text-gray-700 mb-2">Logs</h4>
-          <ul className="space-y-2">
-            {task.logs.map((log) => (
-              <li
-                key={log.id}
-                className="p-3 rounded-md border border-gray-200 bg-gray-50 text-sm"
-              >
-                <div className="font-medium text-gray-900">{log.title}</div>
-                <p className="text-gray-600">{log.description}</p>
-                <div className="text-xs text-gray-500 mt-1">
-                  <span>
-                    <strong>Start:</strong>{" "}
-                    {new Date(log.startTime).toLocaleString()}
-                  </span>
-                  {" • "}
-                  <span>
-                    <strong>End:</strong>{" "}
-                    {new Date(log.endTime).toLocaleString()}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+            <Dialog open={isTaskLogOpen} onOpenChange={setIsTaskLogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="text-xs">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Log
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] min-w-[70vw] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create New Log</DialogTitle>
+                </DialogHeader>
+                <TaskLogManager currentTaskId={task.id} />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      )}
-    </CardContent>
-  </Card>
-);
 
+        {/* Logs Table */}
+        {showLogs && task.logs && task.logs.length > 0 && (
+          <div className="pt-4">
+            <Table>
+              <TableCaption>A list of your recent logs.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Title</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Start Time</TableHead>
+                  <TableHead>End Time</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {task.logs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell className="">{log.title}</TableCell>
+                    <TableCell className="p-2">{log.description}</TableCell>
+                    <TableCell className="p-2 text-gray-600">
+                      {new Date(log.startTime).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="p-2 text-gray-600">
+                      {new Date(log.endTime).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }

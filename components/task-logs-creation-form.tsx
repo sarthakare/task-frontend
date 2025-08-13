@@ -5,19 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CircleAlert } from "lucide-react";
+import { CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { getToken } from "@/utils/auth";
 import { apiFetch } from "@/lib/api";
 import { LoadingSpinner } from "./loading-spinner";
+import { TaskLog } from "@/types";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Log } from "@/types";
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 
 interface TaskLogCreationFormProps {
   currentTaskId: number;
@@ -31,7 +33,7 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
     endTime: "",
   });
 
-  const [logs, setLogs] = useState<Log[]>([]);
+  const [logs, setLogs] = useState<TaskLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,9 +49,10 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
         setLogs(data);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load logs", {
-          icon: <CircleAlert className="text-red-600" />,
-        });
+        toast.error("Failed to load logs",{
+        icon: <CircleAlert  className="text-red-600" />,
+        style: { color: "red" },
+      });
       } finally {
         setLoading(false);
       }
@@ -84,13 +87,17 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
         throw new Error(errorData.detail || "Failed to add log");
       }
 
-      const newLog: Log = await response.json();
+      const newLog: TaskLog = await response.json();
       setLogs((prev) => [newLog, ...prev]);
       setFormData({ title: "", description: "", startTime: "", endTime: "" });
-      toast.success("Log added successfully");
+      toast.success("Log added successfully", {
+      icon: <CheckCircle2 className="text-green-600" />,
+      style: { color: "green" },
+    });
     } catch {
-      toast.error("Log creation failed. Please try again.", {
-        icon: <CircleAlert className="text-red-600" />,
+      toast.error("Log creation failed. Please try again.",{
+        icon: <CircleAlert  className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setSubmitting(false);
@@ -105,7 +112,9 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
           <h2 className="text-xl font-semibold mb-4">Add New Log</h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="title">Log Title *</Label>
+              <Label htmlFor="title">
+                Log Title <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -132,7 +141,9 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <Label htmlFor="start">Start Time *</Label>
+                <Label htmlFor="start">
+                  Start Time <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="start"
                   type="datetime-local"
@@ -145,7 +156,9 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="end">End Time</Label>
+                <Label htmlFor="end">
+                  End Time<span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="end"
                   type="datetime-local"
@@ -153,6 +166,7 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
                   onChange={(e) =>
                     setFormData({ ...formData, endTime: e.target.value })
                   }
+                  required
                 />
               </div>
             </div>
@@ -174,26 +188,33 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
                 No logs added yet.
               </p>
             ) : (
-              logs.map((log) => (
-                <Card key={log.id}>
-                  <CardHeader>
-                    <CardTitle>{log.title}</CardTitle>
-                    <CardDescription>{log.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-sm text-muted-foreground space-y-1">
-                    <p>
-                      <span className="font-medium text-foreground">Start:</span>{" "}
-                      {new Date(log.startTime).toLocaleString()}
-                    </p>
-                    <p>
-                      <span className="font-medium text-foreground">End:</span>{" "}
-                      {log.endTime
-                        ? new Date(log.endTime).toLocaleString()
-                        : "N/A"}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
+              <Table>
+                <TableCaption>A list of your recent logs.</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Title</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Start Time</TableHead>
+                    <TableHead>End Time</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell>{log.title}</TableCell>
+                      <TableCell className="p-2">{log.description}</TableCell>
+                      <TableCell className="p-2 text-gray-600">
+                        {new Date(log.startTime).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="p-2 text-gray-600">
+                        {log.endTime
+                          ? new Date(log.endTime).toLocaleString()
+                          : "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </div>
         </div>
