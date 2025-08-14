@@ -151,7 +151,7 @@ export function TaskDashboard() {
                     Create Task
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-h-[80vh] min-w-[50vw] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Create New Task</DialogTitle>
                   </DialogHeader>

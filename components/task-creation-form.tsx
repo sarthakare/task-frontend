@@ -38,6 +38,7 @@ export function TaskCreationForm({
     description: "",
     assignedTo: currentUser.id,
     priority: "MEDIUM" as TaskPriority,
+    startDate: "", // 🔹 Added
     dueDate: "",
     followUpDate: "",
     tags: [] as string[],
@@ -58,8 +59,8 @@ export function TaskCreationForm({
         setUsers(usersData);
       } catch (err) {
         console.error("Error fetching users:", err);
-        toast.error("Failed to load users",{
-          icon: <CircleAlert  className="text-red-600" />,
+        toast.error("Failed to load users", {
+          icon: <CircleAlert className="text-red-600" />,
           style: { color: "red" },
         });
       } finally {
@@ -80,6 +81,7 @@ export function TaskCreationForm({
       description: formData.description,
       assigned_to: formData.assignedTo,
       priority: formData.priority,
+      start_date: formData.startDate,
       due_date: formData.dueDate,
       follow_up_date: formData.followUpDate || null,
       tags: formData.tags,
@@ -95,7 +97,7 @@ export function TaskCreationForm({
         },
         body: JSON.stringify(payload),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to create task");
@@ -105,7 +107,7 @@ export function TaskCreationForm({
       onTaskCreated(newTask);
     } catch {
       toast.error("Task creation failed. Please try again.", {
-        icon: <CircleAlert  className="text-red-600" />,
+        icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
     }
@@ -133,7 +135,7 @@ export function TaskCreationForm({
   };
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto p-4">
+    <div className="overflow-y-auto p-4">
       {isLoadingUsers ? (
         <div className="mt-2">
           <LoadingSpinner size={16} message="Loading users..." />
@@ -177,7 +179,11 @@ export function TaskCreationForm({
                 disabled={isLoadingUsers}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={isLoadingUsers ? "Loading users..." : "Select user"} />
+                  <SelectValue
+                    placeholder={
+                      isLoadingUsers ? "Loading users..." : "Select user"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((user) => (
@@ -207,6 +213,19 @@ export function TaskCreationForm({
                   <SelectItem value="CRITICAL">Critical</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Start Date *</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={formData.startDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, startDate: e.target.value })
+                }
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -244,7 +263,9 @@ export function TaskCreationForm({
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add tag..."
                 onKeyPress={(e) =>
-                  e.key === "Enter" && (e.preventDefault(), formData.tags.length < maxTags && addTag())
+                  e.key === "Enter" &&
+                  (e.preventDefault(),
+                  formData.tags.length < maxTags && addTag())
                 }
                 disabled={formData.tags.length >= maxTags}
               />
@@ -273,7 +294,9 @@ export function TaskCreationForm({
               ))}
             </div>
             {formData.tags.length >= maxTags && (
-              <div className="text-xs text-red-500 mt-1">Max 10 tags are allowed.</div>
+              <div className="text-xs text-red-500 mt-1">
+                Max 10 tags are allowed.
+              </div>
             )}
           </div>
 
@@ -282,7 +305,6 @@ export function TaskCreationForm({
           </div>
         </form>
       )}
-
     </div>
   );
 }

@@ -51,6 +51,16 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
   const [isTaskLogOpen, setIsTaskLogOpen] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
 
+  const isStartOverdue =
+    new Date(task.start_date) < new Date() &&
+    !["FINISHED", "CANCELLED", "STOPPED"].includes(task.status);
+  const isStartToday =
+    new Date(task.start_date).toDateString() === new Date().toDateString();
+  const isStartSoon =
+    new Date(task.start_date) > new Date() &&
+    new Date(task.start_date) <=
+      new Date(new Date().setDate(new Date().getDate() + 2));
+
   const isOverdue =
     new Date(task.due_date) < new Date() &&
     !["FINISHED", "CANCELLED", "STOPPED"].includes(task.status);
@@ -243,6 +253,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
             </div>
           </div>
           <div className="text-right">
+            {/* Follow-up Date */}
             {task.follow_up_date && (
               <p className="text-xs text-gray-500">
                 Follow-up:{" "}
@@ -251,6 +262,28 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                 </span>
               </p>
             )}
+
+            {/* Start Date */}
+            {task.start_date && (
+              <p className="text-xs text-gray-500">
+                Start:{" "}
+                <span
+                  className={`font-medium ${
+                    isStartOverdue
+                      ? "text-red-600"
+                      : isStartToday
+                      ? "text-yellow-600"
+                      : isStartSoon
+                      ? "text-orange-600"
+                      : "text-gray-700"
+                  }`}
+                >
+                  {new Date(task.start_date).toLocaleDateString()}
+                </span>
+              </p>
+            )}
+
+            {/* Due Date */}
             <p className="text-xs text-gray-500">
               Due:{" "}
               <span

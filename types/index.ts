@@ -17,8 +17,9 @@ export interface Task {
   observers?: string[]
   status: "NEW" | "IN_PROGRESS" | "PENDING" | "FINISHED" | "STOPPED" | "CANCELLED"
   priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
-  follow_up_date: string
+  start_date: string
   due_date: string
+  follow_up_date: string
   followUpDate?: string
   createdAt: string
   updatedAt?: string

@@ -23,6 +23,7 @@ interface TaskStatusManagerProps {
 }
 
 const STATUS_OPTIONS: Task["status"][] = [
+  "NEW",
   "IN_PROGRESS",
   "PENDING",
   "FINISHED",
@@ -94,7 +95,9 @@ export function TaskStatusManager({
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
-              {STATUS_OPTIONS.map((opt) => (
+              {STATUS_OPTIONS.filter(
+                (opt) => !(opt === "NEW" && currentStatus !== "NEW")
+              ).map((opt) => (
                 <SelectItem key={opt} value={opt}>
                   {opt.replace("_", " ")}
                 </SelectItem>
