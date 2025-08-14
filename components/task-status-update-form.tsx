@@ -23,7 +23,6 @@ interface TaskStatusManagerProps {
 }
 
 const STATUS_OPTIONS: Task["status"][] = [
-  "NEW",
   "IN_PROGRESS",
   "PENDING",
   "FINISHED",
