@@ -46,7 +46,7 @@ export function TaskStatusManager({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!status) return;
+    if (!status || loading) return; // 🔹 Prevent multiple submissions
 
     try {
       setLoading(true);
@@ -68,7 +68,7 @@ export function TaskStatusManager({
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
-      reloadTasks(); // 🔹 Fetch updated data from backend
+      reloadTasks();
     } catch (err) {
       console.error(err);
       toast.error("Status update failed. Please try again.", {
@@ -90,6 +90,7 @@ export function TaskStatusManager({
           <Select
             value={status}
             onValueChange={(v) => setStatus(v as Task["status"])}
+            disabled={loading} // 🔹 Disable select when loading
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select status" />
@@ -106,7 +107,11 @@ export function TaskStatusManager({
           </Select>
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loading} // 🔹 Prevent multiple clicks
+        >
           {loading ? "Updating..." : "Update Status"}
         </Button>
       </form>

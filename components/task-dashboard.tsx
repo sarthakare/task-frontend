@@ -14,7 +14,6 @@ import {
 import { Button } from "./ui/button";
 import {
   AlertTriangle,
-  CheckCircle2,
   CircleAlert,
   Clock,
   FileText,
@@ -56,7 +55,7 @@ interface TaskResponse {
 
 export function TaskDashboard() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [notifications, setNotifications] = useState([]); // Replace with actual notification fetching logic
+  const [notifications, setNotifications] = useState([]);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [metrics, setMetrics] = useState<TaskMetrics>({
@@ -65,6 +64,11 @@ export function TaskDashboard() {
     overdue: 0,
     upcoming: 0,
   });
+
+  // 🔹 Added states for search and filters
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
 
   useEffect(() => {
     const user = getUser();
@@ -97,8 +101,8 @@ export function TaskDashboard() {
       });
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      toast.error("Failed to fetch tasks",{
-        icon: <CircleAlert  className="text-red-600" />,
+      toast.error("Failed to fetch tasks", {
+        icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
     }
@@ -108,6 +112,23 @@ export function TaskDashboard() {
     fetchTasks();
   }, []);
 
+  // 🔹 Filtered tasks list
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch =
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (task.description?.toLowerCase() ?? "").includes(
+        searchTerm.toLowerCase()
+      );
+
+    const matchesStatus =
+      statusFilter === "all" || task.status === statusFilter;
+
+    const matchesPriority =
+      priorityFilter === "all" || task.priority === priorityFilter;
+
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
+
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -116,16 +137,15 @@ export function TaskDashboard() {
     ); // Show loading spinner while fetching user data
   }
 
-  const handleTaskCreated = (newTask: Task) => {
-    toast.success(`"${newTask.title}" Task created successfully!`, {
-      icon: <CheckCircle2 className="text-green-600" />,
-      style: { color: "green" },
-    });
+  const handleTaskCreated = () => {
     setIsCreateTaskOpen(false);
-    fetchTasks(); // Refresh the task list to include the new task
+    fetchTasks();
   };
 
-  const completionRate = metrics.total > 0 ? Math.round((metrics.finished / metrics.total) * 100) : 0;
+  const completionRate =
+    metrics.total > 0
+      ? Math.round((metrics.finished / metrics.total) * 100)
+      : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -243,14 +263,14 @@ export function TaskDashboard() {
                 <CardContent>
                   {tasks.length > 0 ? (
                     <div className="space-y-4">
-                    {tasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        fetchTasks={fetchTasks}
-                      />
-                    ))}
-                  </div>
+                      {tasks.map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          fetchTasks={fetchTasks}
+                        />
+                      ))}
+                    </div>
                   ) : (
                     <div className="text-sm text-gray-500 italic">
                       No tasks yet — create some!
@@ -260,7 +280,7 @@ export function TaskDashboard() {
               </Card>
             </TabsContent>
 
-            {/* tasks */}
+            {/* Tasks */}
             <TabsContent value="tasks">
               <Card className="mb-6">
                 <CardContent className="p-4">
@@ -270,15 +290,17 @@ export function TaskDashboard() {
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
                           placeholder="Search tasks..."
-                          // value={searchTerm}
-                          // onChange={(e) => setSearchTerm(e.target.value)}
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
                           className="pl-10"
                         />
                       </div>
                     </div>
+
+                    {/* Status Filter */}
                     <Select
-                    // value={statusFilter}
-                    // onValueChange={setStatusFilter}
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
                     >
                       <SelectTrigger className="w-full md:w-48">
                         <SelectValue placeholder="Filter by status" />
@@ -291,9 +313,11 @@ export function TaskDashboard() {
                         <SelectItem value="FINISHED">Finished</SelectItem>
                       </SelectContent>
                     </Select>
+
+                    {/* Priority Filter */}
                     <Select
-                    // value={priorityFilter}
-                    // onValueChange={setPriorityFilter}
+                      value={priorityFilter}
+                      onValueChange={setPriorityFilter}
                     >
                       <SelectTrigger className="w-full md:w-48">
                         <SelectValue placeholder="Filter by priority" />
@@ -312,13 +336,19 @@ export function TaskDashboard() {
 
               {/* Task List */}
               <div className="space-y-4">
-                {tasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    fetchTasks={fetchTasks}
-                  />
-                ))}
+                {filteredTasks.length > 0 ? (
+                  filteredTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      fetchTasks={fetchTasks}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 italic">
+                    No tasks match your search or filters.
+                  </p>
+                )}
               </div>
             </TabsContent>
 

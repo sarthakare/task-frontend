@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CircleAlert, X } from "lucide-react";
+import { CheckCircle2, CircleAlert, X } from "lucide-react";
 import type { Task, User } from "@/types";
 import { getToken } from "@/utils/auth";
 import { toast } from "sonner";
@@ -47,6 +47,7 @@ export function TaskCreationForm({
   const [users, setUsers] = useState<User[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const maxTags = 10;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch users that current user can assign tasks to
   useEffect(() => {
@@ -75,6 +76,7 @@ export function TaskCreationForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true); // 🔹 Disable button immediately
 
     const payload = {
       title: formData.title,
@@ -105,11 +107,18 @@ export function TaskCreationForm({
 
       const newTask: Task = await response.json();
       onTaskCreated(newTask);
+
+      toast.success(`"${newTask.title}" Task created successfully!`, {
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
+      });
     } catch {
       toast.error("Task creation failed. Please try again.", {
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
+    } finally {
+      setIsSubmitting(false); // 🔹 Re-enable button
     }
   };
 
@@ -301,7 +310,9 @@ export function TaskCreationForm({
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="submit">Create Task</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Task"}
+            </Button>
           </div>
         </form>
       )}
