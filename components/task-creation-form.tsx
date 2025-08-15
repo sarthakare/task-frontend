@@ -225,10 +225,12 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="startDate">Start Date<span className="text-red-500">*</span></Label>
+              <Label htmlFor="startDate">
+                Start Date<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="startDate"
-                type="date"
+                type="datetime-local"
                 value={formData.startDate}
                 onChange={(e) =>
                   setFormData({ ...formData, startDate: e.target.value })
@@ -238,10 +240,12 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate">Due Date<span className="text-red-500">*</span></Label>
+              <Label htmlFor="dueDate">
+                Due Date<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="dueDate"
-                type="date"
+                type="datetime-local"
                 value={formData.dueDate}
                 onChange={(e) =>
                   setFormData({ ...formData, dueDate: e.target.value })
@@ -254,7 +258,7 @@ export function TaskCreationForm({
               <Label htmlFor="followUpDate">Follow-up Date</Label>
               <Input
                 id="followUpDate"
-                type="date"
+                type="datetime-local"
                 value={formData.followUpDate}
                 onChange={(e) =>
                   setFormData({ ...formData, followUpDate: e.target.value })
@@ -274,7 +278,7 @@ export function TaskCreationForm({
                 onKeyPress={(e) =>
                   e.key === "Enter" &&
                   (e.preventDefault(),
-                  formData.tags.length < maxTags && addTag())
+                    formData.tags.length < maxTags && addTag())
                 }
                 disabled={formData.tags.length >= maxTags}
               />

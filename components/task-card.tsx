@@ -258,7 +258,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
               <p className="text-xs text-gray-500">
                 Follow-up:{" "}
                 <span className="text-gray-700">
-                  {new Date(task.follow_up_date).toLocaleDateString()}
+                  {new Date(task.follow_up_date).toLocaleString()}
                 </span>
               </p>
             )}
@@ -278,7 +278,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                       : "text-gray-700"
                   }`}
                 >
-                  {new Date(task.start_date).toLocaleDateString()}
+                  {new Date(task.start_date).toLocaleString()}
                 </span>
               </p>
             )}
@@ -297,7 +297,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                     : "text-gray-700"
                 }`}
               >
-                {new Date(task.due_date).toLocaleDateString()}
+                {new Date(task.due_date).toLocaleString()}
               </span>
             </p>
           </div>
