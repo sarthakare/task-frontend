@@ -153,7 +153,7 @@ export function TaskCreationForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="title">Task Title *</Label>
+              <Label htmlFor="title">Task Title<span className="text-red-500">*</span></Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -179,7 +179,7 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assignedTo">Assign To *</Label>
+              <Label htmlFor="assignedTo">Assign To<span className="text-red-500">*</span></Label>
               <Select
                 value={formData.assignedTo.toString()}
                 onValueChange={(value) =>
@@ -205,7 +205,7 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
+              <Label htmlFor="priority">Priority<span className="text-red-500">*</span></Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value: TaskPriority) =>
@@ -225,7 +225,7 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="startDate">Start Date *</Label>
+              <Label htmlFor="startDate">Start Date<span className="text-red-500">*</span></Label>
               <Input
                 id="startDate"
                 type="date"
@@ -238,7 +238,7 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate">Due Date *</Label>
+              <Label htmlFor="dueDate">Due Date<span className="text-red-500">*</span></Label>
               <Input
                 id="dueDate"
                 type="date"
