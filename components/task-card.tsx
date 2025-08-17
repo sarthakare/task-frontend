@@ -28,7 +28,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { TaskLogManager } from "./task-logs-creation-form";
+import { TaskLogCreationForm } from "./task-logs-creation-form";
 import {
   Table,
   TableBody,
@@ -42,7 +42,7 @@ import { TaskStatusManager } from "./task-status-update-form";
 
 interface TaskCardProps {
   task: Task;
-  fetchTasks: () => void; // new prop
+  fetchTasks: () => void; 
 }
 
 export function TaskCard({ task, fetchTasks }: TaskCardProps) {
@@ -345,7 +345,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                 <DialogHeader>
                   <DialogTitle>Create New Log</DialogTitle>
                 </DialogHeader>
-                <TaskLogManager currentTaskId={task.id} />
+                <TaskLogCreationForm currentTaskId={task.id} onLogCreated={fetchTasks}/>
               </DialogContent>
             </Dialog>
           </div>

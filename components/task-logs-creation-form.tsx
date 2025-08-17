@@ -20,12 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { DateTimePicker } from "./dateTimePicker";
 
 interface TaskLogCreationFormProps {
   currentTaskId: number;
+  onLogCreated: () => void;
 }
 
-export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
+export function TaskLogCreationForm({ currentTaskId, onLogCreated }: TaskLogCreationFormProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -49,10 +51,10 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
         setLogs(data);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load logs",{
-        icon: <CircleAlert  className="text-red-600" />,
-        style: { color: "red" },
-      });
+        toast.error("Failed to load logs", {
+          icon: <CircleAlert className="text-red-600" />,
+          style: { color: "red" },
+        });
       } finally {
         setLoading(false);
       }
@@ -91,12 +93,13 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
       setLogs((prev) => [newLog, ...prev]);
       setFormData({ title: "", description: "", startTime: "", endTime: "" });
       toast.success("Log added successfully", {
-      icon: <CheckCircle2 className="text-green-600" />,
-      style: { color: "green" },
-    });
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
+      });
+      onLogCreated();
     } catch {
-      toast.error("Log creation failed. Please try again.",{
-        icon: <CircleAlert  className="text-red-600" />,
+      toast.error("Log creation failed. Please try again.", {
+        icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
     } finally {
@@ -139,36 +142,22 @@ export function TaskLogManager({ currentTaskId }: TaskLogCreationFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label htmlFor="start">
-                  Start Time <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="start"
-                  type="datetime-local"
-                  value={formData.startTime}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startTime: e.target.value })
-                  }
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <DateTimePicker
+                label="Start Time"
+                value={formData.startTime}
+                onChange={(val) => setFormData({ ...formData, startTime: val })}
+                required
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="end">
-                  End Time<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="end"
-                  type="datetime-local"
-                  value={formData.endTime}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endTime: e.target.value })
-                  }
-                  required
-                />
-              </div>
+            <div className="space-y-2">
+              <DateTimePicker
+                label="End Time"
+                value={formData.endTime}
+                onChange={(val) => setFormData({ ...formData, endTime: val })}
+                required
+              />
             </div>
 
             <Button type="submit" disabled={submitting} className="w-full">

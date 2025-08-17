@@ -21,6 +21,7 @@ import { getToken } from "@/utils/auth";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { apiFetch } from "@/lib/api";
+import { DateTimePicker } from "./dateTimePicker";
 
 interface TaskCreationFormProps {
   currentUser: User;
@@ -225,44 +226,28 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="startDate">
-                Start Date<span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="startDate"
-                type="datetime-local"
+              <DateTimePicker
+                label="Start Date"
                 value={formData.startDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, startDate: e.target.value })
-                }
+                onChange={(val) => setFormData({ ...formData, startDate: val })}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dueDate">
-                Due Date<span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="dueDate"
-                type="datetime-local"
+              <DateTimePicker
+                label="Due Date"
                 value={formData.dueDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, dueDate: e.target.value })
-                }
+                onChange={(val) => setFormData({ ...formData, dueDate: val })}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="followUpDate">Follow-up Date</Label>
-              <Input
-                id="followUpDate"
-                type="datetime-local"
+              <DateTimePicker
+                label="Follow-up Date"
                 value={formData.followUpDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, followUpDate: e.target.value })
-                }
+                onChange={(val) => setFormData({ ...formData, followUpDate: val })}
               />
             </div>
           </div>
