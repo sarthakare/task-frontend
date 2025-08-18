@@ -42,7 +42,7 @@ import { TaskStatusManager } from "./task-status-update-form";
 
 interface TaskCardProps {
   task: Task;
-  fetchTasks: () => void; 
+  fetchTasks: () => void;
 }
 
 export function TaskCard({ task, fetchTasks }: TaskCardProps) {
@@ -59,7 +59,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
   const isStartSoon =
     new Date(task.start_date) > new Date() &&
     new Date(task.start_date) <=
-      new Date(new Date().setDate(new Date().getDate() + 2));
+    new Date(new Date().setDate(new Date().getDate() + 2));
 
   const isOverdue =
     new Date(task.due_date) < new Date() &&
@@ -115,37 +115,33 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
 
   return (
     <Card
-      className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${
-        cardBackgroundColors[task.status]
-      } ${
-        isOverdue
+      className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${cardBackgroundColors[task.status]
+        } ${isOverdue
           ? "border-red-300 bg-red-50/30"
           : isDueToday
-          ? "border-yellow-300 bg-yellow-50/30"
-          : isDueSoon
-          ? "border-orange-300 bg-orange-50/30"
-          : "border-gray-200"
-      }`}
+            ? "border-yellow-300 bg-yellow-50/30"
+            : isDueSoon
+              ? "border-orange-300 bg-orange-50/30"
+              : "border-gray-200"
+        }`}
     >
       <CardContent className="p-4 space-y-4">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="flex-1 min-w-0">
             <h3
-              className={`text-base font-semibold ${
-                task.status === "FINISHED"
-                  ? "line-through text-gray-500"
-                  : "text-gray-900"
-              } ${isExpanded ? "" : "truncate"} cursor-pointer hover:underline`}
+              className={`text-base font-semibold ${task.status === "FINISHED"
+                ? "line-through text-gray-500"
+                : "text-gray-900"
+                } ${isExpanded ? "" : "truncate"} cursor-pointer hover:underline`}
               onClick={() => setIsExpanded((prev) => !prev)}
             >
               {task.title}
             </h3>
             {task.description && (
               <p
-                className={`text-sm text-gray-600 mt-1 ${
-                  isExpanded ? "" : "line-clamp-1"
-                } cursor-pointer hover:underline`}
+                className={`text-sm text-gray-600 mt-1 ${isExpanded ? "" : "line-clamp-1"
+                  } cursor-pointer hover:underline`}
                 onClick={() => setIsExpanded((prev) => !prev)}
               >
                 {task.description}
@@ -268,15 +264,14 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
               <p className="text-xs text-gray-500">
                 Start:{" "}
                 <span
-                  className={`font-medium ${
-                    isStartOverdue
-                      ? "text-red-600"
-                      : isStartToday
+                  className={`font-medium ${isStartOverdue
+                    ? "text-red-600"
+                    : isStartToday
                       ? "text-yellow-600"
                       : isStartSoon
-                      ? "text-orange-600"
-                      : "text-gray-700"
-                  }`}
+                        ? "text-orange-600"
+                        : "text-gray-700"
+                    }`}
                 >
                   {new Date(task.start_date).toLocaleString()}
                 </span>
@@ -287,15 +282,14 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
             <p className="text-xs text-gray-500">
               Due:{" "}
               <span
-                className={`font-medium ${
-                  isOverdue
-                    ? "text-red-600"
-                    : isDueToday
+                className={`font-medium ${isOverdue
+                  ? "text-red-600"
+                  : isDueToday
                     ? "text-yellow-600"
                     : isDueSoon
-                    ? "text-orange-600"
-                    : "text-gray-700"
-                }`}
+                      ? "text-orange-600"
+                      : "text-gray-700"
+                  }`}
               >
                 {new Date(task.due_date).toLocaleString()}
               </span>
@@ -318,6 +312,10 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
               <p className="text-xs text-gray-700">
                 {task.creator?.name || `User ${task.created_by}`} •{" "}
                 {new Date(task.created_at).toLocaleDateString()}
+              </p>
+              <p className="text-xs text-gray-500">
+                {task.creator.role} •{" "}
+                {task.creator.department}
               </p>
             </div>
           </div>
@@ -345,7 +343,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                 <DialogHeader>
                   <DialogTitle>Create New Log</DialogTitle>
                 </DialogHeader>
-                <TaskLogCreationForm currentTaskId={task.id} onLogCreated={fetchTasks}/>
+                <TaskLogCreationForm currentTaskId={task.id} onLogCreated={fetchTasks} />
               </DialogContent>
             </Dialog>
           </div>
