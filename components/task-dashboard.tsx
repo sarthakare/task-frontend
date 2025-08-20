@@ -4,6 +4,8 @@ import { Task, User } from "@/types";
 import { getToken, getUser } from "@/utils/auth";
 import { useEffect, useState } from "react";
 import { NotificationPanel } from "./notification-panel";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +22,15 @@ import {
   Plus,
   Search,
   TrendingUp,
+  UserCircle,
+  LogOut
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { TaskCreationForm } from "./task-creation-form";
 import { toast } from "sonner";
 import { LoadingSpinner } from "./loading-spinner";
@@ -58,12 +68,19 @@ export function TaskDashboard() {
   const [notifications, setNotifications] = useState([]);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const router = useRouter();
   const [metrics, setMetrics] = useState<TaskMetrics>({
     total: 0,
     finished: 0,
     overdue: 0,
     upcoming: 0,
   });
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    Cookies.remove("user");
+    router.push("/auth/login");
+  };
 
   // 🔹 Added states for search and filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -181,6 +198,19 @@ export function TaskDashboard() {
                   />
                 </DialogContent>
               </Dialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <UserCircle className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span className="text-red-600">Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
