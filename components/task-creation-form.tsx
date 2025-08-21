@@ -47,6 +47,7 @@ export function TaskCreationForm({
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const maxTags = 10;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Fetch users that current user can assign tasks to
   useEffect(() => {
@@ -73,8 +74,89 @@ export function TaskCreationForm({
 
   const token = getToken();
 
+  // validate dates dynamically
+  const validateDates = (data: typeof formData) => {
+    const { startDate, dueDate, followUpDate } = data;
+    const newErrors: Record<string, string> = {};
+
+    if (!startDate) newErrors.startDate = "Start date is required.";
+    if (!dueDate) newErrors.dueDate = "Due date is required.";
+
+    if (!newErrors.startDate && !newErrors.dueDate) {
+      const s = new Date(startDate);
+      const d = new Date(dueDate);
+      if (isNaN(s.getTime()) || isNaN(d.getTime())) {
+        newErrors.dueDate = "Invalid start or due date.";
+      } else if (followUpDate) {
+        const f = new Date(followUpDate);
+        if (isNaN(f.getTime())) {
+          newErrors.followUpDate = "Invalid follow-up date.";
+        } else if (!(s < f && f < d)) {
+          newErrors.followUpDate = "Follow-up date must be after start date and before due date.";
+        }
+      } else {
+        if (!(s < d)) {
+          newErrors.dueDate = "Due date must be after start date.";
+        }
+      }
+    }
+
+    return newErrors;
+  };
+
+  const handleDateChange = (field: "startDate" | "dueDate" | "followUpDate", val: string) => {
+    const updated = { ...formData, [field]: val };
+    setFormData(updated);
+    const errs = validateDates(updated);
+    setErrors(errs);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // clear previous errors
+    setErrors({});
+
+    // client-side validations:
+    // - startDate and dueDate are required
+    // - followUpDate is optional; if provided enforce start < followUp < due
+    const { startDate, dueDate, followUpDate } = formData;
+    const newErrors: Record<string, string> = {};
+
+    if (!startDate) newErrors.startDate = "Start date is required.";
+    if (!dueDate) newErrors.dueDate = "Due date is required.";
+
+    // only proceed with ordering checks if start and due are present
+    if (!newErrors.startDate && !newErrors.dueDate) {
+      const s = new Date(startDate);
+      const d = new Date(dueDate);
+
+      if (isNaN(s.getTime()) || isNaN(d.getTime())) {
+        newErrors.dueDate = "Invalid start or due date.";
+      } else if (followUpDate) {
+        const f = new Date(followUpDate);
+        if (isNaN(f.getTime())) {
+          newErrors.followUpDate = "Invalid follow-up date.";
+        } else if (!(s < f)) {
+          if (!(s < d)) {
+            newErrors.dueDate = "Due date must be after start date.";
+          }
+          newErrors.followUpDate = "Follow-up date must be after start date and before due date.";
+        } else if (!(s < f && f < d)) {
+          newErrors.followUpDate = "Follow-up date must be after start date and before due date.";
+        }
+      } else {
+        // no follow-up provided: ensure start < due
+        if (!(s < d)) {
+          newErrors.dueDate = "Due date must be after start date.";
+        }
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return setIsSubmitting(false);
+    }
+
     setIsSubmitting(true); // 🔹 Disable button immediately
 
     const payload = {
@@ -227,26 +309,35 @@ export function TaskCreationForm({
               <DateTimePicker
                 label="Start Date"
                 value={formData.startDate}
-                onChange={(val) => setFormData({ ...formData, startDate: val })}
+                onChange={(val) => handleDateChange("startDate", val)}
                 required
               />
+              {errors.startDate && (
+                <div className="text-xs text-red-500 mt-1">{errors.startDate}</div>
+              )}
             </div>
 
             <div className="space-y-2">
               <DateTimePicker
                 label="Due Date"
                 value={formData.dueDate}
-                onChange={(val) => setFormData({ ...formData, dueDate: val })}
+                onChange={(val) => handleDateChange("dueDate", val)}
                 required
               />
+              {errors.dueDate && (
+                <div className="text-xs text-red-500 mt-1">{errors.dueDate}</div>
+              )}
             </div>
 
             <div className="space-y-2">
               <DateTimePicker
                 label="Follow-up Date"
                 value={formData.followUpDate}
-                onChange={(val) => setFormData({ ...formData, followUpDate: val })}
+                onChange={(val) => handleDateChange("followUpDate", val)}
               />
+              {errors.followUpDate && (
+                <div className="text-xs text-red-500 mt-1">{errors.followUpDate}</div>
+              )}
             </div>
           </div>
 

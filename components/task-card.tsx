@@ -53,6 +53,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
   const [isTaskLogOpen, setIsTaskLogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
+  const hasLogs = Boolean(task.logs && task.logs.length > 0);
 
   const isStartOverdue =
     new Date(task.start_date) < new Date() &&
@@ -82,12 +83,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
     CANCELLED: "bg-red-50 border-red-200 text-red-700",
   };
 
-  const priorityColors = {
-    LOW: "bg-green-100 text-green-800 border-green-200",
-    MEDIUM: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    HIGH: "bg-orange-100 text-orange-800 border-orange-200",
-    CRITICAL: "bg-red-100 text-red-800 border-red-200",
-  };
+  
 
   const cardBackgroundColors = {
     NEW: "bg-blue-50/50",
@@ -123,7 +119,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
 
   return (
     <Card
-      className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${cardBackgroundColors[task.status]
+      className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${cardBackgroundColors[task.status]}
         } ${isOverdue
           ? "border-red-300 bg-red-50/30"
           : isDueToday
@@ -133,217 +129,145 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
               : "border-gray-200"
         }`}
     >
-      <CardContent className="p-4 space-y-4">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div className="flex-1 min-w-0">
+      <CardContent className="p-6">
+        {/* Top row: Status + Title (status moved above title) */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isOverdue && <AlertTriangle className="h-5 w-5 text-red-500" />}
+              {statusIcons[task.status]}
+              <Badge variant="outline" className={`text-sm font-medium ${statusStyles[task.status]}`}>
+                {task.status.replace("_", " ")}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-sm">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-h-[90vh] min-w-[70vw] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Edit Task</DialogTitle>
+                  </DialogHeader>
+                  <TaskEditForm task={task} onTaskUpdated={handleTaskUpdated} />
+                </DialogContent>
+              </Dialog>
+
+              <button onClick={() => setIsExpanded((prev) => !prev)} className="hover:bg-gray-100 p-1 rounded">
+                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="min-w-0">
             <h3
-              className={`text-base font-semibold ${task.status === "FINISHED"
-                ? "line-through text-gray-500"
-                : "text-gray-900"
-                } ${isExpanded ? "" : "truncate"} cursor-pointer hover:underline`}
+              className={`text-lg md:text-xl font-semibold ${task.status === "FINISHED" ? "line-through text-gray-500" : "text-gray-900"} cursor-pointer hover:underline`}
               onClick={() => setIsExpanded((prev) => !prev)}
             >
               {task.title}
             </h3>
             {task.description && (
-              <p
-                className={`text-sm text-gray-600 mt-1 ${isExpanded ? "" : "line-clamp-1"
-                  } cursor-pointer hover:underline`}
-                onClick={() => setIsExpanded((prev) => !prev)}
-              >
+              <p className={`text-sm text-gray-600 mt-2 ${isExpanded ? "" : "line-clamp-2"}`} onClick={() => setIsExpanded((prev) => !prev)}>
                 {task.description}
               </p>
             )}
-          </div>
-          <div className="flex gap-2 items-center">
-            <button
-              onClick={() => setIsExpanded((prev) => !prev)}
-              className="hover:bg-gray-100 p-1 rounded"
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </button>
-            {isOverdue && <AlertTriangle className="h-4 w-4 text-red-500" />}
-            {statusIcons[task.status]}
-
-            {/* Current Status + Change Button */}
-            <div className="flex items-center gap-2">
-              <Badge
-                variant="outline"
-                className={`text-xs font-medium ${statusStyles[task.status]}`}
-              >
-                Status: {task.status.replace("_", " ")}
-              </Badge>
-              {/* status change Button */}
-              <div className="flex gap-3">
-                <Dialog
-                  open={isChangeStatusOpen}
-                  onOpenChange={setIsChangeStatusOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="text-xs">
-                      <RefreshCw className="" />
-                      Change Status
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-h-[50vh] min-w-[30vw] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Change Status</DialogTitle>
-                    </DialogHeader>
-                    <TaskStatusManager
-                      currentTaskId={task.id}
-                      currentStatus={task.status}
-                      reloadTasks={fetchTasks}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tags and Priority */}
-        <div className="flex justify-between items-center flex-wrap gap-y-2 w-full">
-          {/* Left: Tags */}
-          <div className="flex items-center gap-2 flex-wrap">
+            {/* tags */}
             {task.tags?.length > 0 && (
-              <>
-                <Tag className="h-3 w-3 text-gray-400" />
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <Tag className="h-4 w-4 text-gray-400" />
                 {task.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5"
-                  >
+                  <Badge key={tag} variant="secondary" className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5">
                     {tag}
                   </Badge>
                 ))}
-              </>
+              </div>
             )}
           </div>
-
-          {/* Right: Priority (always fixed at right) */}
-          <Badge
-            variant="outline"
-            className={`text-xs font-medium ${priorityColors[task.priority]}`}
-          >
-            {task.priority}
-          </Badge>
         </div>
 
-        {/* Dates & Assignee */}
-        <div className="flex justify-between items-center text-sm flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
+        {/* Two-column: Assigned to | Created by */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 items-start">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
               <AvatarImage src="" />
-              <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
-                {getInitials(task.assignee?.name || `User ${task.assigned_to}`)}
-              </AvatarFallback>
+              <AvatarFallback className="text-sm bg-blue-100 text-blue-700">{getInitials(task.assignee?.name || `User ${task.assigned_to}`)}</AvatarFallback>
             </Avatar>
             <div>
               <p className="text-xs text-gray-500">Assigned to</p>
-              <p className="text-sm font-medium text-gray-900">
-                {task.assignee?.name || `User ${task.assigned_to}`}
-              </p>
-              {task.assignee?.role && (
-                <p className="text-xs text-gray-500">
-                  {task.assignee.role} • {task.assignee.department}
-                </p>
+              <p className="text-sm font-medium text-gray-900">{task.assignee?.name || `User ${task.assigned_to}`}</p>
+              {task.assignee?.role && <p className="text-xs text-gray-500">{task.assignee.role} • {task.assignee.department}</p>}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 md:justify-end">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src="" />
+              <AvatarFallback className="text-sm bg-gray-100 text-gray-700">{getInitials(task.creator?.name || `User ${task.created_by}`)}</AvatarFallback>
+            </Avatar>
+            <div className="text-right">
+              <p className="text-xs text-gray-500">Created by</p>
+              <p className="text-sm font-medium text-gray-900">{task.creator?.name || `User ${task.created_by}`}</p>
+              <p className="text-xs text-gray-500">{new Date(task.created_at).toLocaleDateString()}</p>
+              {task.creator?.role && (
+                <p className="text-xs text-gray-500">{task.creator.role} • {task.creator.department}</p>
               )}
             </div>
           </div>
-          <div className="text-right">
-            {/* Follow-up Date */}
-            {task.follow_up_date && (
-              <p className="text-xs text-gray-500">
-                Follow-up:{" "}
-                <span className="text-gray-700">
-                  {new Date(task.follow_up_date).toLocaleString()}
-                </span>
-              </p>
-            )}
+        </div>
 
-            {/* Start Date */}
-            {task.start_date && (
-              <p className="text-xs text-gray-500">
-                Start:{" "}
-                <span
-                  className={`font-medium ${isStartOverdue
-                    ? "text-red-600"
-                    : isStartToday
-                      ? "text-yellow-600"
-                      : isStartSoon
-                        ? "text-orange-600"
-                        : "text-gray-700"
-                    }`}
-                >
-                  {new Date(task.start_date).toLocaleString()}
-                </span>
-              </p>
-            )}
-
-            {/* Due Date */}
-            <p className="text-xs text-gray-500">
-              Due:{" "}
-              <span
-                className={`font-medium ${isOverdue
-                  ? "text-red-600"
-                  : isDueToday
-                    ? "text-yellow-600"
-                    : isDueSoon
-                      ? "text-orange-600"
-                      : "text-gray-700"
-                  }`}
-              >
-                {new Date(task.due_date).toLocaleString()}
-              </span>
+        {/* Date summary row */}
+        <div className="flex flex-col md:flex-row gap-3 mt-4">
+          <div className="flex-1 p-3 bg-white/60 rounded-md border border-gray-100">
+            <p className="text-xs text-gray-500">Start Date</p>
+            <p className={`text-sm font-medium ${isStartOverdue ? 'text-red-600' : isStartToday ? 'text-yellow-600' : isStartSoon ? 'text-orange-600' : 'text-gray-800'}`}>
+              {task.start_date ? new Date(task.start_date).toLocaleDateString() : '—'}
             </p>
+          </div>
+          <div className={`flex-1 p-3 rounded-md border ${isOverdue ? 'border-red-300 bg-red-50/40' : 'border-gray-100 bg-white/60'}`}>
+            <p className="text-xs text-gray-500">Due Date</p>
+            <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueToday ? 'text-yellow-600' : isDueSoon ? 'text-orange-600' : 'text-gray-800'}`}>
+              {new Date(task.due_date).toLocaleDateString()}
+            </p>
+          </div>
+          <div className="flex-1 p-3 bg-white/60 rounded-md border border-gray-100">
+            <p className="text-xs text-gray-500">Follow-up</p>
+            <p className="text-sm font-medium text-gray-800">{task.follow_up_date ? new Date(task.follow_up_date).toLocaleDateString() : '—'}</p>
           </div>
         </div>
 
-        {/* Footer: Creator, Status Select, Add Log */}
-        <div className="flex flex-wrap justify-between items-center gap-4 pt-3 border-t border-gray-200">
-          {/* Creator Info */}
-          <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src="" />
-              <AvatarFallback className="text-xs bg-gray-100 text-gray-700">
-                {getInitials(task.creator?.name || `User ${task.created_by}`)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-xs text-gray-500">Created by</p>
-              <p className="text-xs text-gray-700">
-                {task.creator?.name || `User ${task.created_by}`} •{" "}
-                {new Date(task.created_at).toLocaleDateString()}
-              </p>
-              <p className="text-xs text-gray-500">
-                {task.creator.role} •{" "}
-                {task.creator.department}
-              </p>
-            </div>
+        {/* Footer actions */}
+        <div className="flex items-center justify-between gap-4 mt-5">
+          <div>
+            <Button size="sm" variant="ghost" className="text-sm" onClick={() => setShowLogs((prev) => !prev)} disabled={!hasLogs}>
+              <List className="h-4 w-4 mr-2" />
+              {showLogs ? `Hide Logs (${task.logs?.length || 0})` : `View Logs (${task.logs?.length || 0})`}
+            </Button>
           </div>
 
-          {/* Add Log Button */}
-          <div className="flex gap-3">
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs"
-              onClick={() => setShowLogs((prev) => !prev)}
-            >
-              <List className="h-4 w-4 mr-1" />
-              {showLogs ? "Hide Logs" : "Show Logs"}
-            </Button>
+          <div className="flex items-center gap-3">
+            <Dialog open={isChangeStatusOpen} onOpenChange={setIsChangeStatusOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="text-sm">
+                  <RefreshCw className="mr-2" />
+                  Change Status
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[50vh] min-w-[30vw] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Change Status</DialogTitle>
+                </DialogHeader>
+                <TaskStatusManager currentTaskId={task.id} currentStatus={task.status} reloadTasks={fetchTasks} />
+              </DialogContent>
+            </Dialog>
 
             <Dialog open={isTaskLogOpen} onOpenChange={setIsTaskLogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="text-xs">
-                  <Plus className="h-4 w-4 mr-1" />
+                <Button size="sm" className="text-sm bg-purple-600 text-white hover:bg-purple-700">
+                  <Plus className="h-4 w-4 mr-2" />
                   Add Log
                 </Button>
               </DialogTrigger>
@@ -354,26 +278,6 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                 <TaskLogCreationForm currentTaskId={task.id} onLogCreated={fetchTasks} />
               </DialogContent>
             </Dialog>
-
-            {/* Edit Task */}
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-xs">
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-h-[90vh] min-w-[70vw] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Edit Task</DialogTitle>
-                </DialogHeader>
-                <TaskEditForm
-                  task={task}
-                  onTaskUpdated={handleTaskUpdated}
-                />
-              </DialogContent>
-            </Dialog>
-
           </div>
         </div>
 
@@ -395,12 +299,8 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                   <TableRow key={log.id}>
                     <TableCell className="">{log.title}</TableCell>
                     <TableCell className="p-2">{log.description}</TableCell>
-                    <TableCell className="p-2 text-gray-600">
-                      {new Date(log.startTime).toLocaleString()}
-                    </TableCell>
-                    <TableCell className="p-2 text-gray-600">
-                      {new Date(log.endTime).toLocaleString()}
-                    </TableCell>
+                    <TableCell className="p-2 text-gray-600">{new Date(log.startTime).toLocaleString()}</TableCell>
+                    <TableCell className="p-2 text-gray-600">{new Date(log.endTime).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
