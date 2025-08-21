@@ -30,6 +30,9 @@ export interface Task {
   logs: TaskLog[];
 }
 
+export type TaskStatus = 'NEW' | 'IN_PROGRESS' | 'PENDING' | 'FINISHED' | 'STOPPED' | 'CANCELLED';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
 export interface TaskComment {
   id: string
   taskId: string

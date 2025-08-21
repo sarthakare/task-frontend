@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,32 +22,30 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { apiFetch } from "@/lib/api";
 import { DateTimePicker } from "./dateTimePicker";
 
-interface TaskCreationFormProps {
-  currentUser: User;
-  onTaskCreated: () => void;
+interface TaskEditFormProps {
+  task: Task;
+  onTaskUpdated: () => void;
 }
 
-export function TaskCreationForm({
-  currentUser,
-  onTaskCreated,
-}: TaskCreationFormProps) {
+export function TaskEditForm({ task, onTaskUpdated }: TaskEditFormProps) {
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    assignedTo: currentUser.id,
-    priority: "MEDIUM" as TaskPriority,
-    startDate: "", // 🔹 Added
-    dueDate: "",
-    followUpDate: "",
-    tags: [] as string[],
+    title: task.title,
+    description: task.description || "",
+    assignedTo: task.assigned_to || 0,
+    priority: task.priority || "LOW",
+    startDate: task.start_date,
+    dueDate: task.due_date,
+    followUpDate: task.follow_up_date || "",
+    tags: task.tags || [],
   });
+
   const [newTag, setNewTag] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const maxTags = 10;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const maxTags = 10;
 
-  // Fetch users that current user can assign tasks to
+  // 🔹 Fetch users list
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -73,9 +70,10 @@ export function TaskCreationForm({
 
   const token = getToken();
 
+  // 🔹 Update Task handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true); // 🔹 Disable button immediately
+    setIsSubmitting(true);
 
     const payload = {
       title: formData.title,
@@ -89,9 +87,10 @@ export function TaskCreationForm({
     };
 
     try {
-      console.log("Sending payload:", payload);
-      const response = await apiFetch("/tasks/create", {
-        method: "POST",
+      console.log("Updating task with payload:", payload);
+
+      const response = await apiFetch(`/tasks/${task.id}`, {
+        method: "PUT", // ✅ Update endpoint
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -101,26 +100,28 @@ export function TaskCreationForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to create task");
+        throw new Error(errorData.detail || "Failed to update task");
       }
 
-      const newTask: Task = await response.json();
-      onTaskCreated();
+      const updatedTask: Task = await response.json();
+      onTaskUpdated();
 
-      toast.success(`"${newTask.title}" Task created successfully!`, {
+      toast.success(`"${updatedTask.title}" Task updated successfully!`, {
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
-    } catch {
-      toast.error("Task creation failed. Please try again.", {
+    } catch (err) {
+      console.error("Error updating task:", err);
+      toast.error("Task update failed. Please try again.", {
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
     } finally {
-      setIsSubmitting(false); // 🔹 Re-enable button
+      setIsSubmitting(false);
     }
   };
 
+  // 🔹 Tag handlers
   const addTag = () => {
     if (
       newTag.trim() &&
@@ -152,14 +153,15 @@ export function TaskCreationForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2 space-y-2">
-              <Label htmlFor="title">Task Title<span className="text-red-500">*</span></Label>
+              <Label htmlFor="title">
+                Task Title<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                placeholder="Enter task title..."
                 required
               />
             </div>
@@ -172,26 +174,22 @@ export function TaskCreationForm({
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Enter task description..."
                 rows={3}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assignedTo">Assign To<span className="text-red-500">*</span></Label>
+              <Label htmlFor="assignedTo">
+                Assign To<span className="text-red-500">*</span>
+              </Label>
               <Select
                 value={formData.assignedTo.toString()}
                 onValueChange={(value) =>
                   setFormData({ ...formData, assignedTo: parseInt(value) })
                 }
-                disabled={isLoadingUsers}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue
-                    placeholder={
-                      isLoadingUsers ? "Loading users..." : "Select user"
-                    }
-                  />
+                  <SelectValue placeholder="Select user" />
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((user) => (
@@ -204,7 +202,9 @@ export function TaskCreationForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority<span className="text-red-500">*</span></Label>
+              <Label htmlFor="priority">
+                Priority<span className="text-red-500">*</span>
+              </Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value: TaskPriority) =>
@@ -245,7 +245,9 @@ export function TaskCreationForm({
               <DateTimePicker
                 label="Follow-up Date"
                 value={formData.followUpDate}
-                onChange={(val) => setFormData({ ...formData, followUpDate: val })}
+                onChange={(val) =>
+                  setFormData({ ...formData, followUpDate: val })
+                }
               />
             </div>
           </div>
@@ -261,7 +263,7 @@ export function TaskCreationForm({
                 onKeyPress={(e) =>
                   e.key === "Enter" &&
                   (e.preventDefault(),
-                    formData.tags.length < maxTags && addTag())
+                  formData.tags.length < maxTags && addTag())
                 }
                 disabled={formData.tags.length >= maxTags}
               />
@@ -298,7 +300,7 @@ export function TaskCreationForm({
 
           <div className="flex justify-end gap-2">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Task"}
+              {isSubmitting ? "Updating..." : "Update Task"}
             </Button>
           </div>
         </form>

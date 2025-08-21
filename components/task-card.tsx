@@ -16,6 +16,7 @@ import {
   List,
   RefreshCw,
 } from "lucide-react";
+import { Edit } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +30,7 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { TaskLogCreationForm } from "./task-logs-creation-form";
+import { TaskEditForm } from "./task-edit-form";
 import {
   Table,
   TableBody,
@@ -49,6 +51,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isChangeStatusOpen, setIsChangeStatusOpen] = useState(false);
   const [isTaskLogOpen, setIsTaskLogOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
 
   const isStartOverdue =
@@ -111,6 +114,11 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleTaskUpdated = () => {
+    fetchTasks();
+    setIsEditOpen(false);
   };
 
   return (
@@ -346,6 +354,26 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                 <TaskLogCreationForm currentTaskId={task.id} onLogCreated={fetchTasks} />
               </DialogContent>
             </Dialog>
+
+            {/* Edit Task */}
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-xs">
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] min-w-[70vw] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Edit Task</DialogTitle>
+                </DialogHeader>
+                <TaskEditForm
+                  task={task}
+                  onTaskUpdated={handleTaskUpdated}
+                />
+              </DialogContent>
+            </Dialog>
+
           </div>
         </div>
 
