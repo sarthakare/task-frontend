@@ -241,10 +241,7 @@ export default function SignupPage() {
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="team-lead">Team Lead</SelectItem>
-                  <SelectItem value="developer">Developer</SelectItem>
-                  <SelectItem value="designer">Designer</SelectItem>
-                  <SelectItem value="analyst">Analyst</SelectItem>
-                  <SelectItem value="coordinator">Coordinator</SelectItem>
+                  <SelectItem value="coordinator">Member</SelectItem>
                 </SelectContent>
               </Select>
             </div>

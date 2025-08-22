@@ -70,3 +70,14 @@ export interface TaskLog {
   startTime: string;
   endTime: string;
 }
+
+export interface HierarchyUser {
+  id: number
+  name: string
+  email: string
+}
+
+export interface DepartmentHierarchy {
+  department: string
+  roles: Record<string, HierarchyUser[]>
+}

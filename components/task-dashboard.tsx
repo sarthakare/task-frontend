@@ -48,6 +48,7 @@ import {
 import { TaskCard } from "./task-card";
 import { apiFetch } from "@/lib/api";
 import { ReportingDashboard } from "./reporting-dashboard";
+import HierarchyDashboard from "./hierarchy-dashboard";
 
 interface TaskMetrics {
   total: number;
@@ -390,59 +391,7 @@ export function TaskDashboard() {
 
             {/* hierarchy */}
             <TabsContent value="hierarchy">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Team Hierarchy</CardTitle>
-                </CardHeader>
-                {/* <CardContent>
-                  <div className="space-y-4">
-                    {users.map((user) => {
-                      const subordinates = hierarchyManager.getSubordinates(
-                        user.id
-                      );
-                      const userTasks = tasks.filter(
-                        (t) => t.assignedTo === user.id
-                      );
-                      const completedTasks = userTasks.filter(
-                        (t) => t.status === "FINISHED"
-                      );
-
-                      return (
-                        <div
-                          key={user.id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
-                        >
-                          <div className="flex items-center gap-4">
-                            <Avatar>
-                              <AvatarFallback>
-                                {user.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h3 className="font-medium">{user.name}</h3>
-                              <p className="text-sm text-gray-600">
-                                {user.role} - {user.department}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium">
-                              {userTasks.length} tasks ({completedTasks.length}{" "}
-                              completed)
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              {subordinates.length} subordinates
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent> */}
-              </Card>
+              <HierarchyDashboard/>
             </TabsContent>
           </Tabs>
         </div>
