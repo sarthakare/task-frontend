@@ -47,6 +47,7 @@ import {
 } from "./ui/select";
 import { TaskCard } from "./task-card";
 import { apiFetch } from "@/lib/api";
+import { ReportingDashboard } from "./reporting-dashboard";
 
 interface TaskMetrics {
   total: number;
@@ -384,12 +385,7 @@ export function TaskDashboard() {
 
             {/* reports */}
             <TabsContent value="reports">
-              {/* <ReportingDashboard
-                tasks={visibleTasks}
-                users={users}
-                currentUser={currentUser}
-                hierarchyManager={hierarchyManager}
-              /> */}
+              <ReportingDashboard />
             </TabsContent>
 
             {/* hierarchy */}
