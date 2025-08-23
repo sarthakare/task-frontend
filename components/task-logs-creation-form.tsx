@@ -41,6 +41,15 @@ export function TaskLogCreationForm({ currentTaskId, onLogCreated }: TaskLogCrea
 
   const token = getToken();
 
+  // dynamic validation: start must be before end when both provided
+  const timeError = (() => {
+    if (!formData.startTime || !formData.endTime) return "";
+    const s = new Date(formData.startTime);
+    const e = new Date(formData.endTime);
+    if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return "";
+    return s >= e ? "Start time must be before end time" : "";
+  })();
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
@@ -66,6 +75,18 @@ export function TaskLogCreationForm({ currentTaskId, onLogCreated }: TaskLogCrea
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+
+    // Client-side time validation guard
+    const start = formData.startTime ? new Date(formData.startTime) : null;
+    const end = formData.endTime ? new Date(formData.endTime) : null;
+    if (start && end && !(start < end)) {
+      toast.error("Start time must be before end time", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
+      setSubmitting(false);
+      return;
+    }
 
     const payload = {
       title: formData.title,
@@ -158,9 +179,14 @@ export function TaskLogCreationForm({ currentTaskId, onLogCreated }: TaskLogCrea
                 onChange={(val) => setFormData({ ...formData, endTime: val })}
                 required
               />
+              {timeError ? (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-2">
+                  <CircleAlert size={14} /> {timeError}
+                </p>
+              ) : null}
             </div>
 
-            <Button type="submit" disabled={submitting} className="w-full">
+            <Button type="submit" disabled={submitting || !!timeError} className="w-full">
               {submitting ? "Adding..." : "Add Log"}
             </Button>
           </form>

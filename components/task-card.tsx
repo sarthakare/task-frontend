@@ -248,7 +248,7 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
 
         {/* Footer actions */}
         <div className="flex items-center justify-between gap-4 mt-5">
-          <div>
+          <div className="border border-gray-200 rounded-md bg-gray-100">
             <Button size="sm" variant="ghost" className="text-sm" onClick={() => setShowLogs((prev) => !prev)} disabled={!hasLogs}>
               <List className="h-4 w-4 mr-2" />
               {showLogs ? `Hide Logs (${task.logs?.length || 0})` : `View Logs (${task.logs?.length || 0})`}
