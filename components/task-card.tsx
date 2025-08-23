@@ -117,6 +117,13 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
     setIsEditOpen(false);
   };
 
+  const formatDateTime = (dateStr?: string | null) => {
+    if (!dateStr) return '—'
+    const d = new Date(dateStr)
+    if (Number.isNaN(d.getTime())) return '—'
+    return d.toLocaleString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+  }
+
   return (
     <Card
       className={`transition-all duration-300 rounded-lg shadow-sm hover:shadow-md border ${cardBackgroundColors[task.status]}
@@ -208,13 +215,13 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
               <AvatarImage src="" />
               <AvatarFallback className="text-sm bg-gray-100 text-gray-700">{getInitials(task.creator?.name || `User ${task.created_by}`)}</AvatarFallback>
             </Avatar>
-            <div className="text-right">
+            <div className="text-left">
               <p className="text-xs text-gray-500">Created by</p>
               <p className="text-sm font-medium text-gray-900">{task.creator?.name || `User ${task.created_by}`}</p>
-              <p className="text-xs text-gray-500">{new Date(task.created_at).toLocaleDateString()}</p>
               {task.creator?.role && (
                 <p className="text-xs text-gray-500">{task.creator.role} • {task.creator.department}</p>
               )}
+              <p className="text-xs text-gray-500">{formatDateTime(task.created_at)}</p>
             </div>
           </div>
         </div>
@@ -224,18 +231,18 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
           <div className="flex-1 p-3 bg-white/60 rounded-md border border-gray-100">
             <p className="text-xs text-gray-500">Start Date</p>
             <p className={`text-sm font-medium ${isStartOverdue ? 'text-red-600' : isStartToday ? 'text-yellow-600' : isStartSoon ? 'text-orange-600' : 'text-gray-800'}`}>
-              {task.start_date ? new Date(task.start_date).toLocaleDateString() : '—'}
+              {formatDateTime(task.start_date)}
             </p>
           </div>
           <div className={`flex-1 p-3 rounded-md border ${isOverdue ? 'border-red-300 bg-red-50/40' : 'border-gray-100 bg-white/60'}`}>
             <p className="text-xs text-gray-500">Due Date</p>
             <p className={`text-sm font-semibold ${isOverdue ? 'text-red-600' : isDueToday ? 'text-yellow-600' : isDueSoon ? 'text-orange-600' : 'text-gray-800'}`}>
-              {new Date(task.due_date).toLocaleDateString()}
+              {formatDateTime(task.due_date)}
             </p>
           </div>
           <div className="flex-1 p-3 bg-white/60 rounded-md border border-gray-100">
             <p className="text-xs text-gray-500">Follow-up</p>
-            <p className="text-sm font-medium text-gray-800">{task.follow_up_date ? new Date(task.follow_up_date).toLocaleDateString() : '—'}</p>
+            <p className="text-sm font-medium text-gray-800">{formatDateTime(task.follow_up_date)}</p>
           </div>
         </div>
 
@@ -299,8 +306,8 @@ export function TaskCard({ task, fetchTasks }: TaskCardProps) {
                   <TableRow key={log.id}>
                     <TableCell className="">{log.title}</TableCell>
                     <TableCell className="p-2">{log.description}</TableCell>
-                    <TableCell className="p-2 text-gray-600">{new Date(log.startTime).toLocaleString()}</TableCell>
-                    <TableCell className="p-2 text-gray-600">{new Date(log.endTime).toLocaleString()}</TableCell>
+                    <TableCell className="p-2 text-gray-600">{formatDateTime(log.startTime)}</TableCell>
+                    <TableCell className="p-2 text-gray-600">{formatDateTime(log.endTime)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
