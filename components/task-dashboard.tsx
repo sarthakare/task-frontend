@@ -67,7 +67,6 @@ interface TaskResponse {
 
 export function TaskDashboard() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [notifications, setNotifications] = useState([]);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const router = useRouter();
@@ -179,7 +178,7 @@ export function TaskDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <NotificationPanel notifications={notifications} />
+              <NotificationPanel userId={currentUser.id} />
               <Dialog
                 open={isCreateTaskOpen}
                 onOpenChange={setIsCreateTaskOpen}

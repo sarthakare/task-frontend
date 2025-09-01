@@ -42,13 +42,15 @@ export interface TaskComment {
 }
 
 export interface Notification {
-  id: string
-  userId: string
-  taskId: string
-  type: "REMINDER" | "ESCALATION" | "ASSIGNMENT" | "STATUS_CHANGE"
+  id: number
+  user_id: number
+  task_id?: number
+  type: "ASSIGNMENT" | "STATUS_CHANGE" | "REMINDER" | "ESCALATION" | "GENERAL" | "BROADCAST"
+  title: string
   message: string
-  isRead: boolean
-  createdAt: string
+  is_read: boolean
+  created_at: string
+  read_at?: string
 }
 
 export interface Report {
