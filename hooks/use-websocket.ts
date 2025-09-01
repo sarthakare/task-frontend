@@ -2,14 +2,14 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 
 interface WebSocketMessage {
   type: 'notification' | 'connection' | 'broadcast' | 'pong';
-  data?: Record<string, unknown>;
+  data?: any;
   message?: string;
   timestamp: string;
 }
 
 interface UseWebSocketOptions {
   userId: number;
-  onNotification?: (notification: Record<string, unknown>) => void;
+  onNotification?: (notification: any) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
@@ -39,18 +39,13 @@ export function useWebSocket({
     setConnectionStatus('connecting');
     
     try {
-      // Get the backend URL from environment variable (same as API calls) 
-      const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      // Use secure WebSocket in production, regular in development
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       
-      if (!backendUrl) {
-        console.error('❌ NEXT_PUBLIC_API_BASE_URL environment variable is not set');
-        setConnectionStatus('error');
-        return;
-      }
+      // Get the WebSocket host from environment variable or use the current host
+      const wsHost = process.env.NEXT_PUBLIC_WS_HOST || window.location.host;
       
-      // Convert HTTP/HTTPS URL to WebSocket URL
-      const wsUrl = backendUrl.replace(/^https?:\/\//, 'ws://').replace(/^https:\/\//, 'wss://');
-      const ws = new WebSocket(`${wsUrl}/ws/notifications/${userId}`);
+      const ws = new WebSocket(`${protocol}//${wsHost}/ws/notifications/${userId}`);
       
       ws.onopen = () => {
         console.log('🔌 WebSocket connected');
@@ -81,9 +76,7 @@ export function useWebSocket({
           switch (message.type) {
             case 'notification':
               console.log('📨 Received notification:', message.data);
-              if (message.data) {
-                onNotification?.(message.data);
-              }
+              onNotification?.(message.data);
               break;
             case 'connection':
               console.log('🔌 Connection message:', message.message);
@@ -134,7 +127,7 @@ export function useWebSocket({
       console.error('❌ Error creating WebSocket connection:', error);
       setConnectionStatus('error');
     }
-  }, [userId, onConnect, onDisconnect, onError, onNotification]);
+  }, [userId, onConnect, onDisconnect, onError]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -147,10 +140,10 @@ export function useWebSocket({
       pingIntervalRef.current = null;
     }
     
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+    if (wsRef.current) {
       wsRef.current.close(1000, 'User initiated disconnect');
+      wsRef.current = null;
     }
-    wsRef.current = null;
     
     setIsConnected(false);
     setConnectionStatus('disconnected');
@@ -174,7 +167,7 @@ export function useWebSocket({
     return () => {
       disconnect();
     };
-  }, [userId, connect, disconnect]); // Include all dependencies
+  }, [userId]); // Only depend on userId, not on connection state
 
   return {
     isConnected,
