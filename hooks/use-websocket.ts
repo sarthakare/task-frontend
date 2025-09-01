@@ -42,10 +42,14 @@ export function useWebSocket({
       // Use secure WebSocket in production, regular in development
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       
-      // Get the WebSocket host from environment variable or use the current host
-      const wsHost = process.env.NEXT_PUBLIC_WS_HOST || window.location.host;
+      // Get the WebSocket host from the same environment variable as the API
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+      const wsHost = apiBaseUrl.replace(/^https?:\/\//, ''); // Remove http:// or https:// prefix
       
-      const ws = new WebSocket(`${protocol}//${wsHost}/ws/notifications/${userId}`);
+      const wsUrl = `${protocol}//${wsHost}/ws/notifications/${userId}`;
+      console.log('🔌 Attempting WebSocket connection to:', wsUrl);
+      
+      const ws = new WebSocket(wsUrl);
       
       ws.onopen = () => {
         console.log('🔌 WebSocket connected');
