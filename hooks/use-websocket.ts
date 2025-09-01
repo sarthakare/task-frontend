@@ -2,14 +2,14 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 
 interface WebSocketMessage {
   type: 'notification' | 'connection' | 'broadcast' | 'pong';
-  data?: unknown;
+  data?: Record<string, unknown>;
   message?: string;
   timestamp: string;
 }
 
 interface UseWebSocketOptions {
   userId: number;
-  onNotification?: (notification: unknown) => void;
+  onNotification?: (notification: Record<string, unknown>) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
@@ -81,7 +81,9 @@ export function useWebSocket({
           switch (message.type) {
             case 'notification':
               console.log('📨 Received notification:', message.data);
-              onNotification?.(message.data);
+              if (message.data) {
+                onNotification?.(message.data);
+              }
               break;
             case 'connection':
               console.log('🔌 Connection message:', message.message);
