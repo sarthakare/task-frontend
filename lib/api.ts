@@ -1,7 +1,7 @@
 import { clearAuth } from "@/utils/auth";
 
 // Define the base URL once
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ||"http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 /**
  * Builds a full URL by prepending BASE_URL to relative paths.
