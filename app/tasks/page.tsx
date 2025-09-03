@@ -1,9 +1,8 @@
 "use client";
 
 import { Task } from "@/types";
-import { getToken } from "@/utils/auth";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import { CircleAlert, Search } from "lucide-react";
 import { useUser } from "@/components/user-provider";
@@ -34,25 +33,18 @@ export default function TasksPage() {
 
   const fetchTasks = async () => {
     try {
-      const token = getToken();
-
-      const response = await apiFetch("/tasks/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch tasks");
+      const data = await api.tasks.getAllTasks();
+      // Handle both array and object responses
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else {
+        const responseData = data as any;
+        setTasks(responseData.tasks || []);
       }
-
-      const data: TaskResponse = await response.json();
-      setTasks(data.tasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       toast.error("Failed to fetch tasks", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
+        description: api.utils.handleError(error),
       });
     }
   };

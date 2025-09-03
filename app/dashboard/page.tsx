@@ -1,11 +1,9 @@
 "use client";
 
 import { Task, User } from "@/types";
-import { getToken } from "@/utils/auth";
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { api } from "@/lib/api-service";
 import { toast } from "sonner";
-import { CircleAlert } from "lucide-react";
 import { useUser } from "@/components/user-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -44,31 +42,30 @@ export default function DashboardPage() {
 
   const fetchTasks = async () => {
     try {
-      const token = getToken();
-
-      const response = await apiFetch("/tasks/all", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch tasks");
+      const data = await api.tasks.getAllTasks();
+      // Handle both array and object responses
+      if (Array.isArray(data)) {
+        setTasks(data);
+        setMetrics({
+          total: data.length,
+          finished: data.filter(task => task.status === 'completed').length,
+          overdue: data.filter(task => task.status === 'overdue').length,
+          upcoming: data.filter(task => task.status === 'pending').length,
+        });
+      } else {
+        const responseData = data as any;
+        setTasks(responseData.tasks || []);
+        setMetrics({
+          total: responseData.total || 0,
+          finished: responseData.finished || 0,
+          overdue: responseData.overdue || 0,
+          upcoming: responseData.upcoming || 0,
+        });
       }
-
-      const data: TaskResponse = await response.json();
-      setTasks(data.tasks);
-      setMetrics({
-        total: data.total,
-        finished: data.finished,
-        overdue: data.overdue,
-        upcoming: data.upcoming,
-      });
     } catch (error) {
       console.error("Error fetching tasks:", error);
       toast.error("Failed to fetch tasks", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
+        description: api.utils.handleError(error),
       });
     }
   };

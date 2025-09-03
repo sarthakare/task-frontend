@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Progress } from "@/components/ui/progress";
 import { Plus, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api-service";
 
 interface Supervisor {
   id: number;
@@ -20,9 +21,8 @@ interface Supervisor {
 
 interface UserCreateFormProps {
   trigger?: React.ReactNode;
+  onUserCreated?: () => void;
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // Password strength checker
 const checkPasswordStrength = (password: string) => {
@@ -61,7 +61,7 @@ const checkPasswordStrength = (password: string) => {
   return { score, strength, color, feedback, percentage: (score / 5) * 100 };
 };
 
-export function UserCreateForm({ trigger }: UserCreateFormProps) {
+export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -100,11 +100,7 @@ export function UserCreateForm({ trigger }: UserCreateFormProps) {
   const fetchSupervisors = async () => {
     setIsLoadingSupervisors(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch users: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await api.users.getAllUsers();
       setSupervisors(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -118,11 +114,7 @@ export function UserCreateForm({ trigger }: UserCreateFormProps) {
   const fetchDepartments = async () => {
     setIsLoadingDepartments(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/departments/`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch departments: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await api.users.getDepartments();
       setDepartments(data);
     } catch (error) {
       console.error('Error fetching departments:', error);
@@ -136,11 +128,7 @@ export function UserCreateForm({ trigger }: UserCreateFormProps) {
   const fetchRoles = async () => {
     setIsLoadingRoles(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/roles/`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch roles: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await api.users.getRoles();
       setRoles(data);
     } catch (error) {
       console.error('Error fetching roles:', error);
@@ -234,20 +222,7 @@ export function UserCreateForm({ trigger }: UserCreateFormProps) {
         supervisor_id: formData.supervisor ? parseInt(formData.supervisor) : null
       };
 
-      const response = await fetch(`${API_BASE_URL}/users/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create user');
-      }
-
-      const createdUser = await response.json();
+      const createdUser = await api.users.createUser(userData);
       console.log('User created successfully:', createdUser);
       
       // Reset form and close dialog
@@ -259,6 +234,11 @@ export function UserCreateForm({ trigger }: UserCreateFormProps) {
         description: `${formData.name} has been added to the system.`,
         duration: 4000,
       });
+      
+      // Call callback to refresh parent component
+      if (onUserCreated) {
+        onUserCreated();
+      }
       
     } catch (error) {
       console.error('Error creating user:', error);
