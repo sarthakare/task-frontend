@@ -5,8 +5,13 @@ interface User {
   id: number;
   name: string;
   email: string;
+  mobile?: string;
   role: string;
   department: string;
+  supervisor_id?: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
 }
 
 interface AuthPayload {

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/auth/login", "/auth/signup"];
+const PUBLIC_ROUTES = ["/auth/login"];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -18,7 +18,7 @@ export function middleware(request: NextRequest) {
   }
 
   // ✅ Prevent logged-in users from seeing login page again
-  if (token && (pathname === "/auth/login" || pathname === "/auth/signup")) {
+  if (token && pathname === "/auth/login") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

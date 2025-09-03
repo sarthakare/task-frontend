@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,7 +59,8 @@ export default function LoginPage() {
       const data = await loginUser(email, password); // response includes token + user
       saveAuth(data, rememberMe);
 
-      toast.success("Login successful", {
+      toast.success(`Welcome back, ${data.user.name}!`, {
+        description: `Role: ${data.user.role} | Department: ${data.user.department}`,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -146,26 +147,18 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) =>
-                    setRememberMe(checked as boolean)
-                  }
-                  disabled={isLoading}
-                />
-                <Label htmlFor="remember" className="text-sm">
-                  Remember me
-                </Label>
-              </div>
-              <Link
-                href="/auth/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
-              >
-                Forgot password?
-              </Link>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={(checked) =>
+                  setRememberMe(checked as boolean)
+                }
+                disabled={isLoading}
+              />
+              <Label htmlFor="remember" className="text-sm">
+                Remember me
+              </Label>
             </div>
           </CardContent>
 
@@ -181,15 +174,7 @@ export default function LoginPage() {
               )}
             </Button>
 
-            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/signup"
-                className="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium"
-              >
-                Sign up
-              </Link>
-            </p>
+
           </CardFooter>
         </form>
       </Card>

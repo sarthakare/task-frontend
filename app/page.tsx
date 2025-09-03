@@ -1,25 +1,19 @@
-"use client"
-import { TaskDashboard } from "@/components/task-dashboard"
+"use client";
 
-interface Task {
-  id: string
-  title: string
-  description: string
-  completed: boolean
-  priority: "low" | "medium" | "high"
-  category: string
-  dueDate: string
-  createdAt: string
-}
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-const priorityColors = {
-  low: "bg-green-100 text-green-800 border-green-200",
-  medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  high: "bg-red-100 text-red-800 border-red-200",
-}
+export default function HomePage() {
+  const router = useRouter();
 
-const categories = ["Personal", "Work", "Shopping", "Health", "Learning"]
+  useEffect(() => {
+    // Redirect to dashboard by default
+    router.push("/dashboard");
+  }, [router]);
 
-export default function Home() {
-  return <TaskDashboard />
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+  );
 }

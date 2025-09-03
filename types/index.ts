@@ -2,8 +2,13 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  mobile?: string;
   role: string;
   department: string;
+  supervisor_id?: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Task {
@@ -41,17 +46,7 @@ export interface TaskComment {
   createdAt: string
 }
 
-export interface Notification {
-  id: number
-  user_id: number
-  task_id?: number
-  type: "ASSIGNMENT" | "STATUS_CHANGE" | "REMINDER" | "ESCALATION" | "GENERAL" | "BROADCAST"
-  title: string
-  message: string
-  is_read: boolean
-  created_at: string
-  read_at?: string
-}
+
 
 export interface Report {
   userId: string
