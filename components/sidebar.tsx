@@ -1,5 +1,6 @@
 "use client";
-
+import { useEffect } from "react";
+import { useUser } from "./user-provider";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,6 @@ import {
   UserCircle,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import { useUser } from "./user-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,7 +87,14 @@ export function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { currentUser, logout } = useUser();
+  const { currentUser, logout, refreshUser, isLoading } = useUser();
+  
+  // Refresh user data when sidebar loads
+  useEffect(() => {
+    if (!currentUser && !isLoading) {
+      refreshUser();
+    }
+  }, [currentUser, isLoading, refreshUser]);
   
   // Determine active menu based on current path
   const getActiveMenu = () => {
@@ -186,41 +193,51 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Footer */}
       <div className="border-t p-4">
-        {!isCollapsed && currentUser ? (
+        {!isCollapsed && (
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-medium text-sm">
-                  {currentUser.name?.charAt(0) || "U"}
-                </span>
+            {isLoading ? (
+              <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
+                <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                <div className="flex-1 min-w-0">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {currentUser.name}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {currentUser.role}
-                </p>
+            ) : currentUser ? (
+              <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-medium text-sm">
+                    {currentUser.name?.charAt(0) || "U"}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {currentUser.role}
+                  </p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <UserCircle className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      <span className="text-red-600">Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                    <UserCircle className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    <span className="text-red-600">Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        ) : (
-          <div className="text-xs text-gray-500">
-            <p>Task Manager v1.0</p>
-            <p className="mt-1">© 2024 All rights reserved</p>
+            ) : (
+              <div className="text-xs text-gray-500">
+                <p>Task Manager v1.0</p>
+                <p className="mt-1">© 2024 All rights reserved</p>
+              </div>
+            )}
           </div>
         )}
       </div>

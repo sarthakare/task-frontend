@@ -37,6 +37,12 @@ export function saveAuth({ access_token, user }: AuthPayload, rememberMe: boolea
   if (rememberMe) {
     localStorage.setItem("rememberMe", "true");
   }
+
+  // Trigger auth change event for real-time updates
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('authChange', Date.now().toString());
+    localStorage.removeItem('authChange');
+  }
 }
 
 export function getToken(): string | undefined {

@@ -10,6 +10,7 @@ interface UserContextType {
   setCurrentUser: (user: User | null) => void;
   isLoading: boolean;
   logout: () => void;
+  refreshUser: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -19,19 +20,70 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
+  const loadUser = () => {
     const user = getUser();
-    if (user) {
+    const token = getToken();
+    
+    // Only set user if token exists
+    if (token && user) {
       setCurrentUser(user);
+    } else {
+      setCurrentUser(null);
     }
     setIsLoading(false);
-  }, []);
+  };
+
+  const refreshUser = () => {
+    setIsLoading(true);
+    loadUser();
+  };
+
+  useEffect(() => {
+    loadUser();
+
+    // Listen for storage changes (when user logs in/out from another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'authChange' || e.key === null) {
+        loadUser();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []); // Empty dependency array - only run once on mount
+
+  // Separate effect for periodic auth checking to avoid dependency issues
+  useEffect(() => {
+    const checkAuthInterval = setInterval(() => {
+      const user = getUser();
+      const token = getToken();
+      
+      // If token/user state doesn't match current state, refresh
+      if ((!token || !user) && currentUser) {
+        setCurrentUser(null);
+      } else if (token && user && !currentUser) {
+        setCurrentUser(user);
+      }
+    }, 1000); // Check every second
+
+    return () => {
+      clearInterval(checkAuthInterval);
+    };
+  }, [currentUser]); // Only depend on currentUser for the polling check
 
   const logout = () => {
     setCurrentUser(null);
     // Clear cookies and redirect to login
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
+    // Trigger storage event for other tabs
+    localStorage.setItem('authChange', Date.now().toString());
+    localStorage.removeItem('authChange');
+    
     router.push("/auth/login");
   };
 
@@ -40,6 +92,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setCurrentUser,
     isLoading,
     logout,
+    refreshUser,
   };
 
   return (

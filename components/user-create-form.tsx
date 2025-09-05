@@ -46,7 +46,7 @@ const checkPasswordStrength = (password: string) => {
 
   let strength = "weak";
   let color = "bg-red-500";
-  
+
   if (score >= 4) {
     strength = "strong";
     color = "bg-green-500";
@@ -118,8 +118,6 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       setDepartments(data);
     } catch (error) {
       console.error('Error fetching departments:', error);
-      // Fallback to default departments if API fails
-      setDepartments(['engineering', 'marketing', 'sales', 'hr', 'finance', 'operations', 'it']);
     } finally {
       setIsLoadingDepartments(false);
     }
@@ -132,8 +130,6 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       setRoles(data);
     } catch (error) {
       console.error('Error fetching roles:', error);
-      // Fallback to default roles if API fails
-      setRoles(['admin', 'manager', 'supervisor', 'team_lead', 'member', 'intern']);
     } finally {
       setIsLoadingRoles(false);
     }
@@ -144,7 +140,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -203,13 +199,13 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Prepare data for API (convert supervisor string to number)
       const userData = {
@@ -219,32 +215,32 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
         password: formData.password,
         department: formData.department,
         role: formData.role,
-        supervisor_id: formData.supervisor ? parseInt(formData.supervisor) : null
+        supervisor_id: formData.supervisor ? parseInt(formData.supervisor) : undefined
       };
 
       const createdUser = await api.users.createUser(userData);
       console.log('User created successfully:', createdUser);
-      
+
       // Reset form and close dialog
       resetForm();
       setIsCreateDialogOpen(false);
-      
+
       // Show success toast
       toast.success('User created successfully!', {
         description: `${formData.name} has been added to the system.`,
         duration: 4000,
       });
-      
+
       // Call callback to refresh parent component
       if (onUserCreated) {
         onUserCreated();
       }
-      
+
     } catch (error) {
       console.error('Error creating user:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create user';
       setErrors({ submit: errorMessage });
-      
+
       // Show error toast
       toast.error('Failed to create user', {
         description: errorMessage,
@@ -287,10 +283,10 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
         <DialogHeader className="pb-4 border-b">
           <DialogTitle className="text-xl font-semibold text-gray-900">Create New User</DialogTitle>
         </DialogHeader>
-        
+
         <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
           <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
                 <Input
@@ -305,7 +301,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                   {errors.name}
                 </p>}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
                 <Input
@@ -321,7 +317,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                   {errors.email}
                 </p>}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">Mobile Number</Label>
                 <Input
@@ -339,7 +335,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department</Label>
                 <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
@@ -381,7 +377,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="supervisor" className="text-sm font-medium text-gray-700">Supervisor/Manager</Label>
+              <Label htmlFor="supervisor" className="text-sm font-medium text-gray-700">Supervisor</Label>
               <Select value={formData.supervisor} onValueChange={(value) => handleInputChange('supervisor', value)}>
                 <SelectTrigger className={`transition-colors ${errors.supervisor ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                   <SelectValue placeholder={isLoadingSupervisors ? "Loading..." : "Select supervisor/manager"} />
@@ -389,9 +385,8 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                 <SelectContent>
                   {supervisors.map((supervisor) => (
                     <SelectItem key={supervisor.id} value={supervisor.id.toString()}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{supervisor.name}</span>
-                        <span className="text-sm text-gray-500">{supervisor.role} • {supervisor.department}</span>
+                      <div className="flex">
+                        <span className="font-medium">{supervisor.name} <span className="text-sm text-gray-500">({supervisor.role} • {supervisor.department})</span> </span>
                       </div>
                     </SelectItem>
                   ))}
@@ -428,17 +423,16 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-                
+
                 {/* Password Strength Meter */}
                 {formData.password && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">Password strength:</span>
-                      <span className={`font-medium ${
-                        passwordStrength.strength === 'strong' ? 'text-green-600' :
-                        passwordStrength.strength === 'medium' ? 'text-yellow-600' :
-                        passwordStrength.strength === 'fair' ? 'text-orange-600' : 'text-red-600'
-                      }`}>
+                      <span className={`font-medium ${passwordStrength.strength === 'strong' ? 'text-green-600' :
+                          passwordStrength.strength === 'medium' ? 'text-yellow-600' :
+                            passwordStrength.strength === 'fair' ? 'text-orange-600' : 'text-red-600'
+                        }`}>
                         {passwordStrength.strength.charAt(0).toUpperCase() + passwordStrength.strength.slice(1)}
                       </span>
                     </div>
@@ -452,7 +446,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     </div>
                   </div>
                 )}
-                
+
                 {errors.password && <p className="text-sm text-red-500 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.password}
@@ -478,12 +472,11 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
-                
+
                 {/* Password Match Indicator */}
                 {formData.confirmPassword && (
-                  <div className={`flex items-center gap-2 text-sm ${
-                    passwordsMatch ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <div className={`flex items-center gap-2 text-sm ${passwordsMatch ? 'text-green-600' : 'text-red-600'
+                    }`}>
                     {passwordsMatch ? (
                       <>
                         <CheckCircle className="h-4 w-4" />
@@ -497,7 +490,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     )}
                   </div>
                 )}
-                
+
                 {errors.confirmPassword && <p className="text-sm text-red-500 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.confirmPassword}
@@ -527,8 +520,8 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSubmitting || !passwordsMatch}
                 className="px-6 bg-blue-600 hover:bg-blue-700"
               >

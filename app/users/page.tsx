@@ -56,8 +56,9 @@ interface User {
 interface UserStats {
   total_users: number;
   active_users: number;
-  role_counts: Record<string, number>;
-  department_counts: Record<string, number>;
+  inactive_users: number;
+  users_by_department: Record<string, number>;
+  users_by_role: Record<string, number>;
 }
 
 export default function UsersPage() {
@@ -256,7 +257,7 @@ export default function UsersPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.role_counts?.manager || 0}</div>
+                <div className="text-2xl font-bold">{stats?.users_by_role?.manager || 0}</div>
                 <p className="text-xs text-muted-foreground">Team managers</p>
               </>
             )}
@@ -275,7 +276,7 @@ export default function UsersPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.role_counts?.team_lead || 0}</div>
+                <div className="text-2xl font-bold">{stats?.users_by_role?.team_lead || 0}</div>
                 <p className="text-xs text-muted-foreground">Team leaders</p>
               </>
             )}
@@ -437,10 +438,45 @@ function EditUserForm({ user, onSubmit, onCancel, isSubmitting }: EditUserFormPr
     role: user.role,
   });
 
+  const [roles, setRoles] = useState<string[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [isLoadingDepartments, setIsLoadingDepartments] = useState(false);
+
+  const fetchDepartments = async () => {
+
+    setIsLoadingDepartments(true);
+    try {
+      const data = await api.users.getDepartments();
+      setDepartments(data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    } finally {
+      setIsLoadingDepartments(false);
+    }
+  };
+
+  const fetchRoles = async () => {
+    setIsLoadingRoles(true);
+    try {
+      const data = await api.users.getRoles();
+      setRoles(data);
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    } finally {
+      setIsLoadingRoles(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoles();
+    fetchDepartments();
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
-  };
+  };  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -479,41 +515,51 @@ function EditUserForm({ user, onSubmit, onCancel, isSubmitting }: EditUserFormPr
             placeholder="Enter mobile number"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="edit-department">Department</Label>
-          <Select value={formData.department} onValueChange={(value) => setFormData(prev => ({ ...prev, department: value }))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select department" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="engineering">Engineering</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="sales">Sales</SelectItem>
-              <SelectItem value="hr">Human Resources</SelectItem>
-              <SelectItem value="finance">Finance</SelectItem>
-              <SelectItem value="operations">Operations</SelectItem>
-              <SelectItem value="design">Design</SelectItem>
-              <SelectItem value="product">Product</SelectItem>
-              <SelectItem value="support">Customer Support</SelectItem>
-              <SelectItem value="legal">Legal</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+                 <div className="space-y-2">
+           <Label htmlFor="edit-department">Department</Label>
+           {isLoadingDepartments ? (
+             <div className="flex items-center gap-2 p-2 border rounded-md bg-gray-50">
+               <Loader2 className="h-4 w-4 animate-spin" />
+               <span className="text-sm text-muted-foreground">Loading departments...</span>
+             </div>
+           ) : (
+             <Select value={formData.department} onValueChange={(value) => setFormData(prev => ({ ...prev, department: value }))}>
+               <SelectTrigger>
+                 <SelectValue placeholder="Select department" />
+               </SelectTrigger>
+               <SelectContent>
+                 {departments.map((dept: string) => (
+                   <SelectItem key={dept} value={dept}>
+                     {dept.charAt(0).toUpperCase() + dept.slice(1).replace('_', ' ')}
+                   </SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+           )}
+         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="edit-role">Role</Label>
-        <Select value={formData.role} onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="team_lead">Team Lead</SelectItem>
-            <SelectItem value="member">Member</SelectItem>
-            <SelectItem value="intern">Intern</SelectItem>
-          </SelectContent>
-        </Select>
+             <div className="space-y-2">
+         <Label htmlFor="edit-role">Role</Label>
+         {isLoadingRoles ? (
+           <div className="flex items-center gap-2 p-2 border rounded-md bg-gray-50">
+             <Loader2 className="h-4 w-4 animate-spin" />
+             <span className="text-sm text-muted-foreground">Loading roles...</span>
+           </div>
+         ) : (
+           <Select value={formData.role} onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}>
+             <SelectTrigger>
+               <SelectValue placeholder="Select role" />
+             </SelectTrigger>
+             <SelectContent>
+               {roles.map((role: string) => (
+                 <SelectItem key={role} value={role}>
+                   {role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' ')}
+                 </SelectItem>
+               ))}
+             </SelectContent>
+           </Select>
+         )}
         
         {/* Role change warning */}
         {formData.role !== user.role && (

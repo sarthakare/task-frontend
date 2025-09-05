@@ -38,7 +38,7 @@ export default function TasksPage() {
       if (Array.isArray(data)) {
         setTasks(data);
       } else {
-        const responseData = data as any;
+        const responseData = data as TaskResponse;
         setTasks(responseData.tasks || []);
       }
     } catch (error) {

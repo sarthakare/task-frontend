@@ -20,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
-import { loginUser } from "@/lib/api";
+import { loginUser } from "@/lib/api-service";
 import { saveAuth } from "@/utils/auth";
 
 export default function LoginPage() {

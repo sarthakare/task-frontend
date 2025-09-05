@@ -2,6 +2,34 @@
 // Comprehensive centralized API service for all backend endpoints
 
 import { clearAuth } from "@/utils/auth";
+import type { 
+  User, 
+  UserCreate, 
+  UserUpdate, 
+  UserLogin, 
+  SupervisorList, 
+  TokenResponse, 
+  UserStats,
+  Task,
+  TaskCreate,
+  TaskUpdate,
+  Project,
+  ProjectCreate,
+  ProjectUpdate,
+  Team,
+  TeamCreate,
+  TeamUpdate,
+  Reminder,
+  ReminderCreate,
+  ReminderUpdate,
+  ReportParams,
+  DashboardOverview,
+  Activity,
+  UserPerformance,
+  TeamPerformance,
+  ProjectProgress,
+  SystemStats
+} from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -63,22 +91,22 @@ export async function apiFetch(input: string | Request, init?: RequestInit) {
 // User Management API
 export const userAPI = {
   // Get all users
-  getAllUsers: () => apiRequest<any[]>('/users/'),
+  getAllUsers: () => apiRequest<User[]>('/users/'),
   
   // Get active users only
-  getActiveUsers: () => apiRequest<any[]>('/users/active'),
+  getActiveUsers: () => apiRequest<User[]>('/users/active'),
   
   // Get specific user by ID
-  getUser: (id: number) => apiRequest<any>(`/users/${id}`),
+  getUser: (id: number) => apiRequest<User>(`/users/${id}`),
   
   // Create new user
-  createUser: (userData: any) => apiRequest<any>('/users/', {
+  createUser: (userData: UserCreate) => apiRequest<User>('/users/', {
     method: 'POST',
     body: JSON.stringify(userData),
   }),
   
   // Update user
-  updateUser: (id: number, userData: any) => apiRequest<any>(`/users/${id}`, {
+  updateUser: (id: number, userData: UserUpdate) => apiRequest<User>(`/users/${id}`, {
     method: 'PUT',
     body: JSON.stringify(userData),
   }),
@@ -89,7 +117,7 @@ export const userAPI = {
   }),
   
   // Get supervisors list
-  getSupervisors: () => apiRequest<any[]>('/users/supervisors/'),
+  getSupervisors: () => apiRequest<SupervisorList[]>('/users/supervisors/'),
   
   // Get departments list
   getDepartments: () => apiRequest<string[]>('/users/departments/'),
@@ -98,27 +126,27 @@ export const userAPI = {
   getRoles: () => apiRequest<string[]>('/users/roles/'),
   
   // Get user statistics
-  getUserStats: () => apiRequest<any>('/users/stats/'),
+  getUserStats: () => apiRequest<UserStats>('/users/stats/'),
 };
 
 // Authentication API
 export const authAPI = {
   // User login
-  login: (credentials: { email: string; password: string }) => 
-    apiRequest<any>('/auth/login', {
+  login: (credentials: UserLogin) => 
+    apiRequest<TokenResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     }),
   
   // User registration
-  register: (userData: any) => 
-    apiRequest<any>('/auth/register', {
+  register: (userData: UserCreate) => 
+    apiRequest<TokenResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
   
   // Manual login (from original api.ts)
-  loginUser: async (email: string, password: string) => {
+  loginUser: async (email: string, password: string): Promise<TokenResponse> => {
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
@@ -132,7 +160,7 @@ export const authAPI = {
       throw new Error(error.detail || "Login failed");
     }
 
-    return await res.json(); // { access_token, token_type }
+    return await res.json(); // { access_token, token_type, user }
   },
   
   // Manual signup (from original api.ts)
@@ -142,7 +170,7 @@ export const authAPI = {
     password: string,
     department: string,
     role: string
-  ) => {
+  ): Promise<TokenResponse> => {
     const res = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: "POST",
       headers: {
@@ -156,12 +184,12 @@ export const authAPI = {
       throw new Error(error.detail || "Signup failed");
     }
 
-    return await res.json(); // { access_token, token_type }
+    return await res.json(); // { access_token, token_type, user }
   },
   
   // Refresh token
   refreshToken: (refreshToken: string) => 
-    apiRequest<any>('/auth/refresh', {
+    apiRequest<TokenResponse>('/auth/refresh', {
       method: 'POST',
       body: JSON.stringify({ refresh_token: refreshToken }),
     }),
@@ -176,22 +204,22 @@ export const authAPI = {
 // Task Management API
 export const taskAPI = {
   // Get all tasks
-  getAllTasks: () => apiRequest<any[]>('/tasks/'),
+  getAllTasks: () => apiRequest<Task[]>('/tasks/'),
   
   // Get tasks by user
-  getTasksByUser: (userId: number) => apiRequest<any[]>(`/tasks/user/${userId}`),
+  getTasksByUser: (userId: number) => apiRequest<Task[]>(`/tasks/user/${userId}`),
   
   // Get specific task
-  getTask: (id: number) => apiRequest<any>(`/tasks/${id}`),
+  getTask: (id: number) => apiRequest<Task>(`/tasks/${id}`),
   
   // Create new task
-  createTask: (taskData: any) => apiRequest<any>('/tasks/', {
+  createTask: (taskData: TaskCreate) => apiRequest<Task>('/tasks/', {
     method: 'POST',
     body: JSON.stringify(taskData),
   }),
   
   // Update task
-  updateTask: (id: number, taskData: any) => apiRequest<any>(`/tasks/${id}`, {
+  updateTask: (id: number, taskData: TaskUpdate) => apiRequest<Task>(`/tasks/${id}`, {
     method: 'PUT',
     body: JSON.stringify(taskData),
   }),
@@ -202,25 +230,25 @@ export const taskAPI = {
   }),
   
   // Get task statistics
-  getTaskStats: () => apiRequest<any>('/tasks/stats/'),
+  getTaskStats: () => apiRequest<{ total: number; by_status: Record<string, number>; by_priority: Record<string, number> }>('/tasks/stats/'),
 };
 
 // Project Management API
 export const projectAPI = {
   // Get all projects
-  getAllProjects: () => apiRequest<any[]>('/projects/'),
+  getAllProjects: () => apiRequest<Project[]>('/projects/'),
   
   // Get specific project
-  getProject: (id: number) => apiRequest<any>(`/projects/${id}`),
+  getProject: (id: number) => apiRequest<Project>(`/projects/${id}`),
   
   // Create new project
-  createProject: (projectData: any) => apiRequest<any>('/projects/', {
+  createProject: (projectData: ProjectCreate) => apiRequest<Project>('/projects/', {
     method: 'POST',
     body: JSON.stringify(projectData),
   }),
   
   // Update project
-  updateProject: (id: number, projectData: any) => apiRequest<any>(`/projects/${id}`, {
+  updateProject: (id: number, projectData: ProjectUpdate) => apiRequest<Project>(`/projects/${id}`, {
     method: 'PUT',
     body: JSON.stringify(projectData),
   }),
@@ -231,25 +259,25 @@ export const projectAPI = {
   }),
   
   // Get project statistics
-  getProjectStats: () => apiRequest<any>('/projects/stats/'),
+  getProjectStats: () => apiRequest<{ total: number; active: number; completed: number }>('/projects/stats/'),
 };
 
 // Team Management API
 export const teamAPI = {
   // Get all teams
-  getAllTeams: () => apiRequest<any[]>('/teams/'),
+  getAllTeams: () => apiRequest<Team[]>('/teams/'),
   
   // Get specific team
-  getTeam: (id: number) => apiRequest<any>(`/teams/${id}`),
+  getTeam: (id: number) => apiRequest<Team>(`/teams/${id}`),
   
   // Create new team
-  createTeam: (teamData: any) => apiRequest<any>('/teams/', {
+  createTeam: (teamData: TeamCreate) => apiRequest<Team>('/teams/', {
     method: 'POST',
     body: JSON.stringify(teamData),
   }),
   
   // Update team
-  updateTeam: (id: number, teamData: any) => apiRequest<any>(`/teams/${id}`, {
+  updateTeam: (id: number, teamData: TeamUpdate) => apiRequest<Team>(`/teams/${id}`, {
     method: 'PUT',
     body: JSON.stringify(teamData),
   }),
@@ -260,11 +288,11 @@ export const teamAPI = {
   }),
   
   // Get team members
-  getTeamMembers: (teamId: number) => apiRequest<any[]>(`/teams/${teamId}/members`),
+  getTeamMembers: (teamId: number) => apiRequest<User[]>(`/teams/${teamId}/members`),
   
   // Add member to team
   addTeamMember: (teamId: number, userId: number) => 
-    apiRequest<any>(`/teams/${teamId}/members`, {
+    apiRequest<{ message: string }>(`/teams/${teamId}/members`, {
       method: 'POST',
       body: JSON.stringify({ user_id: userId }),
     }),
@@ -279,22 +307,22 @@ export const teamAPI = {
 // Reminder API
 export const reminderAPI = {
   // Get all reminders
-  getAllReminders: () => apiRequest<any[]>('/reminders/'),
+  getAllReminders: () => apiRequest<Reminder[]>('/reminders/'),
   
   // Get reminders by user
-  getRemindersByUser: (userId: number) => apiRequest<any[]>(`/reminders/user/${userId}`),
+  getRemindersByUser: (userId: number) => apiRequest<Reminder[]>(`/reminders/user/${userId}`),
   
   // Get specific reminder
-  getReminder: (id: number) => apiRequest<any>(`/reminders/${id}`),
+  getReminder: (id: number) => apiRequest<Reminder>(`/reminders/${id}`),
   
   // Create new reminder
-  createReminder: (reminderData: any) => apiRequest<any>('/reminders/', {
+  createReminder: (reminderData: ReminderCreate) => apiRequest<Reminder>('/reminders/', {
     method: 'POST',
     body: JSON.stringify(reminderData),
   }),
   
   // Update reminder
-  updateReminder: (id: number, reminderData: any) => apiRequest<any>(`/reminders/${id}`, {
+  updateReminder: (id: number, reminderData: ReminderUpdate) => apiRequest<Reminder>(`/reminders/${id}`, {
     method: 'PUT',
     body: JSON.stringify(reminderData),
   }),
@@ -306,7 +334,7 @@ export const reminderAPI = {
   
   // Mark reminder as completed
   markReminderCompleted: (id: number) => 
-    apiRequest<any>(`/reminders/${id}/complete`, {
+    apiRequest<Reminder>(`/reminders/${id}/complete`, {
       method: 'PATCH',
     }),
 };
@@ -315,23 +343,23 @@ export const reminderAPI = {
 export const reportAPI = {
   // Get user performance report
   getUserPerformance: (userId: number, dateRange?: string) => 
-    apiRequest<any>(`/reports/user/${userId}${dateRange ? `?range=${dateRange}` : ''}`),
+    apiRequest<UserPerformance>(`/reports/user/${userId}${dateRange ? `?range=${dateRange}` : ''}`),
   
   // Get team performance report
   getTeamPerformance: (teamId: number, dateRange?: string) => 
-    apiRequest<any>(`/reports/team/${teamId}${dateRange ? `?range=${dateRange}` : ''}`),
+    apiRequest<TeamPerformance>(`/reports/team/${teamId}${dateRange ? `?range=${dateRange}` : ''}`),
   
   // Get project progress report
   getProjectProgress: (projectId: number) => 
-    apiRequest<any>(`/reports/project/${projectId}`),
+    apiRequest<ProjectProgress>(`/reports/project/${projectId}`),
   
   // Get overall system statistics
   getSystemStats: (dateRange?: string) => 
-    apiRequest<any>(`/reports/system${dateRange ? `?range=${dateRange}` : ''}`),
+    apiRequest<SystemStats>(`/reports/system${dateRange ? `?range=${dateRange}` : ''}`),
   
   // Export report
-  exportReport: (reportType: string, params: any) => 
-    apiRequest<any>(`/reports/export/${reportType}`, {
+  exportReport: (reportType: string, params: ReportParams) => 
+    apiRequest<{ download_url: string; file_name: string }>(`/reports/export/${reportType}`, {
       method: 'POST',
       body: JSON.stringify(params),
     }),
@@ -340,23 +368,23 @@ export const reportAPI = {
 // Dashboard API
 export const dashboardAPI = {
   // Get dashboard overview data
-  getOverview: () => apiRequest<any>('/dashboard/overview'),
+  getOverview: () => apiRequest<DashboardOverview>('/dashboard/overview'),
   
   // Get recent activities
   getRecentActivities: (limit?: number) => 
-    apiRequest<any[]>(`/dashboard/activities${limit ? `?limit=${limit}` : ''}`),
+    apiRequest<Activity[]>(`/dashboard/activities${limit ? `?limit=${limit}` : ''}`),
   
   // Get upcoming deadlines
   getUpcomingDeadlines: (days?: number) => 
-    apiRequest<any[]>(`/dashboard/deadlines${days ? `?days=${days}` : ''}`),
+    apiRequest<Task[]>(`/dashboard/deadlines${days ? `?days=${days}` : ''}`),
   
   // Get user workload
   getUserWorkload: (userId: number) => 
-    apiRequest<any>(`/dashboard/workload/${userId}`),
+    apiRequest<{ user: User; tasks: Task[]; workload_percentage: number }>(`/dashboard/workload/${userId}`),
   
   // Get team workload
   getTeamWorkload: (teamId: number) => 
-    apiRequest<any>(`/dashboard/team-workload/${teamId}`),
+    apiRequest<{ team: Team; members_workload: Array<{ user: User; tasks: Task[]; workload_percentage: number }> }>(`/dashboard/team-workload/${teamId}`),
 };
 
 // Utility functions
@@ -374,7 +402,7 @@ export const apiUtils = {
   },
   
   // Handle common API errors
-  handleError: (error: any) => {
+  handleError: (error: unknown) => {
     if (error instanceof Error) {
       return error.message;
     }
