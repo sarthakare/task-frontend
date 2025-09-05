@@ -108,23 +108,21 @@ export interface TaskUpdate {
 export interface ProjectCreate {
   name: string;
   description: string;
+  manager_id: number;
+  assigned_teams: number[];
   start_date: string;
   end_date: string;
-  status: string;
-  priority: string;
-  manager_id: number;
-  team_members: number[];
+  status: 'active' | 'on_hold' | 'completed' | 'cancelled';
 }
 
 export interface ProjectUpdate {
   name?: string;
   description?: string;
+  manager_id?: number;
+  assigned_teams?: number[];
   start_date?: string;
   end_date?: string;
-  status?: string;
-  priority?: string;
-  manager_id?: number;
-  team_members?: number[];
+  status?: 'active' | 'on_hold' | 'completed' | 'cancelled';
 }
 
 export interface TeamCreate {
@@ -221,13 +219,12 @@ export interface Project {
   id: number;
   name: string;
   description: string;
-  start_date: string;
-  end_date: string;
-  status: string;
-  priority: string;
   manager_id: number;
   manager: User;
-  team_members: User[];
+  assigned_teams: Team[];
+  start_date: string;
+  end_date: string;
+  status: 'active' | 'on_hold' | 'completed' | 'cancelled';
   created_at: string;
   updated_at?: string;
 }
