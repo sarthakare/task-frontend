@@ -166,8 +166,8 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
       if (formData.name !== project.name) projectData.name = formData.name;
       if (formData.description !== project.description) projectData.description = formData.description;
       if (parseInt(formData.manager_id) !== project.manager_id) projectData.manager_id = parseInt(formData.manager_id);
-      if (formData.start_date !== project.start_date.split('T')[0]) projectData.start_date = new Date(formData.start_date);
-      if (formData.end_date !== project.end_date.split('T')[0]) projectData.end_date = new Date(formData.end_date);
+      if (formData.start_date !== project.start_date.split('T')[0]) projectData.start_date = formData.start_date;
+      if (formData.end_date !== project.end_date.split('T')[0]) projectData.end_date = formData.end_date;
       if (formData.status !== project.status) projectData.status = formData.status;
       
       // Check if team list changed

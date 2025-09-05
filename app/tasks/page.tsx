@@ -4,8 +4,7 @@ import { Task } from "@/types";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
-import { CircleAlert, Search } from "lucide-react";
-import { useUser } from "@/components/user-provider";
+import { Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
@@ -31,26 +30,9 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
 
-  const fetchTasks = async () => {
-    try {
-      const data = await api.tasks.getAllTasks();
-      // Handle both array and object responses
-      if (Array.isArray(data)) {
-        setTasks(data);
-      } else {
-        const responseData = data as TaskResponse;
-        setTasks(responseData.tasks || []);
-      }
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-      toast.error("Failed to fetch tasks", {
-        description: api.utils.handleError(error),
-      });
-    }
-  };
-
   useEffect(() => {
-    // fetchTasks();
+    // Tasks will be loaded when the component mounts
+    // Implementation can be added here when task management is fully implemented
   }, []);
 
   // Filtered tasks list
