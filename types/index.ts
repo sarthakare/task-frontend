@@ -133,6 +133,7 @@ export interface TeamCreate {
   leader_id: number;
   member_ids: number[];
   department: string;
+  status?: 'active' | 'inactive';
 }
 
 export interface TeamUpdate {
@@ -141,6 +142,7 @@ export interface TeamUpdate {
   leader_id?: number;
   member_ids?: number[];
   department?: string;
+  status?: 'active' | 'inactive';
 }
 
 export interface ReminderCreate {
@@ -238,6 +240,7 @@ export interface Team {
   leader: User;
   members: User[];
   department: string;
+  status: 'active' | 'inactive';
   created_at: string;
   updated_at?: string;
 }
