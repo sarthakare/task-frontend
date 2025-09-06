@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   Clock,
   TrendingUp,
-  TrendingDown,
   Calendar,
   Bell,
   Activity,
@@ -20,9 +19,7 @@ import {
   Target,
   Zap,
   BarChart3,
-  PieChart,
   ArrowUpRight,
-  ArrowDownRight,
   Plus
 } from "lucide-react";
 

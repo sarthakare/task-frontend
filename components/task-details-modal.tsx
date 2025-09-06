@@ -275,10 +275,10 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
                   </div>
                 )}
 
-                {task.completed_at && (
+                {task.completedAt && (
                   <div className="bg-green-50 rounded-lg p-4">
                     <p className="text-sm font-medium text-green-700 mb-2">Completed</p>
-                    <p className="text-green-900">{formatDateTime(task.completed_at)}</p>
+                    <p className="text-green-900">{formatDateTime(task.completedAt)}</p>
                   </div>
                 )}
               </div>

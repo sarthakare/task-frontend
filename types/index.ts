@@ -68,8 +68,9 @@ export interface TaskLog {
   task_id: number;
   title: string;
   description: string;
-  startTime: string;
-  endTime: string;
+  start_time: string;
+  end_time?: string;
+  created_at: string;
 }
 
 export interface HierarchyUser {
