@@ -31,6 +31,7 @@ import type { Project } from "@/types";
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const [stats, setStats] = useState({
     totalProjects: 0,
     activeProjects: 0,
@@ -102,6 +103,13 @@ export default function ProjectsPage() {
     }
   };
 
+  // Filter projects based on search term
+  const filteredProjects = projects.filter(project => 
+    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.assigned_teams.some(team => team.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
     <div className="space-y-6">
@@ -110,12 +118,7 @@ export default function ProjectsPage() {
         description="Track and manage all your projects effectively"
       />
 
-      {/* Quick Actions */}
-      <div className="flex gap-4 mb-6">
-        <ProjectCreateForm onProjectCreated={handleProjectCreated} />
-      </div>
-
-      {/* Search and Filters */}
+      {/* Search and Actions */}
       <Card className="mb-6">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -125,12 +128,14 @@ export default function ProjectsPage() {
                 <Input
                   placeholder="Search projects..."
                   className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
-            <Button variant="outline">
-              Filter
-            </Button>
+            <div className="flex items-center gap-2">
+              <ProjectCreateForm onProjectCreated={handleProjectCreated} />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -182,7 +187,12 @@ export default function ProjectsPage() {
       {/* Projects List */}
       <Card>
         <CardHeader>
-          <CardTitle>All Projects</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Projects ({filteredProjects.length})</span>
+            <div className="text-sm text-gray-500">
+              {filteredProjects.length !== projects.length && `Showing ${filteredProjects.length} of ${projects.length} projects`}
+            </div>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -206,9 +216,9 @@ export default function ProjectsPage() {
                 </div>
               ))}
             </div>
-          ) : projects.length > 0 ? (
+          ) : filteredProjects.length > 0 ? (
             <div className="space-y-4">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <div key={project.id} className="p-4 border rounded-lg bg-white hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -333,19 +343,26 @@ export default function ProjectsPage() {
           ) : (
             <div className="text-center py-12">
               <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {projects.length === 0 ? "No projects yet" : "No projects found"}
+              </h3>
               <p className="text-sm text-gray-500 mb-6">
-                Create your first project to start organizing your work effectively
-              </p>
-              <ProjectCreateForm 
-                onProjectCreated={handleProjectCreated}
-                trigger={
-                  <Button>
-                    <FolderOpen className="h-4 w-4 mr-2" />
-                    Create Your First Project
-                  </Button>
+                {projects.length === 0 
+                  ? "Create your first project to start organizing your work effectively"
+                  : "Try adjusting your search criteria or filters."
                 }
-              />
+              </p>
+              {projects.length === 0 && (
+                <ProjectCreateForm 
+                  onProjectCreated={handleProjectCreated}
+                  trigger={
+                    <Button>
+                      <FolderOpen className="h-4 w-4 mr-2" />
+                      Create Your First Project
+                    </Button>
+                  }
+                />
+              )}
             </div>
           )}
         </CardContent>

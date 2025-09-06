@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { TeamCreateForm } from "@/components/team-create-form";
 import { TeamEditForm } from "@/components/team-edit-form";
-import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff } from "lucide-react";
+import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ import type { Team } from "@/types";
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const [stats, setStats] = useState({
     totalTeams: 0,
     activeTeams: 0,
@@ -82,6 +84,14 @@ export default function TeamsPage() {
     }
   };
 
+  // Filter teams based on search term
+  const filteredTeams = teams.filter(team => 
+    team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    team.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    team.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    team.leader.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <PageHeader 
@@ -89,10 +99,27 @@ export default function TeamsPage() {
         description="Organize and manage your teams effectively"
       />
 
-      {/* Quick Actions */}
-      <div className="flex gap-4 mb-6">
-        <TeamCreateForm onTeamCreated={handleTeamCreated} />
-      </div>
+      {/* Search and Actions */}
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search teams..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <TeamCreateForm onTeamCreated={handleTeamCreated} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Team Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -141,7 +168,12 @@ export default function TeamsPage() {
       {/* Teams List */}
       <Card>
         <CardHeader>
-          <CardTitle>Your Teams</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Teams ({filteredTeams.length})</span>
+            <div className="text-sm text-gray-500">
+              {filteredTeams.length !== teams.length && `Showing ${filteredTeams.length} of ${teams.length} teams`}
+            </div>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -165,9 +197,9 @@ export default function TeamsPage() {
                 </div>
               ))}
             </div>
-          ) : teams.length > 0 ? (
+          ) : filteredTeams.length > 0 ? (
             <div className="space-y-4">
-              {teams.map((team) => (
+              {filteredTeams.map((team) => (
                 <div key={team.id} className="p-4 border rounded-lg bg-white hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -249,19 +281,26 @@ export default function TeamsPage() {
           ) : (
             <div className="text-center py-12">
               <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No teams yet</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {teams.length === 0 ? "No teams yet" : "No teams found"}
+              </h3>
               <p className="text-sm text-gray-500 mb-6">
-                Create your first team to start organizing your work effectively
-              </p>
-              <TeamCreateForm 
-                onTeamCreated={handleTeamCreated}
-                trigger={
-                  <Button>
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Create Your First Team
-                  </Button>
+                {teams.length === 0 
+                  ? "Create your first team to start organizing your work effectively"
+                  : "Try adjusting your search criteria or filters."
                 }
-              />
+              </p>
+              {teams.length === 0 && (
+                <TeamCreateForm 
+                  onTeamCreated={handleTeamCreated}
+                  trigger={
+                    <Button>
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Create Your First Team
+                    </Button>
+                  }
+                />
+              )}
             </div>
           )}
         </CardContent>
