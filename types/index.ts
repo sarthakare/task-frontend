@@ -73,6 +73,13 @@ export interface TaskLog {
   created_at: string;
 }
 
+export interface TaskLogCreate {
+  title: string;
+  description: string;
+  start_time: string;
+  end_time?: string;
+}
+
 export interface HierarchyUser {
   id: number
   name: string

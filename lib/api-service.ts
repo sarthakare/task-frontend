@@ -12,6 +12,8 @@ import type {
   Task,
   TaskCreate,
   TaskUpdate,
+  TaskLog,
+  TaskLogCreate,
   Project,
   ProjectCreate,
   ProjectUpdate,
@@ -233,6 +235,16 @@ export const taskAPI = {
   
   // Get task statistics
   getTaskStats: () => apiRequest<{ total: number; by_status: Record<string, number>; by_priority: Record<string, number> }>('/tasks/stats/'),
+  
+  // Task Log Management
+  // Create task log
+  createTaskLog: (taskId: number, logData: TaskLogCreate) => apiRequest<TaskLog>(`/tasks/${taskId}/logs`, {
+    method: 'POST',
+    body: JSON.stringify(logData),
+  }),
+  
+  // Get task logs
+  getTaskLogs: (taskId: number) => apiRequest<TaskLog[]>(`/tasks/${taskId}/logs`),
 };
 
 // Project Management API

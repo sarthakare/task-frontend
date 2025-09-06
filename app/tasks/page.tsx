@@ -9,6 +9,8 @@ import { PageHeader } from "@/components/page-header";
 import { TaskCreateForm } from "@/components/task-create-form";
 import { TaskEditForm } from "@/components/task-edit-form";
 import { TaskDetailsModal } from "@/components/task-details-modal";
+import { TaskLogCreateForm } from "@/components/task-log-create-form";
+import { TaskLogDisplay } from "@/components/task-log-display";
 import { 
   Search,
   Calendar,
@@ -21,7 +23,11 @@ import {
   X,
   FolderOpen,
   MoreHorizontal,
-  Filter
+  Filter,
+  Plus,
+  Eye,
+  EyeOff,
+  FileText
 } from "lucide-react";
 import {
   Select,
@@ -42,6 +48,8 @@ export default function TasksPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [assigneeFilter, setAssigneeFilter] = useState("all");
+  const [shownLogs, setShownLogs] = useState<Set<number>>(new Set());
+  const [logRefreshTrigger, setLogRefreshTrigger] = useState(0);
   const [stats, setStats] = useState({
     totalTasks: 0,
     newTasks: 0,
@@ -190,6 +198,24 @@ export default function TasksPage() {
     const now = new Date();
     const due = new Date(dueDate);
     return due < now && !['FINISHED', 'CANCELLED'].includes(status);
+  };
+
+  const toggleTaskLogs = (taskId: number) => {
+    setShownLogs(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleLogCreated = () => {
+    setLogRefreshTrigger(prev => prev + 1);
+    // Optionally refresh tasks to get updated log counts
+    fetchTasks();
   };
 
   if (isLoading) {
@@ -435,6 +461,37 @@ export default function TasksPage() {
                         onTaskUpdated={handleTaskUpdated}
                       />
                       
+                      {/* Task Log Actions */}
+                      <TaskLogCreateForm
+                        taskId={task.id}
+                        taskTitle={task.title}
+                        onLogCreated={handleLogCreated}
+                        trigger={
+                          <Button variant="outline" size="sm">
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add Log
+                          </Button>
+                        }
+                      />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => toggleTaskLogs(task.id)}
+                      >
+                        {shownLogs.has(task.id) ? (
+                          <>
+                            <EyeOff className="h-4 w-4 mr-1" />
+                            Hide Logs
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="h-4 w-4 mr-1" />
+                            Show Logs
+                          </>
+                        )}
+                      </Button>
+                      
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm">
@@ -488,6 +545,17 @@ export default function TasksPage() {
                       </DropdownMenu>
                     </div>
                   </div>
+                  
+                  {/* Task Logs Display */}
+                  {shownLogs.has(task.id) && (
+                    <div className="mt-4">
+                      <TaskLogDisplay
+                        taskId={task.id}
+                        taskTitle={task.title}
+                        refreshTrigger={logRefreshTrigger}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
