@@ -351,6 +351,18 @@ export const reminderAPI = {
     apiRequest<Reminder>(`/reminders/${id}/complete`, {
       method: 'PATCH',
     }),
+
+  // Get reminder statistics
+  getReminderStats: (userId?: number) => {
+    const url = userId ? `/reminders/stats/overview?user_id=${userId}` : '/reminders/stats/overview';
+    return apiRequest<{
+      total_reminders: number;
+      active_reminders: number;
+      completed_reminders: number;
+      overdue_reminders: number;
+      today_reminders: number;
+    }>(url);
+  },
 };
 
 // Report API

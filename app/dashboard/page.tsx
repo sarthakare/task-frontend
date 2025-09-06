@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -21,14 +20,11 @@ import {
   Target,
   Zap,
   BarChart3,
-  ArrowUpRight,
-  Plus,
   AlertCircle,
-  Loader2
 } from "lucide-react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
-import type { DashboardOverview, Activity as ActivityType, Task, Project, User } from "@/types";
+import type { DashboardOverview, Activity as ActivityType, Task, Project } from "@/types";
 
 export default function Dashboard() {
   // State for dashboard data

@@ -1,21 +1,98 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/page-header";
+import { ReminderCreateForm } from "@/components/reminder-create-form";
+import { ReminderDisplay } from "@/components/reminder-display";
 import { 
-  Plus, 
   Bell, 
   AlertTriangle,
   Clock,
   CheckCircle,
   Search,
   Filter,
-  RefreshCw
+  RefreshCw,
+  Loader2
 } from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@/lib/api-service";
+import { Reminder } from "@/types";
 
 export default function RemindersPage() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [stats, setStats] = useState({
+    total_reminders: 0,
+    active_reminders: 0,
+    completed_reminders: 0,
+    overdue_reminders: 0,
+    today_reminders: 0
+  });
+
+  const fetchReminders = async () => {
+    try {
+      const [remindersResponse, statsResponse] = await Promise.all([
+        api.reminders.getAllReminders(),
+        api.reminders.getReminderStats()
+      ]);
+      setReminders(remindersResponse);
+      setStats(statsResponse);
+    } catch (error: unknown) {
+      console.error("Error fetching reminders:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to load reminders");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchReminders();
+  };
+
+  const handleReminderCreated = () => {
+    fetchReminders();
+  };
+
+  const handleReminderUpdated = () => {
+    fetchReminders();
+  };
+
+  const handleReminderDeleted = () => {
+    fetchReminders();
+  };
+
+  useEffect(() => {
+    fetchReminders();
+  }, []);
+
+  // Filter reminders based on search term
+  const filteredReminders = reminders.filter((reminder) =>
+    reminder.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    reminder.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    reminder.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (reminder.task && reminder.task.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  // Sort reminders: overdue first, then by due date
+  const sortedReminders = filteredReminders.sort((a, b) => {
+    const now = new Date();
+    const aOverdue = new Date(a.due_date) < now && !a.is_completed;
+    const bOverdue = new Date(b.due_date) < now && !b.is_completed;
+    
+    if (aOverdue && !bOverdue) return -1;
+    if (!aOverdue && bOverdue) return 1;
+    
+    return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+  });
+
   return (
     <div className="space-y-6">
       <PageHeader 
@@ -25,15 +102,12 @@ export default function RemindersPage() {
 
       {/* Quick Actions */}
       <div className="flex gap-4 mb-6">
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Reminder
-        </Button>
-        <Button variant="outline">
+        <ReminderCreateForm onReminderCreated={handleReminderCreated} />
+        <Button variant="outline" disabled>
           <Bell className="h-4 w-4 mr-2" />
           Set Alert
         </Button>
-        <Button variant="outline">
+        <Button variant="outline" disabled>
           <AlertTriangle className="h-4 w-4 mr-2" />
           Escalate Issue
         </Button>
@@ -49,15 +123,21 @@ export default function RemindersPage() {
                 <Input
                   placeholder="Search reminders..."
                   className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
-            <Button variant="outline">
+            <Button variant="outline" disabled>
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline">
-              <RefreshCw className="h-4 w-4 mr-2" />
+            <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
+              {refreshing ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
               Refresh
             </Button>
           </div>
@@ -72,7 +152,11 @@ export default function RemindersPage() {
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
+            {loading ? (
+              <Skeleton className="h-8 w-16 mb-1" />
+            ) : (
+              <div className="text-2xl font-bold">{stats.active_reminders}</div>
+            )}
             <p className="text-xs text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
@@ -82,7 +166,11 @@ export default function RemindersPage() {
             <AlertTriangle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">3</div>
+            {loading ? (
+              <Skeleton className="h-8 w-16 mb-1" />
+            ) : (
+              <div className="text-2xl font-bold text-red-600">{stats.overdue_reminders}</div>
+            )}
             <p className="text-xs text-muted-foreground">Requires attention</p>
           </CardContent>
         </Card>
@@ -92,7 +180,11 @@ export default function RemindersPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            {loading ? (
+              <Skeleton className="h-8 w-16 mb-1" />
+            ) : (
+              <div className="text-2xl font-bold">{stats.today_reminders}</div>
+            )}
             <p className="text-xs text-muted-foreground">Due today</p>
           </CardContent>
         </Card>
@@ -102,8 +194,12 @@ export default function RemindersPage() {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">12</div>
-            <p className="text-xs text-muted-foreground">This week</p>
+            {loading ? (
+              <Skeleton className="h-8 w-16 mb-1" />
+            ) : (
+              <div className="text-2xl font-bold text-green-600">{stats.completed_reminders}</div>
+            )}
+            <p className="text-xs text-muted-foreground">Total completed</p>
           </CardContent>
         </Card>
       </div>
@@ -111,119 +207,52 @@ export default function RemindersPage() {
       {/* Reminders List */}
       <Card>
         <CardHeader>
-          <CardTitle>All Reminders</CardTitle>
+          <CardTitle>All Reminders ({filteredReminders.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {/* Overdue Reminder */}
-            <div className="p-4 border border-red-200 rounded-lg bg-red-50">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-red-900">Project Review Meeting</h3>
-                  <p className="text-sm text-red-700 mt-1">
-                    Quarterly project review meeting with stakeholders
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                      Overdue
-                    </span>
-                    <span className="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">
-                      High Priority
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-red-600">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Was due: Feb 28, 2024
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3" />
-                      Escalated to Manager
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right text-sm text-red-600">
-                  <div>Assigned: John Doe</div>
-                  <div>Escalated: 2 days ago</div>
-                </div>
-              </div>
+          {loading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i} className="border">
+                  <CardContent className="p-4">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-full mb-3" />
+                    <div className="flex gap-2 mb-3">
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-6 w-20" />
+                    </div>
+                    <div className="flex gap-4">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-
-            {/* Today's Reminder */}
-            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-blue-900">Client Presentation</h3>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Prepare presentation for client meeting
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                      Today
-                    </span>
-                    <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                      Medium Priority
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-blue-600">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Due: Today, 3:00 PM
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Bell className="h-3 w-3" />
-                      Reminder set
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right text-sm text-blue-600">
-                  <div>Assigned: Jane Smith</div>
-                  <div>Created: 2 days ago</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Upcoming Reminder */}
-            <div className="p-4 border rounded-lg bg-white">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-gray-900">Team Standup</h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Daily team standup meeting
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                      Tomorrow
-                    </span>
-                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                      Low Priority
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Due: Tomorrow, 9:00 AM
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Bell className="h-3 w-3" />
-                      Reminder set
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right text-sm text-gray-500">
-                  <div>Assigned: Team Lead</div>
-                  <div>Created: 1 week ago</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Placeholder for more reminders */}
+          ) : sortedReminders.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm text-gray-500 italic">
-                Create more reminders to stay organized
-              </p>
+              {searchTerm ? (
+                <p className="text-sm text-gray-500">
+                  No reminders found matching &quot;{searchTerm}&quot;
+                </p>
+              ) : (
+                <p className="text-sm text-gray-500 italic">
+                  No reminders yet. Create your first reminder to get started!
+                </p>
+              )}
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              {sortedReminders.map((reminder) => (
+                <ReminderDisplay
+                  key={reminder.id}
+                  reminder={reminder}
+                  onReminderUpdated={handleReminderUpdated}
+                  onReminderDeleted={handleReminderDeleted}
+                />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

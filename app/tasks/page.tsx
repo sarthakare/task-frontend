@@ -27,7 +27,6 @@ import {
   Plus,
   Eye,
   EyeOff,
-  FileText
 } from "lucide-react";
 import {
   Select,
