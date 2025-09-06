@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Edit, XCircle, Users, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -246,6 +246,9 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
           <DialogTitle className="text-xl font-semibold text-gray-900">
             Edit Project: {project.name}
           </DialogTitle>
+          <DialogDescription>
+            Update the project details, timeline, and team assignments as needed.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">

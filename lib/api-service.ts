@@ -1,7 +1,6 @@
 // lib/api-service.ts
 // Comprehensive centralized API service for all backend endpoints
 
-import { clearAuth } from "@/utils/auth";
 import type { 
   User, 
   UserCreate, 
@@ -30,6 +29,7 @@ import type {
   ProjectProgress,
   SystemStats
 } from "@/types";
+import { getToken, clearAuth } from "@/utils/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
@@ -39,11 +39,13 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const token = getToken();
   
   try {
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,

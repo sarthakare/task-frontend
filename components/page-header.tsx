@@ -13,9 +13,10 @@ import {
 interface PageHeaderProps {
   title: string;
   description?: string;
+  action?: React.ReactNode;
 }
 
-export function PageHeader({ title, description }: PageHeaderProps) {
+export function PageHeader({ title, description, action }: PageHeaderProps) {
   const { currentUser, logout } = useUser();
 
   return (
@@ -27,6 +28,7 @@ export function PageHeader({ title, description }: PageHeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-4">
+        {action && <div>{action}</div>}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

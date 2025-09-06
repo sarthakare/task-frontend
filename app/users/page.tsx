@@ -10,8 +10,6 @@ import {
   Users, 
   Search,
   MoreHorizontal,
-  Mail,
-  Phone,
   Loader2,
   Edit,
   Power
@@ -355,14 +353,17 @@ export default function UsersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        <Mail className="h-4 w-4" />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          setEditingUser(user);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
                       </Button>
-                      {user.mobile && (
-                        <Button variant="outline" size="sm">
-                          <Phone className="h-4 w-4" />
-                        </Button>
-                      )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm">
@@ -370,13 +371,6 @@ export default function UsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => {
-                            setEditingUser(user);
-                            setIsEditDialogOpen(true);
-                          }}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit User
-                          </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => handleToggleUserStatus(user.id, user.is_active)}
                             disabled={isTogglingStatus === user.id}

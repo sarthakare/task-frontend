@@ -19,6 +19,10 @@ export interface Task {
   creator: User
   assigned_to: number
   assignee: User
+  project_id?: number
+  project?: Project
+  team_id?: number
+  team?: Team
   observers?: string[]
   status: "NEW" | "IN_PROGRESS" | "PENDING" | "FINISHED" | "STOPPED" | "CANCELLED"
   priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
@@ -82,6 +86,8 @@ export interface DepartmentHierarchy {
 export interface TaskCreate {
   title: string;
   description: string;
+  project_id?: number;
+  team_id?: number;
   assigned_to: number;
   observers?: string[];
   status: TaskStatus;
@@ -90,11 +96,14 @@ export interface TaskCreate {
   due_date: string;
   follow_up_date: string;
   tags: string[];
+  attachments?: File[];
 }
 
 export interface TaskUpdate {
   title?: string;
   description?: string;
+  project_id?: number;
+  team_id?: number;
   assigned_to?: number;
   observers?: string[];
   status?: TaskStatus;
@@ -103,6 +112,7 @@ export interface TaskUpdate {
   due_date?: string;
   follow_up_date?: string;
   tags?: string[];
+  attachments?: File[];
 }
 
 export interface ProjectCreate {
