@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/page-header";
 import { ReminderCreateForm } from "@/components/reminder-create-form";
 import { ReminderDisplay } from "@/components/reminder-display";
@@ -149,61 +148,73 @@ export default function RemindersPage() {
       </Card>
 
       {/* Reminder Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Reminders</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-blue-900">Active Reminders</CardTitle>
+            <Bell className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold">{stats.active_reminders}</div>
+              <div className="text-2xl font-bold text-blue-900">{stats.active_reminders}</div>
             )}
-            <p className="text-xs text-muted-foreground">Currently active</p>
+            <p className="text-xs text-blue-700">Currently active</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gradient-to-r from-red-50 to-red-100 border-red-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <CardTitle className="text-sm font-medium text-red-900">Overdue</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold text-red-600">{stats.overdue_reminders}</div>
+              <div className="text-2xl font-bold text-red-900">{stats.overdue_reminders}</div>
             )}
-            <p className="text-xs text-muted-foreground">Requires attention</p>
+            <p className="text-xs text-red-700">Requires attention</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Today</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-green-900">Today</CardTitle>
+            <Clock className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold">{stats.today_reminders}</div>
+              <div className="text-2xl font-bold text-green-900">{stats.today_reminders}</div>
             )}
-            <p className="text-xs text-muted-foreground">Due today</p>
+            <p className="text-xs text-green-700">Due today</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium text-purple-900">Completed</CardTitle>
+            <CheckCircle className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold text-green-600">{stats.completed_reminders}</div>
+              <div className="text-2xl font-bold text-purple-900">{stats.completed_reminders}</div>
             )}
-            <p className="text-xs text-muted-foreground">Total completed</p>
+            <p className="text-xs text-purple-700">Total completed</p>
           </CardContent>
         </Card>
       </div>
@@ -215,23 +226,11 @@ export default function RemindersPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <Card key={i} className="border">
-                  <CardContent className="p-4">
-                    <Skeleton className="h-6 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-full mb-3" />
-                    <div className="flex gap-2 mb-3">
-                      <Skeleton className="h-6 w-16" />
-                      <Skeleton className="h-6 w-20" />
-                    </div>
-                    <div className="flex gap-4">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading reminders...</span>
+              </div>
             </div>
           ) : sortedReminders.length === 0 ? (
             <div className="text-center py-8">

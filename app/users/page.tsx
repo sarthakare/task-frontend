@@ -213,11 +213,11 @@ export default function UsersPage() {
       </Card>
 
       {/* User Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-blue-900">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -227,16 +227,16 @@ export default function UsersPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.total_users || 0}</div>
-                <p className="text-xs text-muted-foreground">Total members</p>
+                <div className="text-2xl font-bold text-blue-900">{stats?.total_users || 0}</div>
+                <p className="text-xs text-blue-700">Total members</p>
               </>
             )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-green-900">Active Users</CardTitle>
+            <Users className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -246,16 +246,16 @@ export default function UsersPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.active_users || 0}</div>
-                <p className="text-xs text-muted-foreground">Active members</p>
+                <div className="text-2xl font-bold text-green-900">{stats?.active_users || 0}</div>
+                <p className="text-xs text-green-700">Active members</p>
               </>
             )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Managers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-purple-900">Total Managers</CardTitle>
+            <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -265,16 +265,16 @@ export default function UsersPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.users_by_role?.manager || 0}</div>
-                <p className="text-xs text-muted-foreground">Team managers</p>
+                <div className="text-2xl font-bold text-purple-900">{stats?.users_by_role?.manager || 0}</div>
+                <p className="text-xs text-purple-700">Team managers</p>
               </>
             )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Lead</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-orange-900">Team Lead</CardTitle>
+            <Users className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -284,8 +284,8 @@ export default function UsersPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stats?.users_by_role?.team_lead || 0}</div>
-                <p className="text-xs text-muted-foreground">Team leaders</p>
+                <div className="text-2xl font-bold text-orange-900">{stats?.users_by_role?.team_lead || 0}</div>
+                <p className="text-xs text-orange-700">Team leaders</p>
               </>
             )}
           </CardContent>

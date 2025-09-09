@@ -28,6 +28,7 @@ import {
   Eye,
   EyeOff,
   CircleAlert,
+  Loader2,
 } from "lucide-react";
 import {
   Select,
@@ -43,7 +44,8 @@ import type { Task, TaskStatus, TaskPriority } from "@/types";
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -68,7 +70,7 @@ export default function TasksPage() {
   }, [tasks]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchTasks = async () => {
-    setIsLoading(true);
+    setIsLoadingTasks(true);
     try {
       const data = await api.tasks.getAllTasks();
       // Handle both array and object responses
@@ -87,7 +89,8 @@ export default function TasksPage() {
       });
       setTasks([]);
     } finally {
-      setIsLoading(false);
+      setIsLoadingTasks(false);
+      setIsLoadingStats(false);
     }
   };
 
@@ -222,26 +225,6 @@ export default function TasksPage() {
     fetchTasks();
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Tasks" description="Loading tasks..." />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="space-y-0 pb-2">
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -261,8 +244,17 @@ export default function TasksPage() {
             <FolderOpen className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900">{stats.totalTasks}</div>
-            <p className="text-xs text-blue-700">All tasks</p>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-blue-900">{stats.totalTasks}</div>
+                <p className="text-xs text-blue-700">All tasks</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -272,8 +264,17 @@ export default function TasksPage() {
             <Clock className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{stats.newTasks}</div>
-            <p className="text-xs text-gray-700">Not started</p>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-gray-900">{stats.newTasks}</div>
+                <p className="text-xs text-gray-700">Not started</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -283,8 +284,17 @@ export default function TasksPage() {
             <AlertCircle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-900">{stats.inProgressTasks}</div>
-            <p className="text-xs text-yellow-700">Active tasks</p>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-yellow-900">{stats.inProgressTasks}</div>
+                <p className="text-xs text-yellow-700">Active tasks</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -294,8 +304,17 @@ export default function TasksPage() {
             <Pause className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-900">{stats.pendingTasks}</div>
-            <p className="text-xs text-orange-700">Awaiting review</p>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-orange-900">{stats.pendingTasks}</div>
+                <p className="text-xs text-orange-700">Awaiting review</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -305,8 +324,17 @@ export default function TasksPage() {
             <CheckCircle2 className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-900">{stats.finishedTasks}</div>
-            <p className="text-xs text-green-700">Finished tasks</p>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-green-900">{stats.finishedTasks}</div>
+                <p className="text-xs text-green-700">Finished tasks</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -316,8 +344,17 @@ export default function TasksPage() {
             <X className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-900">{stats.overdueTasks}</div>
-            <p className="text-xs text-red-700">Past due date</p>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-red-900">{stats.overdueTasks}</div>
+                <p className="text-xs text-red-700">Past due date</p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -398,7 +435,14 @@ export default function TasksPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredTasks.length === 0 ? (
+          {isLoadingTasks ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading tasks...</span>
+              </div>
+            </div>
+          ) : filteredTasks.length === 0 ? (
             <div className="text-center py-12">
               <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>

@@ -316,6 +316,14 @@ export const teamAPI = {
     apiRequest<void>(`/teams/${teamId}/members/${userId}`, {
       method: 'DELETE',
     }),
+  
+  // Get team statistics
+  getTeamStats: () => apiRequest<{
+    total_teams: number;
+    active_teams: number;
+    inactive_teams: number;
+    department_counts: Record<string, number>;
+  }>('/teams/stats/'),
 };
 
 // Reminder API

@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/page-header";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Users,
   FolderOpen,
@@ -22,6 +21,7 @@ import {
   BarChart3,
   AlertCircle,
   CircleAlert,
+  Loader2,
 } from "lucide-react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
@@ -193,14 +193,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold text-blue-900">{overview?.total_users || 0}</div>
+              <>
+                <div className="text-2xl font-bold text-blue-900">{overview?.total_users || 0}</div>
+                <div className="flex items-center text-xs text-blue-700 mt-1">
+                  <Users className="h-3 w-3 mr-1" />
+                  {`${overview?.active_users || 0} active`}
+                </div>
+              </>
             )}
-            <div className="flex items-center text-xs text-blue-700 mt-1">
-              <Users className="h-3 w-3 mr-1" />
-              {isLoading ? <Skeleton className="h-3 w-20" /> : `${overview?.active_users || 0} active`}
-            </div>
           </CardContent>
         </Card>
 
@@ -211,14 +216,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold text-green-900">{overview?.total_projects || 0}</div>
+              <>
+                <div className="text-2xl font-bold text-green-900">{overview?.total_projects || 0}</div>
+                <div className="flex items-center text-xs text-green-700 mt-1">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  {`${overview?.active_projects || 0} active`}
+                </div>
+              </>
             )}
-            <div className="flex items-center text-xs text-green-700 mt-1">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              {isLoading ? <Skeleton className="h-3 w-20" /> : `${overview?.active_projects || 0} active`}
-            </div>
           </CardContent>
         </Card>
 
@@ -229,14 +239,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold text-purple-900">{overview?.completed_tasks || 0}</div>
+              <>
+                <div className="text-2xl font-bold text-purple-900">{overview?.completed_tasks || 0}</div>
+                <div className="flex items-center text-xs text-purple-700 mt-1">
+                  <Target className="h-3 w-3 mr-1" />
+                  {`${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate`}
+                </div>
+              </>
             )}
-            <div className="flex items-center text-xs text-purple-700 mt-1">
-              <Target className="h-3 w-3 mr-1" />
-              {isLoading ? <Skeleton className="h-3 w-20" /> : `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate`}
-            </div>
           </CardContent>
         </Card>
 
@@ -247,14 +262,19 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Skeleton className="h-8 w-16 mb-1" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
             ) : (
-              <div className="text-2xl font-bold text-orange-900">{overview?.pending_tasks || 0}</div>
+              <>
+                <div className="text-2xl font-bold text-orange-900">{overview?.pending_tasks || 0}</div>
+                <div className="flex items-center text-xs text-orange-700 mt-1">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  {`${overview?.overdue_tasks || 0} overdue`}
+                </div>
+              </>
             )}
-            <div className="flex items-center text-xs text-orange-700 mt-1">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              {isLoading ? <Skeleton className="h-3 w-20" /> : `${overview?.overdue_tasks || 0} overdue`}
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -279,19 +299,12 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             {isProjectsLoading ? (
-              [...Array(3)].map((_, i) => (
-                <div key={i} className="p-4 border rounded-lg bg-gray-50">
-                  <div className="space-y-2">
-                    <Skeleton className="h-5 w-1/3" />
-                    <Skeleton className="h-4 w-2/3" />
-                    <div className="flex justify-between">
-                      <Skeleton className="h-4 w-20" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                    <Skeleton className="h-2 w-full" />
-                  </div>
+              <div className="flex items-center justify-center py-8">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span className="text-sm text-muted-foreground">Loading projects...</span>
                 </div>
-              ))
+              </div>
             ) : recentProjects.length === 0 ? (
               <div className="text-center py-8">
                 <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -345,16 +358,12 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {isActivitiesLoading ? (
-                [...Array(4)].map((_, i) => (
-                  <div key={i} className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50">
-                    <Skeleton className="h-4 w-4 mt-0.5" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-1/3" />
-                      <Skeleton className="h-3 w-2/3" />
-                      <Skeleton className="h-3 w-1/4" />
-                    </div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Loading activities...</span>
                   </div>
-                ))
+                </div>
               ) : recentActivities.length === 0 ? (
                 <div className="text-center py-8">
                   <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -399,13 +408,11 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="space-y-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-12" />
-                  </div>
-                ))}
+              <div className="flex items-center justify-center py-8">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span className="text-sm text-muted-foreground">Loading...</span>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -454,15 +461,12 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {isDeadlinesLoading ? (
-                [...Array(3)].map((_, i) => (
-                  <div key={i} className="p-3 border-l-4 border-l-blue-500 bg-blue-50 rounded-r-lg">
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-2/3" />
-                      <Skeleton className="h-3 w-1/2" />
-                      <Skeleton className="h-3 w-1/3" />
-                    </div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Loading deadlines...</span>
                   </div>
-                ))
+                </div>
               ) : upcomingDeadlines.length === 0 ? (
                 <div className="text-center py-8">
                   <Bell className="h-12 w-12 text-gray-400 mx-auto mb-3" />
