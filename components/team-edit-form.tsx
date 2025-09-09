@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Edit, XCircle, Users, Loader2 } from "lucide-react";
+import { Edit, XCircle, Users, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import type { User, Team, TeamUpdate } from "@/types";
@@ -181,6 +181,8 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
       toast.success('Team updated successfully!', {
         description: `${formData.name} has been updated.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       // Call callback to refresh parent component
@@ -197,6 +199,8 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
       toast.error('Failed to update team', {
         description: errorMessage,
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsSubmitting(false);

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, XCircle, Users } from "lucide-react";
+import { Plus, XCircle, Users, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import type { User, TeamCreate } from "@/types";
@@ -155,6 +155,8 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
       toast.success('Team created successfully!', {
         description: `${formData.name} has been created.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       // Call callback to refresh parent component
@@ -171,6 +173,8 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
       toast.error('Failed to create team', {
         description: errorMessage,
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsSubmitting(false);

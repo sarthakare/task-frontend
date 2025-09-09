@@ -21,6 +21,7 @@ import {
   Zap,
   BarChart3,
   AlertCircle,
+  CircleAlert,
 } from "lucide-react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
@@ -57,7 +58,10 @@ export default function Dashboard() {
         setOverview(overviewData.value);
       } else {
         console.error('Error fetching overview:', overviewData.reason);
-        toast.error('Failed to load dashboard overview');
+        toast.error('Failed to load dashboard overview',{
+          icon: <CircleAlert className="text-red-600" />,
+          style: { color: "red" },
+        });
       }
 
       // Handle activities data
@@ -65,6 +69,10 @@ export default function Dashboard() {
         setRecentActivities(activitiesData.value);
       } else {
         console.error('Error fetching activities:', activitiesData.reason);
+        toast.error('Failed to load activities',{
+          icon: <CircleAlert className="text-red-600" />,
+          style: { color: "red" },
+        });
       }
       setIsActivitiesLoading(false);
 
@@ -77,6 +85,10 @@ export default function Dashboard() {
         setRecentProjects(sortedProjects);
       } else {
         console.error('Error fetching projects:', projectsData.reason);
+        toast.error('Failed to load projects',{
+          icon: <CircleAlert className="text-red-600" />,
+          style: { color: "red" },
+        });
       }
       setIsProjectsLoading(false);
 
@@ -85,12 +97,19 @@ export default function Dashboard() {
         setUpcomingDeadlines(deadlinesData.value.slice(0, 4));
       } else {
         console.error('Error fetching deadlines:', deadlinesData.reason);
+        toast.error('Failed to load deadlines',{
+          icon: <CircleAlert className="text-red-600" />,
+          style: { color: "red" },
+        });
       }
       setIsDeadlinesLoading(false);
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
+      toast.error('Failed to load dashboard data',{
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setIsLoading(false);
     }

@@ -16,7 +16,8 @@ import {
   Search,
   Filter,
   RefreshCw,
-  Loader2
+  Loader2,
+  CircleAlert
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
@@ -45,7 +46,10 @@ export default function RemindersPage() {
       setStats(statsResponse);
     } catch (error: unknown) {
       console.error("Error fetching reminders:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to load reminders");
+      toast.error(error instanceof Error ? error.message : "Failed to load reminders",{
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -21,7 +21,8 @@ import {
   Pause,
   CheckCircle2,
   X,
-  Eye
+  Eye,
+  CircleAlert
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { api } from "@/lib/api-service";
@@ -89,6 +90,8 @@ export default function ProjectsPage() {
       toast.success(`Project ${statusText} successfully!`, {
         description: `${project.name} has been ${statusText}.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
       
       fetchProjects(); // Refresh the projects list
@@ -98,7 +101,9 @@ export default function ProjectsPage() {
       
       toast.error(`Failed to update project status`, {
         description: errorMessage,
-        duration: 5000,
+        duration: 4000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     }
   };

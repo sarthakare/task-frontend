@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { TeamCreateForm } from "@/components/team-create-form";
 import { TeamEditForm } from "@/components/team-edit-form";
-import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search } from "lucide-react";
+import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
@@ -70,6 +70,8 @@ export default function TeamsPage() {
       toast.success(`Team ${actionText}d successfully!`, {
         description: `${team.name} is now ${newStatus}.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
       
       fetchTeams(); // Refresh the teams list
@@ -80,6 +82,8 @@ export default function TeamsPage() {
       toast.error(`Failed to ${actionText} team`, {
         description: errorMessage,
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     }
   };

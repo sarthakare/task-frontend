@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Eye, EyeOff, CheckCircle, XCircle, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 
@@ -229,6 +229,8 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       toast.success('User created successfully!', {
         description: `${formData.name} has been added to the system.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       // Call callback to refresh parent component
@@ -245,6 +247,8 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       toast.error('Failed to create user', {
         description: errorMessage,
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsSubmitting(false);

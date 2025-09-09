@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Clock, Calendar, FileText, User } from "lucide-react";
+import { Plus, Clock, Calendar, FileText, User, CheckCircle2, CircleAlert } from "lucide-react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import type { TaskLog, TaskLogCreate } from "@/types";
@@ -56,7 +56,10 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
       setExistingLogs(logs);
     } catch (error) {
       console.error("Error fetching task logs:", error);
-      toast.error("Failed to load existing logs");
+      toast.error("Failed to load existing logs", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setLogsLoading(false);
     }
@@ -66,13 +69,19 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
     e.preventDefault();
     
     if (!formData.title.trim() || !formData.description.trim() || !formData.start_time) {
-      toast.error("Please fill in all required fields");
+      toast.error("Please fill in all required fields", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
       return;
     }
 
     // Validate end time is after start time if provided
     if (formData.end_time && formData.end_time <= formData.start_time) {
-      toast.error("End time must be after start time");
+      toast.error("End time must be after start time", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
       return;
     }
 
@@ -89,6 +98,8 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
       
       toast.success("Task log created successfully", {
         description: "The log entry has been added to the task.",
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       // Reset form
@@ -109,6 +120,8 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
       console.error("Error creating task log:", error);
       toast.error("Failed to create task log", {
         description: "Please try again.",
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsLoading(false);

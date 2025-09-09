@@ -11,7 +11,9 @@ import {
   Calendar,
   FileText,
   MoreVertical,
-  Trash2
+  Trash2,
+  CheckCircle2,
+  CircleAlert
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
@@ -108,11 +110,18 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
     setLoading(true);
     try {
       await api.reminders.markReminderCompleted(reminder.id);
-      toast.success("Reminder marked as completed!");
+      toast.success("Reminder marked as completed!", {
+        description: "The reminder has been marked as completed.",
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
+      });
       onReminderUpdated?.();
     } catch (error: unknown) {
       console.error("Error marking reminder completed:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to update reminder");
+      toast.error(error instanceof Error ? error.message : "Failed to update reminder", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setLoading(false);
     }
@@ -124,11 +133,18 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
     setLoading(true);
     try {
       await api.reminders.deleteReminder(reminder.id);
-      toast.success("Reminder deleted successfully!");
+      toast.success("Reminder deleted successfully!", {
+        description: "The reminder has been permanently deleted.",
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
+      });
       onReminderDeleted?.();
     } catch (error: unknown) {
       console.error("Error deleting reminder:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete reminder");
+      toast.error(error instanceof Error ? error.message : "Failed to delete reminder", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setLoading(false);
     }

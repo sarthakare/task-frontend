@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Edit, XCircle, Users, Loader2 } from "lucide-react";
+import { Edit, XCircle, Users, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import type { User, Team, Project, ProjectUpdate } from "@/types";
@@ -194,6 +194,8 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
       toast.success('Project updated successfully!', {
         description: `${formData.name} has been updated.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       // Call callback to refresh parent component
@@ -210,6 +212,8 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
       toast.error('Failed to update project', {
         description: errorMessage,
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsSubmitting(false);

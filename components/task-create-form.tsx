@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Plus, XCircle, Loader2, Upload, X, FileText } from "lucide-react";
+import { Plus, XCircle, Loader2, Upload, X, FileText, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import type { User, Team, Project, TaskCreate, TaskStatus, TaskPriority } from "@/types";
@@ -225,6 +225,8 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       toast.success('Task created successfully!', {
         description: `${formData.title} has been created and assigned.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
 
       // Call callback to refresh parent component
@@ -241,6 +243,8 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       toast.error('Failed to create task', {
         description: errorMessage,
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsSubmitting(false);

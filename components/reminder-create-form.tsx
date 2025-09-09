@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import { User, Task, ReminderCreate } from "@/types";
@@ -43,7 +43,10 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
       setTasks(tasksResponse);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Failed to load users and tasks");
+      toast.error("Failed to load users and tasks", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setLoadingData(false);
     }
@@ -70,19 +73,31 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
     
     // Validation
     if (!formData.title.trim()) {
-      toast.error("Title is required");
+      toast.error("Title is required", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
       return;
     }
     if (!formData.description.trim()) {
-      toast.error("Description is required");
+      toast.error("Description is required", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
       return;
     }
     if (!formData.due_date) {
-      toast.error("Due date is required");
+      toast.error("Due date is required", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
       return;
     }
     if (!formData.user_id || formData.user_id === 0) {
-      toast.error("Please select a user");
+      toast.error("Please select a user", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
       return;
     }
 
@@ -93,12 +108,19 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
         due_date: new Date(formData.due_date).toISOString(),
       });
       
-      toast.success("Reminder created successfully!");
+      toast.success("Reminder created successfully!", {
+        description: "The reminder has been created and will notify the assigned user.",
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
+      });
       setOpen(false);
       onReminderCreated?.();
     } catch (error: unknown) {
       console.error("Error creating reminder:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to create reminder");
+      toast.error(error instanceof Error ? error.message : "Failed to create reminder", {
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
     } finally {
       setLoading(false);
     }

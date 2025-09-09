@@ -27,6 +27,7 @@ import {
   Plus,
   Eye,
   EyeOff,
+  CircleAlert,
 } from "lucide-react";
 import {
   Select,
@@ -81,6 +82,8 @@ export default function TasksPage() {
       console.error("Error fetching tasks:", error);
       toast.error("Failed to fetch tasks", {
         description: "Unable to load tasks. Please try again.",
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
       setTasks([]);
     } finally {
@@ -130,6 +133,8 @@ export default function TasksPage() {
       toast.success(`Task ${statusText}`, {
         description: 'Task status has been updated successfully.',
         duration: 3000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
       
       fetchTasks(); // Refresh the tasks list
@@ -138,6 +143,8 @@ export default function TasksPage() {
       toast.error('Failed to update task status', {
         description: 'Please try again.',
         duration: 4000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     }
   };

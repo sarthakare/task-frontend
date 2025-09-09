@@ -12,7 +12,9 @@ import {
   MoreHorizontal,
   Loader2,
   Edit,
-  Power
+  Power,
+  CheckCircle2,
+  CircleAlert
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -89,6 +91,8 @@ export default function UsersPage() {
       console.error('Error fetching users:', error);
       toast.error('Failed to fetch users', {
         description: api.utils.handleError(error),
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsLoading(false);
@@ -104,6 +108,8 @@ export default function UsersPage() {
       console.error('Error fetching stats:', error);
       toast.error('Failed to fetch user statistics', {
         description: api.utils.handleError(error),
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsLoadingStats(false);
@@ -134,6 +140,8 @@ export default function UsersPage() {
       toast.success('User updated successfully!', {
         description: `${editingUser.name} has been updated.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
       setIsEditDialogOpen(false);
       setEditingUser(null);
@@ -144,6 +152,8 @@ export default function UsersPage() {
       toast.error('Failed to update user', {
         description: api.utils.handleError(error),
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsSubmitting(false);
@@ -159,6 +169,8 @@ export default function UsersPage() {
       toast.success(`User ${action} successfully!`, {
         description: `User has been ${action}.`,
         duration: 4000,
+        icon: <CheckCircle2 className="text-green-600" />,
+        style: { color: "green" },
       });
       fetchUsers();
       fetchStats();
@@ -167,6 +179,8 @@ export default function UsersPage() {
       toast.error('Failed to toggle user status', {
         description: api.utils.handleError(error),
         duration: 5000,
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
     } finally {
       setIsTogglingStatus(null);
