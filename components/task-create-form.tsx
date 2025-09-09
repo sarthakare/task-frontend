@@ -224,7 +224,6 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       // Show success toast
       toast.success('Task created successfully!', {
         description: `${formData.title} has been created and assigned.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -242,7 +241,6 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       // Show error toast
       toast.error('Failed to create task', {
         description: errorMessage,
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

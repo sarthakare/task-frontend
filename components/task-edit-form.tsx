@@ -223,7 +223,6 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       // Show success toast
       toast.success('Task updated successfully!', {
         description: `${formData.title} has been updated.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -241,7 +240,6 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       // Show error toast
       toast.error('Failed to update task', {
         description: errorMessage,
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

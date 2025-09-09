@@ -89,7 +89,6 @@ export default function ProjectsPage() {
       
       toast.success(`Project ${statusText} successfully!`, {
         description: `${project.name} has been ${statusText}.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -101,7 +100,6 @@ export default function ProjectsPage() {
       
       toast.error(`Failed to update project status`, {
         description: errorMessage,
-        duration: 4000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

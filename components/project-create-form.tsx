@@ -167,7 +167,6 @@ export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFo
       // Show success toast
       toast.success('Project created successfully!', {
         description: `${formData.name} has been created.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -185,7 +184,6 @@ export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFo
       // Show error toast
       toast.error('Failed to create project', {
         description: errorMessage,
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

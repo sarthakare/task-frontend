@@ -228,7 +228,6 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       // Show success toast
       toast.success('User created successfully!', {
         description: `${formData.name} has been added to the system.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -246,7 +245,6 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       // Show error toast
       toast.error('Failed to create user', {
         description: errorMessage,
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

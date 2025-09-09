@@ -132,7 +132,6 @@ export default function TasksPage() {
 
       toast.success(`Task ${statusText}`, {
         description: 'Task status has been updated successfully.',
-        duration: 3000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -142,7 +141,6 @@ export default function TasksPage() {
       console.error('Error updating task status:', error);
       toast.error('Failed to update task status', {
         description: 'Please try again.',
-        duration: 4000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

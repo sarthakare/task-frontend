@@ -69,7 +69,6 @@ export default function TeamsPage() {
       
       toast.success(`Team ${actionText}d successfully!`, {
         description: `${team.name} is now ${newStatus}.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -81,7 +80,6 @@ export default function TeamsPage() {
       
       toast.error(`Failed to ${actionText} team`, {
         description: errorMessage,
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

@@ -193,7 +193,6 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
       // Show success toast
       toast.success('Project updated successfully!', {
         description: `${formData.name} has been updated.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -211,7 +210,6 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
       // Show error toast
       toast.error('Failed to update project', {
         description: errorMessage,
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });

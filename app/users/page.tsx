@@ -139,7 +139,6 @@ export default function UsersPage() {
       await api.users.updateUser(editingUser.id, userData);
       toast.success('User updated successfully!', {
         description: `${editingUser.name} has been updated.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -151,7 +150,6 @@ export default function UsersPage() {
       console.error('Error updating user:', error);
       toast.error('Failed to update user', {
         description: api.utils.handleError(error),
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
@@ -168,7 +166,6 @@ export default function UsersPage() {
       const action = currentStatus ? 'deactivated' : 'activated';
       toast.success(`User ${action} successfully!`, {
         description: `User has been ${action}.`,
-        duration: 4000,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -178,7 +175,6 @@ export default function UsersPage() {
       console.error('Error toggling user status:', error);
       toast.error('Failed to toggle user status', {
         description: api.utils.handleError(error),
-        duration: 5000,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
