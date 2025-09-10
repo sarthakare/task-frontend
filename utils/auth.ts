@@ -59,3 +59,22 @@ export function clearAuth() {
   Cookies.remove("user");
   localStorage.removeItem("rememberMe");
 }
+
+// Permission checking utilities
+export function canManageUsers(): boolean {
+  const user = getUser();
+  if (!user) return false;
+  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO";
+}
+
+export function canCreateUsers(): boolean {
+  return canManageUsers();
+}
+
+export function canEditUsers(): boolean {
+  return canManageUsers();
+}
+
+export function canDeleteUsers(): boolean {
+  return canManageUsers();
+}

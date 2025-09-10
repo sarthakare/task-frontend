@@ -64,7 +64,17 @@ async function apiRequest<T>(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+      const errorMessage = errorData.detail || `HTTP ${response.status}: ${response.statusText}`;
+      
+      // Handle specific error cases
+      if (response.status === 400 && errorMessage.includes("deactivated")) {
+        clearAuth();
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     return await response.json();
@@ -164,7 +174,14 @@ export const authAPI = {
 
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.detail || "Login failed");
+      const errorMessage = error.detail || "Login failed";
+      
+      // Handle deactivated user case
+      if (res.status === 400 && errorMessage.includes("deactivated")) {
+        clearAuth();
+      }
+      
+      throw new Error(errorMessage);
     }
 
     return await res.json(); // { access_token, token_type, user }

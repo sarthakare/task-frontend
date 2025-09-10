@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
+import { canCreateUsers, canEditUsers } from "@/utils/auth";
 
 // Types based on backend schemas
 interface User {
@@ -225,7 +226,9 @@ export default function UsersPage() {
                   <SelectItem value="inactive">Inactive Only</SelectItem>
                 </SelectContent>
               </Select>
-              <UserCreateForm onUserCreated={handleUserCreated} />
+              {canCreateUsers() && (
+                <UserCreateForm onUserCreated={handleUserCreated} />
+              )}
             </div>
           </div>
         </CardContent>
@@ -402,36 +405,40 @@ export default function UsersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setEditingUser(user);
-                          setIsEditDialogOpen(true);
-                        }}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem 
-                            onClick={() => handleToggleUserStatus(user.id, user.is_active)}
-                            disabled={isTogglingStatus === user.id}
-                          >
-                            <Power className="h-4 w-4 mr-2" />
-                            {isTogglingStatus === user.id ? (
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            ) : null}
-                            {user.is_active ? 'Deactivate' : 'Activate'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {canEditUsers() && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingUser(user);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      )}
+                      {canEditUsers() && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem 
+                              onClick={() => handleToggleUserStatus(user.id, user.is_active)}
+                              disabled={isTogglingStatus === user.id}
+                            >
+                              <Power className="h-4 w-4 mr-2" />
+                              {isTogglingStatus === user.id ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : null}
+                              {user.is_active ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
                   </div>
                 </div>
