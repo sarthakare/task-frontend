@@ -358,7 +358,31 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="role" className="text-sm font-medium text-gray-700">Role/Designation</Label>
+                <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+                  <SelectTrigger className={`transition-colors ${errors.role ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                    <SelectValue placeholder={isLoadingRoles ? "Loading..." : "Select role"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role.charAt(0).toUpperCase() + role.replace('_', ' ').slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {currentUser?.role?.toUpperCase() === 'ADMIN' && roles.includes('CEO') && (
+                  <p className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
+                    As admin, you can create CEO users. CEO will have access to all departments.
+                  </p>
+                )}
+                {errors.role && <p className="text-sm text-red-500 flex items-center gap-1">
+                  <XCircle className="h-4 w-4" />
+                  {errors.role}
+                </p>}
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department</Label>
                 <Select 
@@ -385,30 +409,6 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                 {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.department}
-                </p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role" className="text-sm font-medium text-gray-700">Role/Designation</Label>
-                <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-                  <SelectTrigger className={`transition-colors ${errors.role ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
-                    <SelectValue placeholder={isLoadingRoles ? "Loading..." : "Select role"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role.charAt(0).toUpperCase() + role.replace('_', ' ').slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {currentUser?.role?.toUpperCase() === 'ADMIN' && roles.includes('CEO') && (
-                  <p className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
-                    As admin, you can create CEO users. CEO will have access to all departments.
-                  </p>
-                )}
-                {errors.role && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.role}
                 </p>}
               </div>
             </div>
