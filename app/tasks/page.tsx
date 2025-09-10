@@ -307,37 +307,6 @@ export default function TasksPage() {
         }
       />
 
-      {/* Access Scope Information */}
-      {accessScope && (
-        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-indigo-900 flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Your Task Access Scope
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div>
-                <p className="text-sm text-indigo-800 font-medium">
-                  Role: {accessScope.user_role}
-                </p>
-                <p className="text-xs text-indigo-700">
-                  {accessScope.scope_description}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-bold text-indigo-900">
-                  {accessScope.viewable_user_count}
-                </p>
-                <p className="text-xs text-indigo-700">
-                  users&apos; tasks visible
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Task Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
