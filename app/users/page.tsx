@@ -356,18 +356,16 @@ export default function UsersPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        // Assign background color based on the user's role (manager, team_lead, member, intern)
+                        // Assign background color based on the user's role (manager, team_lead, member)
                         user.role === 'manager' ? 'bg-purple-100' :
                         user.role === 'team_lead' ? 'bg-blue-100' :
                         user.role === 'member' ? 'bg-green-100' :
-                        user.role === 'intern' ? 'bg-yellow-100' :
                         'bg-gray-100'
                       }`}>
                         <span className={`font-medium ${
                           user.role === 'manager' ? 'text-purple-600' :
                           user.role === 'team_lead' ? 'text-blue-600' :
                           user.role === 'member' ? 'text-green-600' :
-                          user.role === 'intern' ? 'text-yellow-600' :
                           'text-gray-600'
                         }`}>
                           {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
@@ -385,7 +383,6 @@ export default function UsersPage() {
                               user.role === 'team_lead' ? 'bg-blue-100 text-blue-800' :
                               user.role === 'manager' ? 'bg-purple-100 text-purple-800' :
                               user.role === 'member' ? 'bg-green-100 text-green-800' :
-                              user.role === 'intern' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-green-100 text-green-800'
                             }`}>
                               {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}

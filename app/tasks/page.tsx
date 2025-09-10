@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/page-header";
 import { TaskCreateForm } from "@/components/task-create-form";
 import { TaskEditForm } from "@/components/task-edit-form";
+import { TaskStatusUpdate } from "@/components/task-status-update";
 import { TaskDetailsModal } from "@/components/task-details-modal";
 import { TaskLogCreateForm } from "@/components/task-log-create-form";
 import { TaskLogDisplay } from "@/components/task-log-display";
-import { 
+import {
   Search,
   Calendar,
   User,
@@ -22,7 +23,6 @@ import {
   Pause,
   X,
   FolderOpen,
-  MoreHorizontal,
   Filter,
   Plus,
   Eye,
@@ -39,7 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import type { Task, TaskStatus, TaskPriority } from "@/types";
@@ -165,6 +164,39 @@ export default function TasksPage() {
     return false;
   };
 
+  const canUpdateTaskStatus = (task: Task): boolean => {
+    if (!currentUser) return false;
+    
+    const userRole = currentUser.role.toUpperCase();
+    
+    // ADMIN and CEO can update status of all tasks
+    if (userRole === 'ADMIN' || userRole === 'CEO') {
+      return true;
+    }
+    
+    // User can update status of their own created tasks
+    if (task.creator?.id === currentUser.id) {
+      return true;
+    }
+    
+    // User can update status if they are assigned to the task
+    if (task.assigned_to === currentUser.id) {
+      return true;
+    }
+    
+    // Check if user can update status based on role hierarchy
+    if (accessScope) {
+      const viewableUserIds = accessScope.viewable_users.map(u => u.id);
+      
+      // User can update status if the CREATOR is in their scope
+      if (viewableUserIds.includes(task.creator?.id || 0)) {
+        return true;
+      }
+    }
+    
+    return false;
+  };
+
   const calculateStats = () => {
     const now = new Date();
     
@@ -195,31 +227,6 @@ export default function TasksPage() {
     fetchTasks(); // Refresh tasks list after updating a task
   };
 
-  const handleTaskStatusChange = async (taskId: number, newStatus: TaskStatus) => {
-    try {
-      await api.tasks.updateTask(taskId, { status: newStatus });
-      
-      const statusText = newStatus === 'IN_PROGRESS' ? 'started' : 
-                        newStatus === 'FINISHED' ? 'completed' :
-                        newStatus === 'PENDING' ? 'marked as pending' :
-                        newStatus === 'CANCELLED' ? 'cancelled' : 'updated';
-
-      toast.success(`Task ${statusText}`, {
-        description: 'Task status has been updated successfully.',
-        icon: <CheckCircle2 className="text-green-600" />,
-        style: { color: "green" },
-      });
-      
-      fetchTasks(); // Refresh the tasks list
-    } catch (error) {
-      console.error('Error updating task status:', error);
-      toast.error('Failed to update task status', {
-        description: 'Please try again.',
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-    }
-  };
 
   // Get unique assignees for filter
   const uniqueAssignees = Array.from(new Set(tasks.map(task => task.assignee?.name).filter(Boolean)));
@@ -601,6 +608,14 @@ export default function TasksPage() {
                         />
                       )}
                       
+                      {/* Show status update button if user has permission */}
+                      {canUpdateTaskStatus(task) && (
+                        <TaskStatusUpdate 
+                          task={task} 
+                          onStatusUpdated={handleTaskUpdated}
+                        />
+                      )}
+                      
                       {/* Task Log Actions */}
                       <TaskLogCreateForm
                         taskId={task.id}
@@ -632,57 +647,6 @@ export default function TasksPage() {
                         )}
                       </Button>
                       
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuSeparator />
-                          
-                          {/* Status change options */}
-                          {task.status !== 'IN_PROGRESS' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleTaskStatusChange(task.id, 'IN_PROGRESS')}
-                              className="flex items-center gap-2"
-                            >
-                              <AlertCircle className="h-4 w-4" />
-                              Start Task
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {task.status === 'IN_PROGRESS' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleTaskStatusChange(task.id, 'PENDING')}
-                              className="flex items-center gap-2"
-                            >
-                              <Pause className="h-4 w-4" />
-                              Mark Pending
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {!['FINISHED', 'CANCELLED'].includes(task.status) && (
-                            <DropdownMenuItem 
-                              onClick={() => handleTaskStatusChange(task.id, 'FINISHED')}
-                              className="flex items-center gap-2"
-                            >
-                              <CheckCircle2 className="h-4 w-4" />
-                              Mark Complete
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {!['FINISHED', 'CANCELLED'].includes(task.status) && (
-                            <DropdownMenuItem 
-                              onClick={() => handleTaskStatusChange(task.id, 'CANCELLED')}
-                              className="flex items-center gap-2"
-                            >
-                              <X className="h-4 w-4" />
-                              Cancel Task
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </div>
                   

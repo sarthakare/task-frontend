@@ -231,6 +231,12 @@ export const taskAPI = {
     body: JSON.stringify(taskData),
   }),
   
+  // Update task status only
+  updateTaskStatus: (id: number, status: string) => apiRequest<Task>(`/tasks/${id}/status`, {
+    method: 'PUT',
+    body: JSON.stringify({ status }),
+  }),
+  
   // Delete task
   deleteTask: (id: number) => apiRequest<void>(`/tasks/${id}`, {
     method: 'DELETE',
