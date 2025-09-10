@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { UserCreateForm } from "@/components/user-create-form";
+import { UserEditForm } from "@/components/user-edit-form";
 import { 
   Users, 
   Search,
@@ -35,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 
@@ -65,6 +65,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   
@@ -116,13 +117,21 @@ export default function UsersPage() {
     }
   };
 
-  // Filter users based on search term
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter users based on search term and status
+  const filteredUsers = users.filter(user => {
+    // Search filter
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.role.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Status filter
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "active" && user.is_active) ||
+      (statusFilter === "inactive" && !user.is_active);
+    
+    return matchesSearch && matchesStatus;
+  });
 
   // Handle user refresh after creation
   const handleUserCreated = () => {
@@ -206,6 +215,16 @@ export default function UsersPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
               <UserCreateForm onUserCreated={handleUserCreated} />
             </div>
           </div>
@@ -213,7 +232,7 @@ export default function UsersPage() {
       </Card>
 
       {/* User Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
         <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-900">Total Users</CardTitle>
@@ -254,7 +273,7 @@ export default function UsersPage() {
         </Card>
         <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-900">Total Managers</CardTitle>
+            <CardTitle className="text-sm font-medium text-purple-900">Managers</CardTitle>
             <Users className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
@@ -273,7 +292,7 @@ export default function UsersPage() {
         </Card>
         <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-900">Team Lead</CardTitle>
+            <CardTitle className="text-sm font-medium text-orange-900">Team Leads</CardTitle>
             <Users className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
@@ -286,6 +305,25 @@ export default function UsersPage() {
               <>
                 <div className="text-2xl font-bold text-orange-900">{stats?.users_by_role?.team_lead || 0}</div>
                 <p className="text-xs text-orange-700">Team leaders</p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-r from-indigo-50 to-indigo-100 border-indigo-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-indigo-900">Members</CardTitle>
+            <Users className="h-4 w-4 text-indigo-600" />
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-indigo-900">{stats?.users_by_role?.member || 0}</div>
+                <p className="text-xs text-indigo-700">Team members</p>
               </>
             )}
           </CardContent>
@@ -314,7 +352,7 @@ export default function UsersPage() {
           ) : (
             <div className="space-y-4">
               {filteredUsers.map((user) => (
-                <div key={user.id} className="p-4 border rounded-lg bg-white">
+                <div key={user.id} className={`p-4 border rounded-lg ${user.is_active ? 'bg-white' : 'bg-gray-50 border-gray-300'}`}>
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -342,23 +380,27 @@ export default function UsersPage() {
                           <p className="text-sm text-gray-500">{user.mobile}</p>
                         )}
                         <div className="flex gap-2 mt-1">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            user.role === 'team_lead' ? 'bg-blue-100 text-blue-800' :
-                            user.role === 'manager' ? 'bg-purple-100 text-purple-800' :
-                            user.role === 'member' ? 'bg-green-100 text-green-800' :
-                            user.role === 'intern' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
-                          </span>
+                          {user.role.toUpperCase() !== 'CEO' && (
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              user.role === 'team_lead' ? 'bg-blue-100 text-blue-800' :
+                              user.role === 'manager' ? 'bg-purple-100 text-purple-800' :
+                              user.role === 'member' ? 'bg-green-100 text-green-800' :
+                              user.role === 'intern' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
+                            </span>
+                          )}
                           <span className={`px-2 py-1 text-xs rounded-full ${
                             user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {user.is_active ? 'Active' : 'Inactive'}
                           </span>
-                          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                            {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
-                          </span>
+                          {user.role.toUpperCase() !== 'CEO' && (
+                            <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                              {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -404,188 +446,25 @@ export default function UsersPage() {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden">
+          <DialogHeader className="pb-4 border-b">
             <DialogTitle>Edit User: {editingUser?.name}</DialogTitle>
           </DialogHeader>
-          {editingUser && (
-            <EditUserForm 
-              user={editingUser} 
-              onSubmit={handleEditUser}
-              onCancel={() => {
-                setIsEditDialogOpen(false);
-                setEditingUser(null);
-              }}
-              isSubmitting={isSubmitting}
-            />
-          )}
+          <div className="overflow-y-auto max-h-[calc(90vh-120px)] pr-2">
+            {editingUser && (
+              <UserEditForm 
+                user={editingUser} 
+                onSubmit={handleEditUser}
+                onCancel={() => {
+                  setIsEditDialogOpen(false);
+                  setEditingUser(null);
+                }}
+                isSubmitting={isSubmitting}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-// Edit User Form Component
-interface EditUserFormProps {
-  user: User;
-  onSubmit: (userData: Partial<User>) => void;
-  onCancel: () => void;
-  isSubmitting: boolean;
-}
-
-function EditUserForm({ user, onSubmit, onCancel, isSubmitting }: EditUserFormProps) {
-  const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
-    mobile: user.mobile || '',
-    department: user.department,
-    role: user.role,
-  });
-
-  const [roles, setRoles] = useState<string[]>([]);
-  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
-  const [departments, setDepartments] = useState<string[]>([]);
-  const [isLoadingDepartments, setIsLoadingDepartments] = useState(false);
-
-  const fetchDepartments = async () => {
-
-    setIsLoadingDepartments(true);
-    try {
-      const data = await api.users.getDepartments();
-      setDepartments(data);
-    } catch (error) {
-      console.error('Error fetching departments:', error);
-    } finally {
-      setIsLoadingDepartments(false);
-    }
-  };
-
-  const fetchRoles = async () => {
-    setIsLoadingRoles(true);
-    try {
-      const data = await api.users.getRoles();
-      setRoles(data);
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-    } finally {
-      setIsLoadingRoles(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRoles();
-    fetchDepartments();
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };  
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="edit-name">Full Name</Label>
-          <Input
-            id="edit-name"
-            value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Enter full name"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="edit-email">Email</Label>
-          <Input
-            id="edit-email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-            placeholder="Enter email address"
-            required
-          />
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="edit-mobile">Mobile Number</Label>
-          <Input
-            id="edit-mobile"
-            type="tel"
-            value={formData.mobile}
-            onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-            placeholder="Enter mobile number"
-          />
-        </div>
-                 <div className="space-y-2">
-           <Label htmlFor="edit-department">Department</Label>
-           {isLoadingDepartments ? (
-             <div className="flex items-center gap-2 p-2 border rounded-md bg-gray-50">
-               <Loader2 className="h-4 w-4 animate-spin" />
-               <span className="text-sm text-muted-foreground">Loading departments...</span>
-             </div>
-           ) : (
-             <Select value={formData.department} onValueChange={(value) => setFormData(prev => ({ ...prev, department: value }))}>
-               <SelectTrigger>
-                 <SelectValue placeholder="Select department" />
-               </SelectTrigger>
-               <SelectContent>
-                 {departments.map((dept: string) => (
-                   <SelectItem key={dept} value={dept}>
-                     {dept.charAt(0).toUpperCase() + dept.slice(1).replace('_', ' ')}
-                   </SelectItem>
-                 ))}
-               </SelectContent>
-             </Select>
-           )}
-         </div>
-      </div>
-
-             <div className="space-y-2">
-         <Label htmlFor="edit-role">Role</Label>
-         {isLoadingRoles ? (
-           <div className="flex items-center gap-2 p-2 border rounded-md bg-gray-50">
-             <Loader2 className="h-4 w-4 animate-spin" />
-             <span className="text-sm text-muted-foreground">Loading roles...</span>
-           </div>
-         ) : (
-           <Select value={formData.role} onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}>
-             <SelectTrigger>
-               <SelectValue placeholder="Select role" />
-             </SelectTrigger>
-             <SelectContent>
-               {roles.map((role: string) => (
-                 <SelectItem key={role} value={role}>
-                   {role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' ')}
-                 </SelectItem>
-               ))}
-             </SelectContent>
-           </Select>
-         )}
-        
-        {/* Role change warning */}
-        {formData.role !== user.role && (
-          <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
-            <p className="text-sm text-blue-800">
-              <strong>Role Change Warning:</strong> Changing a user&apos;s role will affect their permissions and access levels.
-            </p>
-            <p className="text-sm text-blue-600 mt-1">
-              <strong>Current Role:</strong> {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
-            </p>
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Updating...' : 'Update User'}
-        </Button>
-      </div>
-    </form>
   );
 }

@@ -29,6 +29,8 @@ import {
   EyeOff,
   CircleAlert,
   Loader2,
+  Briefcase,
+  Users,
 } from "lucide-react";
 import {
   Select,
@@ -52,6 +54,23 @@ export default function TasksPage() {
   const [assigneeFilter, setAssigneeFilter] = useState("all");
   const [shownLogs, setShownLogs] = useState<Set<number>>(new Set());
   const [logRefreshTrigger, setLogRefreshTrigger] = useState(0);
+  const [accessScope, setAccessScope] = useState<{
+    user_role: string;
+    scope_description: string;
+    viewable_user_count: number;
+    viewable_users: Array<{
+      id: number;
+      name: string;
+      role: string;
+      department: string;
+    }>;
+  } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    id: number;
+    name: string;
+    role: string;
+    department: string;
+  } | null>(null);
   const [stats, setStats] = useState({
     totalTasks: 0,
     newTasks: 0,
@@ -63,6 +82,8 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchTasks();
+    fetchAccessScope();
+    fetchCurrentUser();
   }, []);
 
   useEffect(() => {
@@ -92,6 +113,56 @@ export default function TasksPage() {
       setIsLoadingTasks(false);
       setIsLoadingStats(false);
     }
+  };
+
+  const fetchAccessScope = async () => {
+    try {
+      const data = await api.tasks.getAccessScope();
+      setAccessScope(data);
+    } catch (error) {
+      console.error("Error fetching access scope:", error);
+      // Don't show error toast for this as it's not critical
+    }
+  };
+
+  const fetchCurrentUser = async () => {
+    try {
+      const data = await api.users.getCurrentUser();
+      setCurrentUser(data);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      // Don't show error toast for this as it's not critical
+    }
+  };
+
+  const canEditTask = (task: Task): boolean => {
+    if (!currentUser || !accessScope) return false;
+    
+    const userRole = currentUser.role.toUpperCase();
+    
+    // ADMIN and CEO can edit all tasks
+    if (userRole === 'ADMIN' || userRole === 'CEO') {
+      return true;
+    }
+    
+    // User can edit their own created tasks
+    if (task.creator?.id === currentUser.id) {
+      return true;
+    }
+    
+    // Check if user can edit based on role hierarchy (but NOT just because they're assigned)
+    const viewableUserIds = accessScope.viewable_users.map(u => u.id);
+    
+    // User can edit if the CREATOR is in their scope (not the assignee)
+    // This means they can manage tasks created by their subordinates
+    if (viewableUserIds.includes(task.creator?.id || 0)) {
+      return true;
+    }
+    
+    // Being an assignee does NOT give edit rights
+    // Only hierarchy or being the creator gives edit rights
+    
+    return false;
   };
 
   const calculateStats = () => {
@@ -236,6 +307,38 @@ export default function TasksPage() {
         }
       />
 
+      {/* Access Scope Information */}
+      {accessScope && (
+        <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-indigo-900 flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Your Task Access Scope
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <p className="text-sm text-indigo-800 font-medium">
+                  Role: {accessScope.user_role}
+                </p>
+                <p className="text-xs text-indigo-700">
+                  {accessScope.scope_description}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-indigo-900">
+                  {accessScope.viewable_user_count}
+                </p>
+                <p className="text-xs text-indigo-700">
+                  users&apos; tasks visible
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Task Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
@@ -244,6 +347,7 @@ export default function TasksPage() {
             <FolderOpen className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
+            
             {isLoadingStats ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -476,11 +580,27 @@ export default function TasksPage() {
                       </div>
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 text-sm">
                         <div className="flex items-center gap-2">
                           <User className="h-3 w-3 text-gray-400" />
-                          <span className="text-gray-600">{task.assignee?.name || 'Unassigned'}</span>
+                          <span className="text-gray-600">Creator: {task.creator?.name || 'Unknown'}</span>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <User className="h-3 w-3 text-blue-400" />
+                          <span className="text-gray-600">Assignee: {task.assignee?.name || 'Unassigned'}</span>
+                        </div>
+                        {task.project?.name && (
+                          <div className="flex items-center gap-2">
+                            <Briefcase className="h-3 w-3 text-green-400" />
+                            <span className="text-gray-600">Project: {task.project.name}</span>
+                          </div>
+                        )}
+                        {task.team?.name && (
+                          <div className="flex items-center gap-2">
+                            <Users className="h-3 w-3 text-purple-400" />
+                            <span className="text-gray-600">Team: {task.team.name}</span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2">
                           <Calendar className="h-3 w-3 text-gray-400" />
                           <span className="text-gray-600">Due: {new Date(task.due_date).toLocaleDateString()}</span>
@@ -504,10 +624,13 @@ export default function TasksPage() {
                     <div className="flex items-center gap-2 ml-4">
                       <TaskDetailsModal task={task} />
                       
-                      <TaskEditForm 
-                        task={task} 
-                        onTaskUpdated={handleTaskUpdated}
-                      />
+                      {/* Show edit button only if user has permission */}
+                      {canEditTask(task) && (
+                        <TaskEditForm 
+                          task={task} 
+                          onTaskUpdated={handleTaskUpdated}
+                        />
+                      )}
                       
                       {/* Task Log Actions */}
                       <TaskLogCreateForm

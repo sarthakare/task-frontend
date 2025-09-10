@@ -9,6 +9,7 @@ import { TeamCreateForm } from "@/components/team-create-form";
 import { TeamEditForm } from "@/components/team-edit-form";
 import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import type { Team } from "@/types";
@@ -17,6 +18,7 @@ export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [stats, setStats] = useState({
     totalTeams: 0,
     activeTeams: 0,
@@ -86,13 +88,19 @@ export default function TeamsPage() {
     }
   };
 
-  // Filter teams based on search term
-  const filteredTeams = teams.filter(team => 
-    team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.leader.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter teams based on search term and status
+  const filteredTeams = teams.filter(team => {
+    const matchesSearch = team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      team.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      team.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      team.leader.name.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "active" && team.status === "active") ||
+      (statusFilter === "inactive" && team.status === "inactive");
+    
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -117,6 +125,16 @@ export default function TeamsPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Teams</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
               <TeamCreateForm onTeamCreated={handleTeamCreated} />
             </div>
           </div>
@@ -216,13 +234,13 @@ export default function TeamsPage() {
           ) : filteredTeams.length > 0 ? (
             <div className="space-y-4">
               {filteredTeams.map((team) => (
-                <div key={team.id} className="p-4 border rounded-lg bg-white hover:shadow-md transition-shadow">
+                <div key={team.id} className={`p-4 border rounded-lg ${team.status === 'active' ? 'bg-white' : 'bg-gray-50 border-gray-300'} hover:shadow-md transition-shadow`}>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{team.name}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{team.description}</p>
+                          <h3 className={`font-medium ${team.status === 'active' ? 'text-gray-900' : 'text-gray-600'}`}>{team.name}</h3>
+                          <p className={`text-sm mt-1 ${team.status === 'active' ? 'text-gray-600' : 'text-gray-500'}`}>{team.description}</p>
                         </div>
                         
                         {/* Action buttons */}

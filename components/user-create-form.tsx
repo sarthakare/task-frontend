@@ -66,6 +66,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
   const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<{id: number, role: string} | null>(null);
   const [isLoadingSupervisors, setIsLoadingSupervisors] = useState(false);
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(false);
   const [isLoadingRoles, setIsLoadingRoles] = useState(false);
@@ -91,11 +92,21 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
   // Fetch data when component mounts or dialog opens
   useEffect(() => {
     if (isCreateDialogOpen) {
+      fetchCurrentUser();
       fetchSupervisors();
       fetchDepartments();
       fetchRoles();
     }
   }, [isCreateDialogOpen]);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const user = await api.users.getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  };
 
   const fetchSupervisors = async () => {
     setIsLoadingSupervisors(true);
@@ -136,10 +147,19 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+
+      // Auto-set department to "All" when CEO role is selected by admin
+      if (field === 'role' && value === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN') {
+        newData.department = 'All';
+      }
+
+      return newData;
+    });
 
     // Clear error when user starts typing
     if (errors[field]) {
@@ -177,7 +197,8 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       newErrors.role = 'Role is required';
     }
 
-    if (!formData.supervisor) {
+    // Supervisor is optional for CEO role when created by admin
+    if (!formData.supervisor && !(formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN')) {
       newErrors.supervisor = 'Supervisor is required';
     }
 
@@ -340,8 +361,12 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department</Label>
-                <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
-                  <SelectTrigger className={`transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                <Select 
+                  value={formData.department} 
+                  onValueChange={(value) => handleInputChange('department', value)}
+                  disabled={formData.role === 'CEO'}
+                >
+                  <SelectTrigger className={`transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'} ${formData.role === 'CEO' ? 'bg-gray-100' : ''}`}>
                     <SelectValue placeholder={isLoadingDepartments ? "Loading..." : "Select department"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -352,6 +377,11 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     ))}
                   </SelectContent>
                 </Select>
+                {formData.role === 'CEO' && (
+                  <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
+                    CEO role automatically gets &quot;All&quot; departments access
+                  </p>
+                )}
                 {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.department}
@@ -371,6 +401,11 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     ))}
                   </SelectContent>
                 </Select>
+                {currentUser?.role?.toUpperCase() === 'ADMIN' && roles.includes('CEO') && (
+                  <p className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
+                    As admin, you can create CEO users. CEO will have access to all departments.
+                  </p>
+                )}
                 {errors.role && <p className="text-sm text-red-500 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.role}
@@ -379,7 +414,9 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="supervisor" className="text-sm font-medium text-gray-700">Supervisor</Label>
+              <Label htmlFor="supervisor" className="text-sm font-medium text-gray-700">
+                Supervisor {formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN' && '(Optional for CEO)'}
+              </Label>
               <Select value={formData.supervisor} onValueChange={(value) => handleInputChange('supervisor', value)}>
                 <SelectTrigger className={`transition-colors ${errors.supervisor ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                   <SelectValue placeholder={isLoadingSupervisors ? "Loading..." : "Select supervisor/manager"} />
@@ -394,6 +431,11 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                   ))}
                 </SelectContent>
               </Select>
+              {formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN' && (
+                <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
+                  CEO users typically don&apos;t have a supervisor. You can leave this blank.
+                </p>
+              )}
               {errors.supervisor && <p className="text-sm text-red-500 flex items-center gap-1">
                 <XCircle className="h-4 w-4" />
                 {errors.supervisor}

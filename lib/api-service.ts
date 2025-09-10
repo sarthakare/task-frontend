@@ -131,6 +131,9 @@ export const userAPI = {
   
   // Get user statistics
   getUserStats: () => apiRequest<UserStats>('/users/stats/'),
+  
+  // Get current user information
+  getCurrentUser: () => apiRequest<User>('/users/me'),
 };
 
 // Authentication API
@@ -235,6 +238,27 @@ export const taskAPI = {
   
   // Get task statistics
   getTaskStats: () => apiRequest<{ total: number; by_status: Record<string, number>; by_priority: Record<string, number> }>('/tasks/stats/'),
+  
+  // Get user's task access scope
+  getAccessScope: () => apiRequest<{
+    user_role: string;
+    scope_description: string;
+    viewable_user_count: number;
+    viewable_users: Array<{
+      id: number;
+      name: string;
+      role: string;
+      department: string;
+    }>;
+  }>('/tasks/access-scope'),
+  
+  // Check if user can edit a specific task
+  canEditTask: (taskId: number) => apiRequest<{
+    can_edit: boolean;
+    user_id: number;
+    user_role: string;
+    task_id: number;
+  }>(`/tasks/${taskId}/can-edit`),
   
   // Task Log Management
   // Create task log
