@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { TeamCreateForm } from "@/components/team-create-form";
 import { TeamEditForm } from "@/components/team-edit-form";
-import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2 } from "lucide-react";
+import { TeamDetailsModal } from "@/components/team-details-modal";
+import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2, Eye } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
+import { canCreateTeams, canEditTeams } from "@/utils/auth";
 import type { Team } from "@/types";
 
 export default function TeamsPage() {
@@ -25,6 +27,14 @@ export default function TeamsPage() {
     totalMembers: 0,
     teamLeads: 0
   });
+
+  // Check permissions
+  const canCreate = canCreateTeams();
+  const canEdit = canEditTeams();
+
+  // Team details modal state
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchTeams();
@@ -60,6 +70,16 @@ export default function TeamsPage() {
 
   const handleTeamUpdated = () => {
     fetchTeams(); // Refresh teams list after updating a team
+  };
+
+  const handleViewTeamDetails = (team: Team) => {
+    setSelectedTeam(team);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedTeam(null);
   };
 
   const handleToggleTeamStatus = async (team: Team) => {
@@ -135,7 +155,7 @@ export default function TeamsPage() {
                   <SelectItem value="inactive">Inactive Only</SelectItem>
                 </SelectContent>
               </Select>
-              <TeamCreateForm onTeamCreated={handleTeamCreated} />
+              {canCreate && <TeamCreateForm onTeamCreated={handleTeamCreated} />}
             </div>
           </div>
         </CardContent>
@@ -245,10 +265,12 @@ export default function TeamsPage() {
                         
                         {/* Action buttons */}
                         <div className="flex items-center gap-2 ml-4">
-                          <TeamEditForm 
-                            team={team} 
-                            onTeamUpdated={handleTeamUpdated}
-                          />
+                          {canEdit && (
+                            <TeamEditForm 
+                              team={team} 
+                              onTeamUpdated={handleTeamUpdated}
+                            />
+                          )}
                           
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -258,21 +280,32 @@ export default function TeamsPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem 
-                                onClick={() => handleToggleTeamStatus(team)}
+                                onClick={() => handleViewTeamDetails(team)}
                                 className="flex items-center gap-2"
                               >
-                                {team.status === 'active' ? (
-                                  <>
-                                    <PowerOff className="h-4 w-4" />
-                                    Deactivate Team
-                                  </>
-                                ) : (
-                                  <>
-                                    <Power className="h-4 w-4" />
-                                    Activate Team
-                                  </>
-                                )}
+                                <Eye className="h-4 w-4" />
+                                View Details
                               </DropdownMenuItem>
+                              
+                              {/* Only show status change options if user has edit permissions */}
+                              {canEdit && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleToggleTeamStatus(team)}
+                                  className="flex items-center gap-2"
+                                >
+                                  {team.status === 'active' ? (
+                                    <>
+                                      <PowerOff className="h-4 w-4" />
+                                      Deactivate Team
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Power className="h-4 w-4" />
+                                      Activate Team
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -324,7 +357,7 @@ export default function TeamsPage() {
                   : "Try adjusting your search criteria or filters."
                 }
               </p>
-              {teams.length === 0 && (
+              {teams.length === 0 && canCreate && (
                 <TeamCreateForm 
                   onTeamCreated={handleTeamCreated}
                   trigger={
@@ -339,6 +372,13 @@ export default function TeamsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Team Details Modal */}
+      <TeamDetailsModal 
+        team={selectedTeam}
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+      />
     </div>
   );
 }

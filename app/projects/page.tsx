@@ -29,9 +29,12 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
+import { canCreateProjects, canEditProjects } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 import type { Project } from "@/types";
 
 export default function ProjectsPage() {
+  const { currentUser } = useUser();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,6 +49,10 @@ export default function ProjectsPage() {
   // Project details modal state
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  // Check permissions
+  const canCreate = canCreateProjects();
+  const canEdit = canEditProjects();
 
   useEffect(() => {
     fetchProjects();
@@ -152,9 +159,11 @@ export default function ProjectsPage() {
                 />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <ProjectCreateForm onProjectCreated={handleProjectCreated} />
-            </div>
+            {canCreate && (
+              <div className="flex items-center gap-2">
+                <ProjectCreateForm onProjectCreated={handleProjectCreated} />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -263,10 +272,12 @@ export default function ProjectsPage() {
                         
                         {/* Action buttons */}
                         <div className="flex items-center gap-2 ml-4">
-                          <ProjectEditForm 
-                            project={project} 
-                            onProjectUpdated={handleProjectUpdated}
-                          />
+                          {canEdit && (
+                            <ProjectEditForm 
+                              project={project} 
+                              onProjectUpdated={handleProjectUpdated}
+                            />
+                          )}
                           
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -283,47 +294,52 @@ export default function ProjectsPage() {
                                 View Details
                               </DropdownMenuItem>
                               
-                              <DropdownMenuSeparator />
-                              
-                              {/* Status change options */}
-                              {project.status !== 'active' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'active')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Play className="h-4 w-4" />
-                                  Activate Project
-                                </DropdownMenuItem>
-                              )}
-                              
-                              {project.status === 'active' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Pause className="h-4 w-4" />
-                                  Put On Hold
-                                </DropdownMenuItem>
-                              )}
-                              
-                              {project.status !== 'completed' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'completed')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <CheckCircle2 className="h-4 w-4" />
-                                  Mark Completed
-                                </DropdownMenuItem>
-                              )}
-                              
-                              {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <X className="h-4 w-4" />
-                                  Cancel Project
-                                </DropdownMenuItem>
+                              {/* Only show status change options if user has edit permissions */}
+                              {canEdit && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  
+                                  {/* Status change options */}
+                                  {project.status !== 'active' && (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleProjectStatusChange(project, 'active')}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Play className="h-4 w-4" />
+                                      Activate Project
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {project.status === 'active' && (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleProjectStatusChange(project, 'on_hold')}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Pause className="h-4 w-4" />
+                                      Put On Hold
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {project.status !== 'completed' && (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleProjectStatusChange(project, 'completed')}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <CheckCircle2 className="h-4 w-4" />
+                                      Mark Completed
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {project.status !== 'cancelled' && project.status !== 'completed' && (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleProjectStatusChange(project, 'cancelled')}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <X className="h-4 w-4" />
+                                      Cancel Project
+                                    </DropdownMenuItem>
+                                  )}
+                                </>
                               )}
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -385,7 +401,7 @@ export default function ProjectsPage() {
                   : "Try adjusting your search criteria or filters."
                 }
               </p>
-              {projects.length === 0 && (
+              {projects.length === 0 && canCreate && (
                 <ProjectCreateForm 
                   onProjectCreated={handleProjectCreated}
                   trigger={

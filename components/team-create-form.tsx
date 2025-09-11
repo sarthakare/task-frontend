@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, XCircle, Users, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
+import { canCreateTeams } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 import type { User, TeamCreate } from "@/types";
 
 interface TeamCreateFormProps {
@@ -19,6 +21,7 @@ interface TeamCreateFormProps {
 }
 
 export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) {
+  const { currentUser } = useUser();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -128,6 +131,16 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check permissions before submitting
+    if (!canCreateTeams()) {
+      toast.error('Access Denied', {
+        description: 'Only admin and CEO users can create teams.',
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -192,7 +205,19 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
   };
 
   const defaultTrigger = (
-    <Button onClick={() => setIsCreateDialogOpen(true)}>
+    <Button 
+      onClick={() => {
+        if (!canCreateTeams()) {
+          toast.error('Access Denied', {
+            description: 'Only admin and CEO users can create teams.',
+            icon: <CircleAlert className="text-red-600" />,
+            style: { color: "red" },
+          });
+          return;
+        }
+        setIsCreateDialogOpen(true);
+      }}
+    >
       <Plus className="h-4 w-4 mr-2" />
       Create Team
     </Button>

@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Edit, XCircle, Users, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
+import { canEditTeams } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 import type { User, Team, TeamUpdate } from "@/types";
 
 interface TeamEditFormProps {
@@ -20,6 +22,7 @@ interface TeamEditFormProps {
 }
 
 export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps) {
+  const { currentUser } = useUser();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -141,6 +144,16 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check permissions before submitting
+    if (!canEditTeams()) {
+      toast.error('Access Denied', {
+        description: 'Only admin and CEO users can edit teams.',
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -218,7 +231,21 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
   };
 
   const defaultTrigger = (
-    <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={() => {
+        if (!canEditTeams()) {
+          toast.error('Access Denied', {
+            description: 'Only admin and CEO users can edit teams.',
+            icon: <CircleAlert className="text-red-600" />,
+            style: { color: "red" },
+          });
+          return;
+        }
+        setIsEditDialogOpen(true);
+      }}
+    >
       <Edit className="h-4 w-4 mr-1" />
       Edit
     </Button>

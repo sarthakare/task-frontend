@@ -78,3 +78,41 @@ export function canEditUsers(): boolean {
 export function canDeleteUsers(): boolean {
   return canManageUsers();
 }
+
+// Project management permissions
+export function canManageProjects(): boolean {
+  const user = getUser();
+  if (!user) return false;
+  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO";
+}
+
+export function canCreateProjects(): boolean {
+  return canManageProjects();
+}
+
+export function canEditProjects(): boolean {
+  return canManageProjects();
+}
+
+export function canDeleteProjects(): boolean {
+  return canManageProjects();
+}
+
+// Team management permissions
+export function canManageTeams(): boolean {
+  const user = getUser();
+  if (!user) return false;
+  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO";
+}
+
+export function canCreateTeams(): boolean {
+  return canManageTeams();
+}
+
+export function canEditTeams(): boolean {
+  return canManageTeams();
+}
+
+export function canDeleteTeams(): boolean {
+  return canManageTeams();
+}

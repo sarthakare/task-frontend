@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Edit, XCircle, Users, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
+import { canEditProjects } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 import type { User, Team, Project, ProjectUpdate } from "@/types";
 
 interface ProjectEditFormProps {
@@ -20,6 +22,7 @@ interface ProjectEditFormProps {
 }
 
 export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectEditFormProps) {
+  const { currentUser } = useUser();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -153,6 +156,16 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check permissions before submitting
+    if (!canEditProjects()) {
+      toast.error('Access Denied', {
+        description: 'Only admin and CEO users can edit projects.',
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -232,7 +245,21 @@ export function ProjectEditForm({ project, trigger, onProjectUpdated }: ProjectE
   };
 
   const defaultTrigger = (
-    <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={() => {
+        if (!canEditProjects()) {
+          toast.error('Access Denied', {
+            description: 'Only admin and CEO users can edit projects.',
+            icon: <CircleAlert className="text-red-600" />,
+            style: { color: "red" },
+          });
+          return;
+        }
+        setIsEditDialogOpen(true);
+      }}
+    >
       <Edit className="h-4 w-4 mr-1" />
       Edit
     </Button>

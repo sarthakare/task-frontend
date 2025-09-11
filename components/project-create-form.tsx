@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, XCircle, Loader2, Users, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
+import { canCreateProjects } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 import type { User, Team, ProjectCreate } from "@/types";
 
 interface ProjectCreateFormProps {
@@ -19,6 +21,7 @@ interface ProjectCreateFormProps {
 }
 
 export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFormProps) {
+  const { currentUser } = useUser();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -139,6 +142,16 @@ export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check permissions before submitting
+    if (!canCreateProjects()) {
+      toast.error('Access Denied', {
+        description: 'Only admin and CEO users can create projects.',
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -206,7 +219,19 @@ export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFo
   };
 
   const defaultTrigger = (
-    <Button onClick={() => setIsCreateDialogOpen(true)}>
+    <Button 
+      onClick={() => {
+        if (!canCreateProjects()) {
+          toast.error('Access Denied', {
+            description: 'Only admin and CEO users can create projects.',
+            icon: <CircleAlert className="text-red-600" />,
+            style: { color: "red" },
+          });
+          return;
+        }
+        setIsCreateDialogOpen(true);
+      }}
+    >
       <Plus className="h-4 w-4 mr-2" />
       Create Project
     </Button>
