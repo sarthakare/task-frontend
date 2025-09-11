@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
 import { ProjectCreateForm } from "@/components/project-create-form";
 import { ProjectEditForm } from "@/components/project-edit-form";
+import { ProjectDetailsModal } from "@/components/project-details-modal";
 import { 
   FolderOpen, 
   Search,
@@ -41,6 +42,10 @@ export default function ProjectsPage() {
     onHoldProjects: 0,
     cancelledProjects: 0
   });
+
+  // Project details modal state
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -78,6 +83,16 @@ export default function ProjectsPage() {
 
   const handleProjectUpdated = () => {
     fetchProjects(); // Refresh projects list after updating a project
+  };
+
+  const handleViewProjectDetails = (project: Project) => {
+    setSelectedProject(project);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedProject(null);
   };
 
   const handleProjectStatusChange = async (project: Project, newStatus: 'active' | 'on_hold' | 'completed' | 'cancelled') => {
@@ -261,7 +276,7 @@ export default function ProjectsPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem 
-                                onClick={() => {/* View details functionality can be added later */}}
+                                onClick={() => handleViewProjectDetails(project)}
                                 className="flex items-center gap-2"
                               >
                                 <Eye className="h-4 w-4" />
@@ -385,6 +400,13 @@ export default function ProjectsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Project Details Modal */}
+      <ProjectDetailsModal 
+        project={selectedProject}
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+      />
     </div>
   );
 }
