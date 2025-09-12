@@ -268,7 +268,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
   };
 
   const defaultTrigger = (
-    <Button onClick={() => setIsDialogOpen(true)}>
+    <Button onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
       <Plus className="h-4 w-4 mr-2" />
       Create Task
     </Button>

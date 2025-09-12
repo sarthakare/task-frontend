@@ -87,7 +87,7 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
   };
 
   const defaultTrigger = (
-    <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)}>
+    <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
       <Eye className="h-4 w-4 mr-1" />
       View
     </Button>

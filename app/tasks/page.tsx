@@ -7,16 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/page-header";
 import { TaskCreateForm } from "@/components/task-create-form";
-import { TaskEditForm } from "@/components/task-edit-form";
-import { TaskStatusUpdate } from "@/components/task-status-update";
-import { TaskDetailsModal } from "@/components/task-details-modal";
-import { TaskLogCreateForm } from "@/components/task-log-create-form";
-import { TaskLogDisplay } from "@/components/task-log-display";
+import { TaskCard } from "@/components/task-card";
 import {
   Search,
-  Calendar,
-  User,
-  Flag,
   Clock,
   CheckCircle2,
   AlertCircle,
@@ -24,13 +17,10 @@ import {
   X,
   FolderOpen,
   Filter,
-  Plus,
-  Eye,
-  EyeOff,
   CircleAlert,
   Loader2,
-  Briefcase,
-  Users,
+  Grid3X3,
+  List,
 } from "lucide-react";
 import {
   Select,
@@ -53,6 +43,7 @@ export default function TasksPage() {
   const [assigneeFilter, setAssigneeFilter] = useState("all");
   const [shownLogs, setShownLogs] = useState<Set<number>>(new Set());
   const [logRefreshTrigger, setLogRefreshTrigger] = useState(0);
+  const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [accessScope, setAccessScope] = useState<{
     user_role: string;
     scope_description: string;
@@ -245,45 +236,6 @@ export default function TasksPage() {
     return matchesSearch && matchesStatus && matchesPriority && matchesAssignee;
   });
 
-  const getStatusColor = (status: TaskStatus) => {
-    switch (status) {
-      case "NEW": return "bg-blue-100 text-blue-800";
-      case "IN_PROGRESS": return "bg-yellow-100 text-yellow-800";
-      case "PENDING": return "bg-orange-100 text-orange-800";
-      case "FINISHED": return "bg-green-100 text-green-800";
-      case "STOPPED": return "bg-gray-100 text-gray-800";
-      case "CANCELLED": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getPriorityColor = (priority: TaskPriority) => {
-    switch (priority) {
-      case "LOW": return "bg-green-100 text-green-800";
-      case "MEDIUM": return "bg-yellow-100 text-yellow-800";
-      case "HIGH": return "bg-orange-100 text-orange-800";
-      case "CRITICAL": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusIcon = (status: TaskStatus) => {
-    switch (status) {
-      case "NEW": return <Clock className="h-4 w-4 text-blue-600" />;
-      case "IN_PROGRESS": return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-      case "PENDING": return <Pause className="h-4 w-4 text-orange-600" />;
-      case "FINISHED": return <CheckCircle2 className="h-4 w-4 text-green-600" />;
-      case "STOPPED": return <Pause className="h-4 w-4 text-gray-600" />;
-      case "CANCELLED": return <X className="h-4 w-4 text-red-600" />;
-      default: return <Clock className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  const isOverdue = (dueDate: string, status: TaskStatus) => {
-    const now = new Date();
-    const due = new Date(dueDate);
-    return due < now && !['FINISHED', 'CANCELLED'].includes(status);
-  };
 
   const toggleTaskLogs = (taskId: number) => {
     setShownLogs(prev => {
@@ -317,13 +269,14 @@ export default function TasksPage() {
 
       {/* Task Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-900">Total Tasks</CardTitle>
-            <FolderOpen className="h-4 w-4 text-blue-600" />
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FolderOpen className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            
             {isLoadingStats ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -331,17 +284,19 @@ export default function TasksPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-blue-900">{stats.totalTasks}</div>
-                <p className="text-xs text-blue-700">All tasks</p>
+                <div className="text-3xl font-bold text-blue-900 mb-1">{stats.totalTasks}</div>
+                <p className="text-xs text-blue-700 font-medium">All tasks</p>
               </>
             )}
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200">
+        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">New Tasks</CardTitle>
-            <Clock className="h-4 w-4 text-gray-600" />
+            <CardTitle className="text-sm font-medium text-slate-900">New Tasks</CardTitle>
+            <div className="p-2 bg-slate-100 rounded-lg">
+              <Clock className="h-4 w-4 text-slate-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -351,17 +306,19 @@ export default function TasksPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-gray-900">{stats.newTasks}</div>
-                <p className="text-xs text-gray-700">Not started</p>
+                <div className="text-3xl font-bold text-slate-900 mb-1">{stats.newTasks}</div>
+                <p className="text-xs text-slate-700 font-medium">Not started</p>
               </>
             )}
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200">
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-yellow-900">In Progress</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-sm font-medium text-amber-900">In Progress</CardTitle>
+            <div className="p-2 bg-amber-100 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -371,17 +328,19 @@ export default function TasksPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-yellow-900">{stats.inProgressTasks}</div>
-                <p className="text-xs text-yellow-700">Active tasks</p>
+                <div className="text-3xl font-bold text-amber-900 mb-1">{stats.inProgressTasks}</div>
+                <p className="text-xs text-amber-700 font-medium">Active tasks</p>
               </>
             )}
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-orange-900">Pending</CardTitle>
-            <Pause className="h-4 w-4 text-orange-600" />
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <Pause className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -391,17 +350,19 @@ export default function TasksPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-orange-900">{stats.pendingTasks}</div>
-                <p className="text-xs text-orange-700">Awaiting review</p>
+                <div className="text-3xl font-bold text-orange-900 mb-1">{stats.pendingTasks}</div>
+                <p className="text-xs text-orange-700 font-medium">Awaiting review</p>
               </>
             )}
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-900">Completed</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium text-emerald-900">Completed</CardTitle>
+            <div className="p-2 bg-emerald-100 rounded-lg">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -411,17 +372,19 @@ export default function TasksPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-green-900">{stats.finishedTasks}</div>
-                <p className="text-xs text-green-700">Finished tasks</p>
+                <div className="text-3xl font-bold text-emerald-900 mb-1">{stats.finishedTasks}</div>
+                <p className="text-xs text-emerald-700 font-medium">Finished tasks</p>
               </>
             )}
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-red-50 to-red-100 border-red-200">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-red-900">Overdue</CardTitle>
-            <X className="h-4 w-4 text-red-600" />
+            <div className="p-2 bg-red-100 rounded-lg">
+              <X className="h-4 w-4 text-red-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingStats ? (
@@ -431,8 +394,8 @@ export default function TasksPage() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-red-900">{stats.overdueTasks}</div>
-                <p className="text-xs text-red-700">Past due date</p>
+                <div className="text-3xl font-bold text-red-900 mb-1">{stats.overdueTasks}</div>
+                <p className="text-xs text-red-700 font-medium">Past due date</p>
               </>
             )}
           </CardContent>
@@ -440,77 +403,131 @@ export default function TasksPage() {
       </div>
 
       {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Filter className="h-5 w-5 text-blue-600" />
+            </div>
+            Search & Filters
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="relative">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Bar - 55% width on large screens */}
+            <div className="relative flex-1 lg:w-[55%]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search tasks..."
+                placeholder="Search tasks, descriptions, or assignees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
               />
             </div>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="NEW">New</SelectItem>
-                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
-                <SelectItem value="FINISHED">Finished</SelectItem>
-                <SelectItem value="STOPPED">Stopped</SelectItem>
-                <SelectItem value="CANCELLED">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Filters - 45% width on large screens, arranged in 3 columns */}
+            <div className="flex flex-col sm:flex-row gap-4 flex-1 lg:w-[45%]">
+              <div className="flex-1">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                    <SelectItem value="FINISHED">Finished</SelectItem>
+                    <SelectItem value="STOPPED">Stopped</SelectItem>
+                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Priorities" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Priorities</SelectItem>
-                <SelectItem value="LOW">Low</SelectItem>
-                <SelectItem value="MEDIUM">Medium</SelectItem>
-                <SelectItem value="HIGH">High</SelectItem>
-                <SelectItem value="CRITICAL">Critical</SelectItem>
-              </SelectContent>
-            </Select>
+              <div className="flex-1">
+                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Priorities" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="LOW">Low</SelectItem>
+                    <SelectItem value="MEDIUM">Medium</SelectItem>
+                    <SelectItem value="HIGH">High</SelectItem>
+                    <SelectItem value="CRITICAL">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Assignees" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Assignees</SelectItem>
-                {uniqueAssignees.map((assignee) => (
-                  <SelectItem key={assignee} value={assignee}>
-                    {assignee}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <div className="flex-1">
+                <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Assignees" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Assignees</SelectItem>
+                    {uniqueAssignees.map((assignee) => (
+                      <SelectItem key={assignee} value={assignee}>
+                        {assignee}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Tasks List */}
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-4">
           <CardTitle className="flex items-center justify-between">
-            <span>Tasks ({filteredTasks.length})</span>
-            <div className="text-sm text-gray-500">
-              {filteredTasks.length !== tasks.length && `Showing ${filteredTasks.length} of ${tasks.length} tasks`}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <FolderOpen className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <span className="text-lg font-semibold">Tasks</span>
+                <div className="text-sm text-gray-500 font-normal">
+                  {filteredTasks.length !== tasks.length 
+                    ? `Showing ${filteredTasks.length} of ${tasks.length} tasks`
+                    : `${filteredTasks.length} tasks total`
+                  }
+                </div>
+              </div>
+            </div>
+            
+            {/* View Toggle Buttons */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('card')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
+                    viewMode === 'card' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-blue-600 hover:to-purple-600' 
+                      : 'text-gray-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <Grid3X3 className="h-4 w-4 mr-1" />
+                  Card
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
+                    viewMode === 'list' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-blue-600 hover:to-purple-600' 
+                      : 'text-gray-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  List
+                </Button>
+              </div>
             </div>
           </CardTitle>
         </CardHeader>
@@ -534,7 +551,7 @@ export default function TasksPage() {
               </p>
               {tasks.length === 0 && (
                 <TaskCreateForm trigger={
-                  <Button>
+                  <Button className="cursor-pointer">
                     <FolderOpen className="h-4 w-4 mr-2" />
                     Create First Task
                   </Button>
@@ -542,125 +559,20 @@ export default function TasksPage() {
               )}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className={viewMode === 'card' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredTasks.map((task) => (
-                <div key={task.id} className={`p-4 border rounded-lg hover:bg-gray-50 transition-colors ${isOverdue(task.due_date, task.status) ? 'border-red-200 bg-red-50' : 'border-gray-200'}`}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        {getStatusIcon(task.status)}
-                        <h3 className="font-medium text-gray-900">{task.title}</h3>
-                        {isOverdue(task.due_date, task.status) && (
-                          <Badge className="bg-red-100 text-red-800">Overdue</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          <User className="h-3 w-3 text-gray-400" />
-                          <span className="text-gray-600">Creator: {task.creator?.name || 'Unknown'}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <User className="h-3 w-3 text-blue-400" />
-                          <span className="text-gray-600">Assignee: {task.assignee?.name || 'Unassigned'}</span>
-                        </div>
-                        {task.project?.name && (
-                          <div className="flex items-center gap-2">
-                            <Briefcase className="h-3 w-3 text-green-400" />
-                            <span className="text-gray-600">Project: {task.project.name}</span>
-                          </div>
-                        )}
-                        {task.team?.name && (
-                          <div className="flex items-center gap-2">
-                            <Users className="h-3 w-3 text-purple-400" />
-                            <span className="text-gray-600">Team: {task.team.name}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-3 w-3 text-gray-400" />
-                          <span className="text-gray-600">Due: {new Date(task.due_date).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Flag className="h-3 w-3 text-gray-400" />
-                          <Badge className={getPriorityColor(task.priority)}>
-                            {task.priority}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <AlertCircle className="h-3 w-3 text-gray-400" />
-                          <Badge className={getStatusColor(task.status)}>
-                            {task.status.replace('_', ' ')}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Action buttons */}
-                    <div className="flex items-center gap-2 ml-4">
-                      <TaskDetailsModal task={task} />
-                      
-                      {/* Show edit button only if user has permission */}
-                      {canEditTask(task) && (
-                        <TaskEditForm 
-                          task={task} 
-                          onTaskUpdated={handleTaskUpdated}
-                        />
-                      )}
-                      
-                      {/* Show status update button if user has permission */}
-                      {canUpdateTaskStatus(task) && (
-                        <TaskStatusUpdate 
-                          task={task} 
-                          onStatusUpdated={handleTaskUpdated}
-                        />
-                      )}
-                      
-                      {/* Task Log Actions */}
-                      <TaskLogCreateForm
-                        taskId={task.id}
-                        taskTitle={task.title}
-                        onLogCreated={handleLogCreated}
-                        trigger={
-                          <Button variant="outline" size="sm">
-                            <Plus className="h-4 w-4 mr-1" />
-                            Add Log
-                          </Button>
-                        }
-                      />
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => toggleTaskLogs(task.id)}
-                      >
-                        {shownLogs.has(task.id) ? (
-                          <>
-                            <EyeOff className="h-4 w-4 mr-1" />
-                            Hide Logs
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="h-4 w-4 mr-1" />
-                            Show Logs
-                          </>
-                        )}
-                      </Button>
-                      
-                    </div>
-                  </div>
-                  
-                  {/* Task Logs Display */}
-                  {shownLogs.has(task.id) && (
-                    <div className="mt-4">
-                      <TaskLogDisplay
-                        taskId={task.id}
-                        taskTitle={task.title}
-                        refreshTrigger={logRefreshTrigger}
-                      />
-                    </div>
-                  )}
-                </div>
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  canEdit={canEditTask(task)}
+                  canUpdateStatus={canUpdateTaskStatus(task)}
+                  onTaskUpdated={handleTaskUpdated}
+                  onLogCreated={handleLogCreated}
+                  shownLogs={shownLogs}
+                  onToggleLogs={toggleTaskLogs}
+                  logRefreshTrigger={logRefreshTrigger}
+                  viewMode={viewMode}
+                />
               ))}
             </div>
           )}
