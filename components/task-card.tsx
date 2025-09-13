@@ -22,6 +22,8 @@ import {
   Eye,
   EyeOff,
   AlertTriangle,
+  Edit,
+  RefreshCw,
 } from "lucide-react";
 import type { Task, TaskStatus, TaskPriority } from "@/types";
 
@@ -138,7 +140,7 @@ export function TaskCard({
           /* List View Layout */
           <div className="space-y-3">
             {/* Header Row */}
-            <div className="flex items-start justify-between">
+             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   {getStatusIcon(task.status)}
@@ -154,7 +156,7 @@ export function TaskCard({
                 )}
               </div>
 
-              <div className="flex items-center gap-2 ml-4">
+               <div className="flex flex-wrap items-center gap-2 sm:ml-4">
                 <Badge className={`${getStatusColor(task.status)} border text-xs font-medium`}>
                   {task.status.replace('_', ' ')}
                 </Badge>
@@ -171,7 +173,7 @@ export function TaskCard({
             </div>
 
             {/* Project and Team Row */}
-            <div className="flex items-center gap-4 text-sm">
+             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
               {task.project?.name && (
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-3 w-3 text-gray-400 flex-shrink-0" />
@@ -191,7 +193,7 @@ export function TaskCard({
             </div>
 
             {/* People Row */}
-            <div className="flex items-center gap-4 text-sm">
+             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <User className="h-3 w-3 text-gray-400 flex-shrink-0" />
                 <span className="text-gray-600">
@@ -207,7 +209,7 @@ export function TaskCard({
             </div>
 
             {/* Dates Row */}
-            <div className="flex items-center gap-4 text-sm">
+             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <Calendar className="h-3 w-3 text-gray-400 flex-shrink-0" />
                 <span className="text-gray-600">
@@ -233,9 +235,9 @@ export function TaskCard({
           </div>
         ) : (
           /* Card View Layout */
-          <div className="flex items-start justify-between mb-4">
+           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
+               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(task.status)}
                   <h3 className="font-semibold text-gray-900 truncate">{task.title}</h3>
@@ -244,7 +246,7 @@ export function TaskCard({
                   )}
                 </div>
                 {isTaskOverdue && (
-                  <Badge className={`${getOverdueBadgeColor(task.status)} border text-xs font-medium`}>
+                   <Badge className={`${getOverdueBadgeColor(task.status)} border text-xs font-medium self-start`}>
                     Overdue
                   </Badge>
                 )}
@@ -258,7 +260,7 @@ export function TaskCard({
             </div>
 
             {/* Status and Priority Badges */}
-            <div className="flex flex-col gap-2 ml-4">
+             <div className="flex flex-row sm:flex-col gap-2 sm:ml-4">
               <Badge className={`${getStatusColor(task.status)} border text-xs font-medium`}>
                 {task.status.replace('_', ' ')}
               </Badge>
@@ -275,7 +277,7 @@ export function TaskCard({
             {/* Key Information Grid */}
             <div className="space-y-3 mb-4">
               {/* First Row: Project and Team */}
-              <div className="flex items-center gap-4 text-sm">
+               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
                 {task.project?.name && (
                   <div className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -295,7 +297,7 @@ export function TaskCard({
               </div>
 
               {/* Second Row: Assignee and Creator */}
-              <div className="flex items-center gap-4 text-sm">
+               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
                   <span className="text-gray-600">
@@ -311,7 +313,7 @@ export function TaskCard({
               </div>
 
               {/* Third Row: Dates */}
-              <div className="flex items-center gap-4 text-sm">
+               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
                   <span className="text-gray-600">
@@ -336,8 +338,9 @@ export function TaskCard({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-500">
-              <div className="flex items-center gap-2">
+             <div className="pt-4 border-t border-gray-500">
+               {/* Primary Actions Row */}
+               <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                 <TaskDetailsModal task={task} />
                 
                 {canEdit && (
@@ -345,8 +348,9 @@ export function TaskCard({
                     task={task} 
                     onTaskUpdated={onTaskUpdated}
                     trigger={
-                      <Button variant="outline" size="sm" className="h-8 cursor-pointer">
-                        Edit
+                       <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
+                         <Edit className="h-4 w-4 mr-1" />
+                         <span className="hidden sm:inline">Edit</span>
                       </Button>
                     }
                   />
@@ -357,23 +361,25 @@ export function TaskCard({
                     task={task} 
                     onStatusUpdated={onTaskUpdated}
                     trigger={
-                      <Button variant="outline" size="sm" className="h-8 cursor-pointer">
-                        Update Status
+                       <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
+                         <RefreshCw className="h-4 w-4 mr-1" />
+                         <span className="hidden sm:inline">Update Status</span>
                       </Button>
                     }
                   />
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
+               {/* Secondary Actions Row */}
+               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <TaskLogCreateForm
                   taskId={task.id}
                   taskTitle={task.title}
                   onLogCreated={onLogCreated}
                   trigger={
-                    <Button variant="outline" size="sm" className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer">
+                     <Button variant="outline" size="sm" className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0">
                       <Plus className="h-4 w-4 mr-1" />
-                      Add Log
+                       <span className="hidden sm:inline">Add Log</span>
                     </Button>
                   }
                 />
@@ -382,17 +388,17 @@ export function TaskCard({
                   variant="outline" 
                   size="sm"
                   onClick={() => onToggleLogs(task.id)}
-                  className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer"
+                   className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0"
                 >
                   {shownLogs.has(task.id) ? (
                     <>
                       <EyeOff className="h-4 w-4 mr-1" />
-                      Hide Logs
+                       <span className="hidden sm:inline">Hide Logs</span>
                     </>
                   ) : (
                     <>
                       <Eye className="h-4 w-4 mr-1" />
-                      Show Logs
+                       <span className="hidden sm:inline">Show Logs</span>
                     </>
                   )}
                 </Button>
@@ -401,76 +407,86 @@ export function TaskCard({
           </>
         )}
 
-        {/* List View Action Buttons */}
-        {viewMode === 'list' && (
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-500">
-            <TaskDetailsModal task={task} />
-            
-            {canEdit && (
-              <TaskEditForm 
-                task={task} 
-                onTaskUpdated={onTaskUpdated}
-                trigger={
-                  <Button variant="outline" size="sm" className="h-8 text-xs border-gray-300 hover:bg-gray-50 cursor-pointer">
-                    Edit
-                  </Button>
-                }
-              />
-            )}
-            
-            {canUpdateStatus && (
-              <TaskStatusUpdate 
-                task={task} 
-                onStatusUpdated={onTaskUpdated}
-                trigger={
-                  <Button variant="outline" size="sm" className="h-8 text-xs border-gray-300 hover:bg-gray-50 cursor-pointer">
-                    Update Status
-                  </Button>
-                }
-              />
-            )}
-            
-            <TaskLogCreateForm
-              taskId={task.id}
-              taskTitle={task.title}
-              onLogCreated={onLogCreated}
-              trigger={
-                <Button variant="outline" size="sm" className="h-8 text-xs border-gray-300 hover:bg-gray-50 cursor-pointer">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Log
-                </Button>
-              }
-            />
-            
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => onToggleLogs(task.id)}
-              className="h-8 text-xs border-gray-300 hover:bg-gray-50 cursor-pointer"
-            >
-              {shownLogs.has(task.id) ? (
-                <>
-                  <EyeOff className="h-3 w-3 mr-1" />
-                  Hide Logs
-                </>
-              ) : (
-                <>
-                  <Eye className="h-3 w-3 mr-1" />
-                  Show Logs
-                </>
-              )}
-            </Button>
-          </div>
-        )}
+         {/* List View Action Buttons */}
+         {viewMode === 'list' && (
+           <div className="mt-3 pt-3 border-t border-gray-500">
+             {/* Primary Actions Row */}
+             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+               <TaskDetailsModal task={task} />
+               
+               {canEdit && (
+                 <TaskEditForm 
+                   task={task} 
+                   onTaskUpdated={onTaskUpdated}
+                   trigger={
+                     <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
+                       <Edit className="h-4 w-4 mr-1" />
+                       Edit
+                     </Button>
+                   }
+                 />
+               )}
+               
+               {canUpdateStatus && (
+                 <TaskStatusUpdate 
+                   task={task} 
+                   onStatusUpdated={onTaskUpdated}
+                   trigger={
+                     <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
+                       <RefreshCw className="h-4 w-4 mr-1" />
+                       Update Status
+                     </Button>
+                   }
+                 />
+               )}
+             </div>
+             
+             {/* Secondary Actions Row */}
+             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+               <TaskLogCreateForm
+                 taskId={task.id}
+                 taskTitle={task.title}
+                 onLogCreated={onLogCreated}
+                 trigger={
+                   <Button variant="outline" size="sm" className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0">
+                     <Plus className="h-4 w-4 mr-1" />
+                     Add Log
+                   </Button>
+                 }
+               />
+               
+               <Button 
+                 variant="outline" 
+                 size="sm"
+                 onClick={() => onToggleLogs(task.id)}
+                 className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0"
+               >
+                 {shownLogs.has(task.id) ? (
+                   <>
+                     <EyeOff className="h-4 w-4 mr-1" />
+                     Hide Logs
+                   </>
+                 ) : (
+                   <>
+                     <Eye className="h-4 w-4 mr-1" />
+                     Show Logs
+                   </>
+                 )}
+               </Button>
+             </div>
+           </div>
+         )}
 
         {/* Task Logs Display */}
         {shownLogs.has(task.id) && (
           <div className="mt-4 pt-4 border-t border-gray-100">
-            <TaskLogDisplay
-              taskId={task.id}
-              taskTitle={task.title}
-              refreshTrigger={logRefreshTrigger}
-            />
+            <div className="overflow-x-auto">
+              <TaskLogDisplay
+                taskId={task.id}
+                taskTitle={task.title}
+                refreshTrigger={logRefreshTrigger}
+              />
+            </div>
           </div>
         )}
       </CardContent>

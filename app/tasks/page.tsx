@@ -273,7 +273,7 @@ export default function TasksPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-900">Total Tasks</CardTitle>
             <div className="p-2 bg-blue-100 rounded-lg">
-              <FolderOpen className="h-4 w-4 text-blue-600" />
+            <FolderOpen className="h-4 w-4 text-blue-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -339,7 +339,7 @@ export default function TasksPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-orange-900">Pending</CardTitle>
             <div className="p-2 bg-orange-100 rounded-lg">
-              <Pause className="h-4 w-4 text-orange-600" />
+            <Pause className="h-4 w-4 text-orange-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -383,7 +383,7 @@ export default function TasksPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-red-900">Overdue</CardTitle>
             <div className="p-2 bg-red-100 rounded-lg">
-              <X className="h-4 w-4 text-red-600" />
+            <X className="h-4 w-4 text-red-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -404,7 +404,7 @@ export default function TasksPage() {
 
       {/* Search and Filters */}
       <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-4">
+        <CardHeader className="">
           <CardTitle className="flex items-center gap-2 text-lg">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Filter className="h-5 w-5 text-blue-600" />
@@ -421,58 +421,58 @@ export default function TasksPage() {
                 placeholder="Search tasks, descriptions, or assignees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
+                className="pl-10 h-9 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
               />
             </div>
 
             {/* Filters - 45% width on large screens, arranged in 3 columns */}
             <div className="flex flex-col sm:flex-row gap-4 flex-1 lg:w-[45%]">
               <div className="flex-1">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
-                    <SelectValue placeholder="All Statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="NEW">New</SelectItem>
-                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                    <SelectItem value="PENDING">Pending</SelectItem>
-                    <SelectItem value="FINISHED">Finished</SelectItem>
-                    <SelectItem value="STOPPED">Stopped</SelectItem>
-                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="NEW">New</SelectItem>
+                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="FINISHED">Finished</SelectItem>
+                <SelectItem value="STOPPED">Stopped</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
               </div>
 
               <div className="flex-1">
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                   <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
-                    <SelectValue placeholder="All Priorities" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Priorities</SelectItem>
-                    <SelectItem value="LOW">Low</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="HIGH">High</SelectItem>
-                    <SelectItem value="CRITICAL">Critical</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SelectValue placeholder="All Priorities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+                <SelectItem value="CRITICAL">Critical</SelectItem>
+              </SelectContent>
+            </Select>
               </div>
 
               <div className="flex-1">
-                <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+            <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
                   <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
-                    <SelectValue placeholder="All Assignees" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Assignees</SelectItem>
-                    {uniqueAssignees.map((assignee) => (
-                      <SelectItem key={assignee} value={assignee}>
-                        {assignee}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SelectValue placeholder="All Assignees" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Assignees</SelectItem>
+                {uniqueAssignees.map((assignee) => (
+                  <SelectItem key={assignee} value={assignee}>
+                    {assignee}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
               </div>
             </div>
           </div>
@@ -481,7 +481,7 @@ export default function TasksPage() {
 
       {/* Tasks List */}
       <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-4">
+        <CardHeader className="">
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 rounded-lg">
@@ -507,8 +507,8 @@ export default function TasksPage() {
                   onClick={() => setViewMode('card')}
                   className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
                     viewMode === 'card' 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-blue-600 hover:to-purple-600' 
-                      : 'text-gray-600 hover:bg-blue-50'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                      : 'text-gray-600 hover:bg-blue-200'
                   }`}
                 >
                   <Grid3X3 className="h-4 w-4 mr-1" />
@@ -520,8 +520,8 @@ export default function TasksPage() {
                   onClick={() => setViewMode('list')}
                   className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
                     viewMode === 'list' 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-blue-600 hover:to-purple-600' 
-                      : 'text-gray-600 hover:bg-blue-50'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                      : 'text-gray-600 hover:bg-blue-200'
                   }`}
                 >
                   <List className="h-4 w-4 mr-1" />
@@ -559,15 +559,15 @@ export default function TasksPage() {
               )}
             </div>
           ) : (
-            <div className={viewMode === 'card' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'space-y-3'}>
+            <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredTasks.map((task) => (
                 <TaskCard
                   key={task.id}
-                  task={task}
+                          task={task} 
                   canEdit={canEditTask(task)}
                   canUpdateStatus={canUpdateTaskStatus(task)}
-                  onTaskUpdated={handleTaskUpdated}
-                  onLogCreated={handleLogCreated}
+                          onTaskUpdated={handleTaskUpdated}
+                        onLogCreated={handleLogCreated}
                   shownLogs={shownLogs}
                   onToggleLogs={toggleTaskLogs}
                   logRefreshTrigger={logRefreshTrigger}

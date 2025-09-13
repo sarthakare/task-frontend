@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Calendar, FileText, Timer, CircleAlert } from "lucide-react";
 import { api } from "@/lib/api-service";
@@ -142,17 +141,18 @@ export function TaskLogDisplay({ taskId, taskTitle, refreshTrigger }: TaskLogDis
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="max-h-[400px]">
+        <div className="overflow-x-auto">
+          <div className="min-w-[800px]">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="font-semibold">#</TableHead>
-                <TableHead className="font-semibold">Title</TableHead>
-                <TableHead className="font-semibold">Description</TableHead>
-                <TableHead className="font-semibold">Date</TableHead>
-                <TableHead className="font-semibold">Start Time</TableHead>
-                <TableHead className="font-semibold">End Time</TableHead>
-                <TableHead className="font-semibold">Duration</TableHead>
+                <TableHead className="font-semibold w-12">#</TableHead>
+                <TableHead className="font-semibold min-w-[120px]">Title</TableHead>
+                <TableHead className="font-semibold min-w-[150px]">Description</TableHead>
+                <TableHead className="font-semibold min-w-[80px]">Date</TableHead>
+                <TableHead className="font-semibold min-w-[80px]">Start Time</TableHead>
+                <TableHead className="font-semibold min-w-[80px]">End Time</TableHead>
+                <TableHead className="font-semibold min-w-[90px]">Duration</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -162,38 +162,38 @@ export function TaskLogDisplay({ taskId, taskTitle, refreshTrigger }: TaskLogDis
                 
                 return (
                   <TableRow key={log.id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium text-center">
+                    <TableCell className="font-medium text-center w-12">
                       <Badge variant="outline" className="text-xs">
                         #{logNumber}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium">
-                      <div className="max-w-[150px]">
+                    <TableCell className="font-medium min-w-[120px]">
+                      <div className="max-w-[120px]">
                         <p className="truncate text-sm" title={log.title}>
                           {log.title}
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="max-w-[200px]">
+                    <TableCell className="min-w-[150px]">
+                      <div className="max-w-[150px]">
                         <p className="text-sm text-gray-600 line-clamp-2" title={log.description}>
                           {log.description}
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[80px]">
                       <div className="flex items-center gap-1 text-sm">
                         <Calendar className="h-3 w-3 text-gray-400" />
                         {formatDateOnly(log.start_time)}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[80px]">
                       <div className="flex items-center gap-1 text-sm">
                         <Clock className="h-3 w-3 text-green-600" />
                         {formatTimeOnly(log.start_time)}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[80px]">
                       {log.end_time ? (
                         <div className="flex items-center gap-1 text-sm">
                           <Clock className="h-3 w-3 text-red-600" />
@@ -205,7 +205,7 @@ export function TaskLogDisplay({ taskId, taskTitle, refreshTrigger }: TaskLogDis
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[90px]">
                       <Badge className={`text-xs ${className}`}>
                         <Timer className="h-3 w-3 mr-1" />
                         {duration}
@@ -216,7 +216,8 @@ export function TaskLogDisplay({ taskId, taskTitle, refreshTrigger }: TaskLogDis
               })}
             </TableBody>
           </Table>
-        </ScrollArea>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

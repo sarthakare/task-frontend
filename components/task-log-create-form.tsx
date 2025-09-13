@@ -39,13 +39,13 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
     if (open) {
       // Load existing logs when dialog opens
       await fetchExistingLogs();
-      // Set default start time to current time
-      const now = new Date();
-      const localISOTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-      setFormData(prev => ({
-        ...prev,
-        start_time: localISOTime,
-      }));
+      // Reset form data when opening
+      setFormData({
+        title: "",
+        description: "",
+        start_time: "",
+        end_time: "",
+      });
     }
   };
 
@@ -68,7 +68,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title.trim() || !formData.description.trim() || !formData.start_time) {
+    if (!formData.title.trim() || !formData.description.trim() || !formData.start_time || !formData.end_time) {
       toast.error("Please fill in all required fields", {
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
@@ -91,7 +91,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
         title: formData.title.trim(),
         description: formData.description.trim(),
         start_time: formData.start_time,
-        end_time: formData.end_time || undefined,
+        end_time: formData.end_time,
       };
 
       await api.tasks.createTaskLog(taskId, logData);
@@ -198,6 +198,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
                       value={formData.title}
                       onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       className="w-full"
+                      required
                     />
                   </div>
 
@@ -211,6 +212,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
                       value={formData.description}
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                       className="w-full min-h-[100px]"
+                      required
                     />
                   </div>
 
@@ -225,12 +227,13 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
                         value={formData.start_time}
                         onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
                         className="w-full"
+                        required
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="end_time">
-                        End Date & Time <span className="text-gray-500">(Optional)</span>
+                        End Date & Time <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="end_time"
@@ -238,6 +241,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
                         value={formData.end_time}
                         onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
                         className="w-full"
+                        required
                       />
                     </div>
                   </div>
