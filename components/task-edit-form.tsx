@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Edit, XCircle, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
+import { Edit, XCircle, Loader2, CheckCircle2, CircleAlert, Upload, X, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import type { User, Team, Project, Task, TaskUpdate, TaskStatus, TaskPriority } from "@/types";
@@ -27,6 +27,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
   const [isLoadingTeams, setIsLoadingTeams] = useState(false);
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attachments, setAttachments] = useState<File[]>([]);
   
   const [formData, setFormData] = useState({
     title: task.title,
@@ -120,6 +121,15 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
         [field]: ''
       }));
     }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    setAttachments(prev => [...prev, ...files]);
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
 
@@ -261,6 +271,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       due_date: task.due_date.split('T')[0],
       follow_up_date: task.follow_up_date.split('T')[0],
     });
+    setAttachments([]);
     setErrors({});
   };
 
@@ -276,22 +287,28 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-hidden">
-        <DialogHeader className="pb-4 border-b">
-          <DialogTitle className="text-xl font-semibold text-gray-900">
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
+        <DialogHeader className="pb-6 border-b border-gray-100">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">
+              <Edit className="h-5 w-5 text-white" />
+            </div>
             Edit Task: {task.title}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-600 mt-2">
             Update the task details, assignment, and timeline as needed.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="overflow-y-auto max-h-[calc(85vh-120px)] pr-2">
+        <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
           <form onSubmit={handleSubmit} className="space-y-6 py-4">
             
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Basic Information</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-indigo-500 to-blue-600 rounded-full"></div>
+                Basic Information
+              </h3>
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
@@ -301,7 +318,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="Enter task name"
-                    className={`transition-colors ${errors.title ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`h-10 bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.title ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
                   />
                   {errors.title && <p className="text-sm text-red-500 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
@@ -317,7 +334,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Enter task description and requirements"
                     rows={3}
-                    className={`transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
                   />
                   {errors.description && <p className="text-sm text-red-500 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
@@ -329,13 +346,16 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
 
             {/* Assignment & Context */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Assignment & Context</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+                Assignment & Context
+              </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="project_id" className="text-sm font-medium text-gray-700">Project (Optional)</Label>
+                  <Label htmlFor="project_id" className="text-sm font-medium text-gray-700">Project</Label>
                   <Select value={formData.project_id} onValueChange={(value) => handleInputChange('project_id', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
                       <SelectValue placeholder={isLoadingProjects ? "Loading..." : "Select project"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -352,9 +372,9 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="team_id" className="text-sm font-medium text-gray-700">Team (Optional)</Label>
+                  <Label htmlFor="team_id" className="text-sm font-medium text-gray-700">Team</Label>
                   <Select value={formData.team_id} onValueChange={(value) => handleInputChange('team_id', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
                       <SelectValue placeholder={isLoadingTeams ? "Loading..." : "Select team"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -369,41 +389,44 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="assigned_to" className="text-sm font-medium text-gray-700">Assignee *</Label>
-                <Select value={formData.assigned_to} onValueChange={(value) => handleInputChange('assigned_to', value)}>
-                  <SelectTrigger className={`transition-colors ${errors.assigned_to ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
-                    <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select assignee"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id.toString()}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{user.name}</span>
-                          <span className="text-xs text-gray-500">{user.role} • {user.department}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.assigned_to && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.assigned_to}
-                </p>}
+                <div className="space-y-2">
+                  <Label htmlFor="assigned_to" className="text-sm font-medium text-gray-700">Assignee *</Label>
+                  <Select value={formData.assigned_to} onValueChange={(value) => handleInputChange('assigned_to', value)}>
+                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.assigned_to ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                      <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select assignee"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id.toString()}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{user.name}</span>
+                            <span className="text-xs text-gray-500">{user.role} • {user.department}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.assigned_to && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.assigned_to}
+                  </p>}
+                </div>
               </div>
             </div>
 
             {/* Status & Priority */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Status & Priority</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+                Status & Priority
+              </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="status" className="text-sm font-medium text-gray-700">Status</Label>
                   <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-green-300 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -420,7 +443,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                 <div className="space-y-2">
                   <Label htmlFor="priority" className="text-sm font-medium text-gray-700">Priority</Label>
                   <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-green-300 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -436,9 +459,12 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
 
             {/* Dates */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Dates</h3>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-600 rounded-full"></div>
+                Dates
+              </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="start_date" className="text-sm font-medium text-gray-700">Start Date *</Label>
                   <Input
@@ -446,7 +472,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     type="date"
                     value={formData.start_date}
                     onChange={(e) => handleInputChange('start_date', e.target.value)}
-                    className={`transition-colors ${errors.start_date ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.start_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
                   {errors.start_date && <p className="text-sm text-red-500 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
@@ -462,7 +488,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     value={formData.due_date}
                     onChange={(e) => handleInputChange('due_date', e.target.value)}
                     min={formData.start_date}
-                    className={`transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
                   {errors.due_date && <p className="text-sm text-red-500 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
@@ -478,13 +504,74 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     value={formData.follow_up_date}
                     onChange={(e) => handleInputChange('follow_up_date', e.target.value)}
                     min={formData.start_date}
-                    className={`transition-colors ${errors.follow_up_date ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.follow_up_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
                   {errors.follow_up_date && <p className="text-sm text-red-500 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.follow_up_date}
                   </p>}
                 </div>
+              </div>
+            </div>
+
+            {/* Attachments */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></div>
+                Attachments
+              </h3>
+              
+              <div className="space-y-3">
+                <Label htmlFor="attachments" className="text-sm font-medium text-gray-700">Upload Files</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    id="attachments"
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="file:mr-4 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-purple-50 file:to-pink-50 file:text-purple-700 hover:file:from-purple-100 hover:file:to-pink-100 transition-all"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => document.getElementById('attachments')?.click()}
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Browse
+                  </Button>
+                </div>
+                
+                {attachments.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600 font-medium">{attachments.length} file(s) selected:</p>
+                    <div className="space-y-2">
+                      {attachments.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100 hover:border-purple-200 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-white rounded-md border border-purple-200">
+                              <FileText className="h-4 w-4 text-purple-600" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium text-gray-700">{file.name}</span>
+                              <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeAttachment(index)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -497,7 +584,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
               </div>
             )}
 
-            <div className="flex justify-end space-x-3 pt-6 border-t">
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
               <Button
                 type="button"
                 variant="outline"
@@ -506,14 +593,14 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                   setIsDialogOpen(false);
                 }}
                 disabled={isSubmitting}
-                className="px-6"
+                className="px-6 h-10 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 bg-blue-600 hover:bg-blue-700"
+                className="mb-10 px-6 h-10 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {isSubmitting ? (
                   <>
@@ -521,7 +608,10 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     Updating...
                   </>
                 ) : (
-                  'Update Task'
+                  <>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Update Task
+                  </>
                 )}
               </Button>
             </div>
