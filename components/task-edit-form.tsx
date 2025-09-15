@@ -351,7 +351,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                 Assignment & Context
               </h3>
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="project_id" className="text-sm font-medium text-gray-700">Project</Label>
                   <Select value={formData.project_id} onValueChange={(value) => handleInputChange('project_id', value)}>
@@ -361,9 +361,13 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     <SelectContent>
                       {projects.map((project) => (
                         <SelectItem key={project.id} value={project.id.toString()}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{project.name}</span>
-                            <span className="text-xs text-gray-500">Manager: {project.manager.name}</span>
+                          <div className="flex flex-col max-w-[200px]">
+                            <span className="font-medium truncate" title={project.name}>
+                              {project.name.length > 25 ? `${project.name.substring(0, 25)}...` : project.name}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate" title={project.manager.name}>
+                              Manager: {project.manager.name.length > 20 ? `${project.manager.name.substring(0, 20)}...` : project.manager.name}
+                            </span>
                           </div>
                         </SelectItem>
                       ))}
@@ -380,9 +384,13 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     <SelectContent>
                       {teams.map((team) => (
                         <SelectItem key={team.id} value={team.id.toString()}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{team.name}</span>
-                            <span className="text-xs text-gray-500">{team.department} • {team.members.length} members</span>
+                          <div className="flex flex-col max-w-[200px]">
+                            <span className="font-medium truncate" title={team.name}>
+                              {team.name.length > 25 ? `${team.name.substring(0, 25)}...` : team.name}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate" title={`${team.department} • ${team.members.length} members`}>
+                              {team.department.length > 15 ? `${team.department.substring(0, 15)}...` : team.department} • {team.members.length} members
+                            </span>
                           </div>
                         </SelectItem>
                       ))}
@@ -399,9 +407,13 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     <SelectContent>
                       {users.map((user) => (
                         <SelectItem key={user.id} value={user.id.toString()}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{user.name}</span>
-                            <span className="text-xs text-gray-500">{user.role} • {user.department}</span>
+                          <div className="flex flex-col max-w-[200px]">
+                            <span className="font-medium truncate" title={user.name}>
+                              {user.name.length > 25 ? `${user.name.substring(0, 25)}...` : user.name}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate" title={`${user.role} • ${user.department}`}>
+                              {user.role} • {user.department.length > 15 ? `${user.department.substring(0, 15)}...` : user.department}
+                            </span>
                           </div>
                         </SelectItem>
                       ))}

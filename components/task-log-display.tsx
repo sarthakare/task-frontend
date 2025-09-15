@@ -16,7 +16,7 @@ interface TaskLogDisplayProps {
   refreshTrigger?: number; // Can be used to force refresh
 }
 
-export function TaskLogDisplay({ taskId, taskTitle, refreshTrigger }: TaskLogDisplayProps) {
+export function TaskLogDisplay({ taskId, refreshTrigger }: TaskLogDisplayProps) {
   const [logs, setLogs] = useState<TaskLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
