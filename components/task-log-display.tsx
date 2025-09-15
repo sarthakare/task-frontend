@@ -129,15 +129,10 @@ export function TaskLogDisplay({ taskId, taskTitle, refreshTrigger }: TaskLogDis
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-600" />
-            Task Logs ({logs.length})
-          </div>
-          <Badge variant="outline" className="text-xs">
-            {taskTitle}
-          </Badge>
+      <CardHeader className="">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Clock className="h-5 w-5 text-blue-600" />
+          Task Logs ({logs.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
