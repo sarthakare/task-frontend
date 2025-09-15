@@ -600,7 +600,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="mb-10 px-6 h-10 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 h-10 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {isSubmitting ? (
                   <>

@@ -145,22 +145,31 @@ export default function ProjectsPage() {
       />
 
       {/* Search and Actions */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search projects..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Search className="h-5 w-5 text-blue-600" />
             </div>
+            Search & Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Bar - 70% width on large screens */}
+            <div className="relative flex-1 lg:w-[70%]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search projects, descriptions, managers, or teams..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
+              />
+            </div>
+
+            {/* Actions - 30% width on large screens */}
             {canCreate && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-1 lg:w-[30%]">
                 <ProjectCreateForm onProjectCreated={handleProjectCreated} />
               </div>
             )}
@@ -169,11 +178,13 @@ export default function ProjectsPage() {
       </Card>
 
       {/* Project Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-900">Total Projects</CardTitle>
-            <FolderOpen className="h-4 w-4 text-blue-600" />
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FolderOpen className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -182,15 +193,20 @@ export default function ProjectsPage() {
                 <span className="text-sm text-muted-foreground">Loading...</span>
               </div>
             ) : (
-              <div className="text-2xl font-bold text-blue-900">{stats.totalProjects}</div>
+              <>
+                <div className="text-3xl font-bold text-blue-900 mb-1">{stats.totalProjects}</div>
+                <p className="text-xs text-blue-700 font-medium">All projects</p>
+              </>
             )}
-            <p className="text-xs text-blue-700">All projects</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-900">Active</CardTitle>
-            <Clock className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium text-emerald-900">Active</CardTitle>
+            <div className="p-2 bg-emerald-100 rounded-lg">
+              <Clock className="h-4 w-4 text-emerald-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -199,15 +215,20 @@ export default function ProjectsPage() {
                 <span className="text-sm text-muted-foreground">Loading...</span>
               </div>
             ) : (
-              <div className="text-2xl font-bold text-green-900">{stats.activeProjects}</div>
+              <>
+                <div className="text-3xl font-bold text-emerald-900 mb-1">{stats.activeProjects}</div>
+                <p className="text-xs text-emerald-700 font-medium">Currently active</p>
+              </>
             )}
-            <p className="text-xs text-green-700">Currently active</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-900">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-purple-600" />
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <CheckCircle className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -216,15 +237,20 @@ export default function ProjectsPage() {
                 <span className="text-sm text-muted-foreground">Loading...</span>
               </div>
             ) : (
-              <div className="text-2xl font-bold text-purple-900">{stats.completedProjects}</div>
+              <>
+                <div className="text-3xl font-bold text-purple-900 mb-1">{stats.completedProjects}</div>
+                <p className="text-xs text-purple-700 font-medium">Finished projects</p>
+              </>
             )}
-            <p className="text-xs text-purple-700">Finished projects</p>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-orange-900">On Hold</CardTitle>
-            <TrendingUp className="h-4 w-4 text-orange-600" />
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <TrendingUp className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -233,20 +259,32 @@ export default function ProjectsPage() {
                 <span className="text-sm text-muted-foreground">Loading...</span>
               </div>
             ) : (
-              <div className="text-2xl font-bold text-orange-900">{stats.onHoldProjects}</div>
+              <>
+                <div className="text-3xl font-bold text-orange-900 mb-1">{stats.onHoldProjects}</div>
+                <p className="text-xs text-orange-700 font-medium">Paused projects</p>
+              </>
             )}
-            <p className="text-xs text-orange-700">Paused projects</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Projects List */}
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="">
           <CardTitle className="flex items-center justify-between">
-            <span>Projects ({filteredProjects.length})</span>
-            <div className="text-sm text-gray-500">
-              {filteredProjects.length !== projects.length && `Showing ${filteredProjects.length} of ${projects.length} projects`}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <FolderOpen className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <span className="text-lg font-semibold">Projects</span>
+                <div className="text-sm text-gray-500 font-normal">
+                  {filteredProjects.length !== projects.length 
+                    ? `Showing ${filteredProjects.length} of ${projects.length} projects`
+                    : `${filteredProjects.length} projects total`
+                  }
+                </div>
+              </div>
             </div>
           </CardTitle>
         </CardHeader>
@@ -259,130 +297,135 @@ export default function ProjectsPage() {
               </div>
             </div>
           ) : filteredProjects.length > 0 ? (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredProjects.map((project) => (
-                <div key={project.id} className="p-4 border rounded-lg bg-white hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start">
+                <div key={project.id} className="group p-6 border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200">
+                  <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{project.name}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{project.description}</p>
-                        </div>
-                        
-                        {/* Action buttons */}
-                        <div className="flex items-center gap-2 ml-4">
-                          {canEdit && (
-                            <ProjectEditForm 
-                              project={project} 
-                              onProjectUpdated={handleProjectUpdated}
-                            />
-                          )}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        {project.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                        {project.description}
+                      </p>
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2 ml-4">
+                      {canEdit && (
+                        <ProjectEditForm 
+                          project={project} 
+                          onProjectUpdated={handleProjectUpdated}
+                        />
+                      )}
+                      
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem 
+                            onClick={() => handleViewProjectDetails(project)}
+                            className="flex items-center gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
                           
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem 
-                                onClick={() => handleViewProjectDetails(project)}
-                                className="flex items-center gap-2"
-                              >
-                                <Eye className="h-4 w-4" />
-                                View Details
-                              </DropdownMenuItem>
+                          {/* Only show status change options if user has edit permissions */}
+                          {canEdit && (
+                            <>
+                              <DropdownMenuSeparator />
                               
-                              {/* Only show status change options if user has edit permissions */}
-                              {canEdit && (
-                                <>
-                                  <DropdownMenuSeparator />
-                                  
-                                  {/* Status change options */}
-                                  {project.status !== 'active' && (
-                                    <DropdownMenuItem 
-                                      onClick={() => handleProjectStatusChange(project, 'active')}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <Play className="h-4 w-4" />
-                                      Activate Project
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {project.status === 'active' && (
-                                    <DropdownMenuItem 
-                                      onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <Pause className="h-4 w-4" />
-                                      Put On Hold
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {project.status !== 'completed' && (
-                                    <DropdownMenuItem 
-                                      onClick={() => handleProjectStatusChange(project, 'completed')}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <CheckCircle2 className="h-4 w-4" />
-                                      Mark Completed
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                    <DropdownMenuItem 
-                                      onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <X className="h-4 w-4" />
-                                      Cancel Project
-                                    </DropdownMenuItem>
-                                  )}
-                                </>
+                              {/* Status change options */}
+                              {project.status !== 'active' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleProjectStatusChange(project, 'active')}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Play className="h-4 w-4" />
+                                  Activate Project
+                                </DropdownMenuItem>
                               )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
+                              
+                              {project.status === 'active' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleProjectStatusChange(project, 'on_hold')}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Pause className="h-4 w-4" />
+                                  Put On Hold
+                                </DropdownMenuItem>
+                              )}
+                              
+                              {project.status !== 'completed' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleProjectStatusChange(project, 'completed')}
+                                  className="flex items-center gap-2"
+                                >
+                                  <CheckCircle2 className="h-4 w-4" />
+                                  Mark Completed
+                                </DropdownMenuItem>
+                              )}
+                              
+                              {project.status !== 'cancelled' && project.status !== 'completed' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleProjectStatusChange(project, 'cancelled')}
+                                  className="flex items-center gap-2"
+                                >
+                                  <X className="h-4 w-4" />
+                                  Cancel Project
+                                </DropdownMenuItem>
+                              )}
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 mb-4">
+                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                      project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                      project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                      project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                      'bg-red-100 text-red-800 border border-red-200'
+                    }`}>
+                      {project.status === 'active' ? 'Active' :
+                       project.status === 'completed' ? 'Completed' :
+                       project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
+                    </span>
+                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                      {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="font-medium">Due:</span>
+                        <span>{new Date(project.end_date).toLocaleDateString()}</span>
                       </div>
-                      
-                      <div className="flex gap-2 mt-3">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          project.status === 'active' ? 'bg-blue-100 text-blue-800' :
-                          project.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          project.status === 'on_hold' ? 'bg-orange-100 text-orange-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {project.status === 'active' ? 'Active' :
-                           project.status === 'completed' ? 'Completed' :
-                           project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
-                        </span>
-                        <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
-                          {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
-                        </span>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Users className="h-4 w-4 text-gray-400" />
+                        <span className="font-medium">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)}</span>
+                        <span>Members</span>
                       </div>
-                      
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Due: {new Date(project.end_date).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            <span>{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)} Members</span>
-                          </div>
-                        </div>
-                        <div className="text-right text-sm text-gray-500 space-y-1">
-                          <div className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
-                            <span>Manager: {project.manager.name}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Started: {new Date(project.start_date).toLocaleDateString()}</span>
-                          </div>
-                        </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <User className="h-4 w-4 text-gray-400" />
+                        <span className="font-medium">Manager:</span>
+                        <span>{project.manager.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="font-medium">Started:</span>
+                        <span>{new Date(project.start_date).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
@@ -391,21 +434,23 @@ export default function ProjectsPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <div className="p-4 bg-gray-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <FolderOpen className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {projects.length === 0 ? "No projects yet" : "No projects found"}
               </h3>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-gray-500 mb-6 max-w-md mx-auto">
                 {projects.length === 0 
-                  ? "Create your first project to start organizing your work effectively"
-                  : "Try adjusting your search criteria or filters."
+                  ? "Create your first project to start organizing your work effectively and track progress with your team."
+                  : "Try adjusting your search criteria or filters to find what you're looking for."
                 }
               </p>
               {projects.length === 0 && canCreate && (
                 <ProjectCreateForm 
                   onProjectCreated={handleProjectCreated}
                   trigger={
-                    <Button>
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
                       <FolderOpen className="h-4 w-4 mr-2" />
                       Create Your First Project
                     </Button>
