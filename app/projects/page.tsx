@@ -391,7 +391,7 @@ export default function ProjectsPage() {
                       
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
-                        {canEdit && (
+                        {canEdit && ( 
                           <ProjectEditForm 
                             project={project} 
                             onProjectUpdated={handleProjectUpdated}
