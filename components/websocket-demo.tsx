@@ -153,9 +153,9 @@ export default function WebSocketDemo() {
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <h4 className="font-medium text-blue-800 mb-1">Instructions:</h4>
           <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Type a message and click "Send" or press Enter</li>
+            <li>• Type a message and click &quot;Send&quot; or press Enter</li>
             <li>• The server will echo back your message</li>
-            <li>• Use "Reconnect" if the connection is lost</li>
+            <li>• Use &quot;Reconnect&quot; if the connection is lost</li>
             <li>• Check the status indicator for connection state</li>
           </ul>
         </div>
