@@ -468,6 +468,33 @@ export const dashboardAPI = {
     apiRequest<{ team: Team; members_workload: Array<{ user: User; tasks: Task[]; workload_percentage: number }> }>(`/dashboard/team-workload/${teamId}`),
 };
 
+// WebSocket API
+export const websocketAPI = {
+  // Create WebSocket connection
+  createConnection: (onMessage?: (data: string) => void, onError?: (error: Event) => void) => {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    const wsUrl = API_BASE_URL.replace('http', 'ws') + '/ws';
+    
+    const ws = new WebSocket(wsUrl);
+    
+    if (onMessage) {
+      ws.onmessage = (event) => onMessage(event.data);
+    }
+    
+    if (onError) {
+      ws.onerror = onError;
+    }
+    
+    return ws;
+  },
+  
+  // Get WebSocket URL
+  getWebSocketURL: () => {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    return API_BASE_URL.replace('http', 'ws') + '/ws';
+  },
+};
+
 // Utility functions
 export const apiUtils = {
   // Get API base URL (useful for external integrations)
@@ -514,6 +541,7 @@ export const api = {
   reminders: reminderAPI,
   reports: reportAPI,
   dashboard: dashboardAPI,
+  websocket: websocketAPI,
   utils: apiUtils,
 };
 
