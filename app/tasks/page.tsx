@@ -559,7 +559,9 @@ export default function TasksPage() {
               )}
             </div>
           ) : (
-            <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
+            <div className={`transition-all duration-500 ease-in-out ${
+              viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'
+            }`}>
               {filteredTasks.map((task) => (
                 <TaskCard
                   key={task.id}

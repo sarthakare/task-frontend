@@ -354,9 +354,10 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="project_id" className="text-sm font-medium text-gray-700">Project</Label>
-                  <Select value={formData.project_id} onValueChange={(value) => handleInputChange('project_id', value)}>
+                  <Select value={formData.project_id} onValueChange={(value) => handleInputChange('project_id', value)} disabled={isLoadingProjects}>
                     <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
                       <SelectValue placeholder={isLoadingProjects ? "Loading..." : "Select project"} />
+                      {isLoadingProjects && <Loader2 className="h-4 w-4 animate-spin ml-auto" />}
                     </SelectTrigger>
                     <SelectContent>
                       {projects.map((project) => (
@@ -377,9 +378,10 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
 
                 <div className="space-y-2">
                   <Label htmlFor="team_id" className="text-sm font-medium text-gray-700">Team</Label>
-                  <Select value={formData.team_id} onValueChange={(value) => handleInputChange('team_id', value)}>
+                  <Select value={formData.team_id} onValueChange={(value) => handleInputChange('team_id', value)} disabled={isLoadingTeams}>
                     <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
                       <SelectValue placeholder={isLoadingTeams ? "Loading..." : "Select team"} />
+                      {isLoadingTeams && <Loader2 className="h-4 w-4 animate-spin ml-auto" />}
                     </SelectTrigger>
                     <SelectContent>
                       {teams.map((team) => (
@@ -400,9 +402,10 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
 
                 <div className="space-y-2">
                   <Label htmlFor="assigned_to" className="text-sm font-medium text-gray-700">Assignee *</Label>
-                  <Select value={formData.assigned_to} onValueChange={(value) => handleInputChange('assigned_to', value)}>
+                  <Select value={formData.assigned_to} onValueChange={(value) => handleInputChange('assigned_to', value)} disabled={isLoadingUsers}>
                     <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.assigned_to ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                       <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select assignee"} />
+                      {isLoadingUsers && <Loader2 className="h-4 w-4 animate-spin ml-auto" />}
                     </SelectTrigger>
                     <SelectContent>
                       {users.map((user) => (

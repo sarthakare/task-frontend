@@ -130,15 +130,15 @@ export function TaskCard({
   const isTaskOverdue = isOverdue(task.due_date, task.status);
 
   return (
-    <Card className={`group transition-all duration-200 hover:shadow-md border-l-4 ${
+    <Card className={`group transition-all duration-500 ease-in-out hover:shadow-md border-l-4 ${
       isTaskOverdue 
         ? getOverdueColor()
         : `${getStatusBorderColor(task.status)} hover:shadow-lg`
     }`}>
-      <CardContent className={viewMode === 'list' ? 'p-4' : 'p-6'}>
+      <CardContent className={`transition-all duration-500 ease-in-out ${viewMode === 'list' ? 'p-4' : 'p-6'}`}>
         {viewMode === 'list' ? (
           /* List View Layout */
-          <div className="space-y-3">
+          <div className="space-y-3 transition-all duration-500 ease-in-out">
             {/* Header Row */}
              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div className="flex-1 min-w-0">
@@ -235,7 +235,7 @@ export function TaskCard({
           </div>
         ) : (
           /* Card View Layout */
-           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4 transition-all duration-500 ease-in-out">
             <div className="flex-1 min-w-0">
                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                 <div className="flex items-center gap-2">

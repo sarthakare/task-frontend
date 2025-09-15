@@ -24,20 +24,24 @@ import {
   X,
   Eye,
   CircleAlert,
-  Loader2
+  Loader2,
+  Grid3X3,
+  List
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import { canCreateProjects, canEditProjects } from "@/utils/auth";
-import { useUser } from "@/components/user-provider";
 import type { Project } from "@/types";
 
 export default function ProjectsPage() {
-  const { currentUser } = useUser();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [managerFilter, setManagerFilter] = useState("all");
+  const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [stats, setStats] = useState({
     totalProjects: 0,
     activeProjects: 0,
@@ -129,50 +133,89 @@ export default function ProjectsPage() {
     }
   };
 
-  // Filter projects based on search term
-  const filteredProjects = projects.filter(project => 
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.assigned_teams.some(team => team.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Get unique managers for filter
+  const uniqueManagers = Array.from(new Set(projects.map(project => project.manager.name).filter(Boolean)));
+
+  // Filter projects based on search term and filters
+  const filteredProjects = projects.filter(project => {
+    const matchesSearch =
+      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.manager.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.assigned_teams.some(team => team.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesStatus = statusFilter === "all" || project.status === statusFilter;
+    const matchesManager = managerFilter === "all" || project.manager.name === managerFilter;
+
+    return matchesSearch && matchesStatus && matchesManager;
+  });
 
   return (
     <div className="space-y-6">
       <PageHeader 
         title="Project Management" 
         description="Track and manage all your projects effectively"
+        action={
+          canCreate ? <ProjectCreateForm onProjectCreated={handleProjectCreated} /> : null
+        }
       />
 
-      {/* Search and Actions */}
+      {/* Search and Filters */}
       <Card className="border-0 shadow-sm">
         <CardHeader className="">
           <CardTitle className="flex items-center gap-2 text-lg">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Search className="h-5 w-5 text-blue-600" />
             </div>
-            Search & Actions
+            Search & Filters
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search Bar - 70% width on large screens */}
-            <div className="relative flex-1 lg:w-[70%]">
+            {/* Search Bar - 55% width on large screens */}
+            <div className="relative flex-1 lg:w-[55%]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search projects, descriptions, managers, or teams..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
+                className="pl-10 h-9 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
               />
             </div>
 
-            {/* Actions - 30% width on large screens */}
-            {canCreate && (
-              <div className="flex items-center gap-2 flex-1 lg:w-[30%]">
-                <ProjectCreateForm onProjectCreated={handleProjectCreated} />
+            {/* Filters - 45% width on large screens, arranged in 2 columns */}
+            <div className="flex flex-col sm:flex-row gap-4 flex-1 lg:w-[45%]">
+              <div className="flex-1">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="on_hold">On Hold</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
+
+              <div className="flex-1">
+                <Select value={managerFilter} onValueChange={setManagerFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Managers" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Managers</SelectItem>
+                    {uniqueManagers.map((manager) => (
+                      <SelectItem key={manager} value={manager}>
+                        {manager}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -286,6 +329,38 @@ export default function ProjectsPage() {
                 </div>
               </div>
             </div>
+            
+            {/* View Toggle Buttons */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('card')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
+                    viewMode === 'card' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                      : 'text-gray-600 hover:bg-blue-200'
+                  }`}
+                >
+                  <Grid3X3 className="h-4 w-4 mr-1" />
+                  Card
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
+                    viewMode === 'list' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                      : 'text-gray-600 hover:bg-blue-200'
+                  }`}
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  List
+                </Button>
+              </div>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -297,138 +372,272 @@ export default function ProjectsPage() {
               </div>
             </div>
           ) : filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredProjects.map((project) => (
-                <div key={project.id} className="group p-6 border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {project.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-                        {project.description}
-                      </p>
-                    </div>
-                    
-                    {/* Action buttons */}
-                    <div className="flex items-center gap-2 ml-4">
-                      {canEdit && (
-                        <ProjectEditForm 
-                          project={project} 
-                          onProjectUpdated={handleProjectUpdated}
-                        />
-                      )}
+                <div key={project.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${
+                  viewMode === 'list' ? 'p-4' : 'p-6'
+                }`}>
+                  {viewMode === 'card' ? (
+                    /* Card View Layout */
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                          {project.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                          {project.description}
+                        </p>
+                      </div>
                       
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem 
-                            onClick={() => handleViewProjectDetails(project)}
-                            className="flex items-center gap-2"
-                          >
-                            <Eye className="h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          
-                          {/* Only show status change options if user has edit permissions */}
-                          {canEdit && (
-                            <>
-                              <DropdownMenuSeparator />
-                              
-                              {/* Status change options */}
-                              {project.status !== 'active' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'active')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Play className="h-4 w-4" />
-                                  Activate Project
-                                </DropdownMenuItem>
-                              )}
-                              
-                              {project.status === 'active' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Pause className="h-4 w-4" />
-                                  Put On Hold
-                                </DropdownMenuItem>
-                              )}
-                              
-                              {project.status !== 'completed' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'completed')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <CheckCircle2 className="h-4 w-4" />
-                                  Mark Completed
-                                </DropdownMenuItem>
-                              )}
-                              
-                              {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                  className="flex items-center gap-2"
-                                >
-                                  <X className="h-4 w-4" />
-                                  Cancel Project
-                                </DropdownMenuItem>
-                              )}
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 ml-4">
+                        {canEdit && (
+                          <ProjectEditForm 
+                            project={project} 
+                            onProjectUpdated={handleProjectUpdated}
+                          />
+                        )}
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => handleViewProjectDetails(project)}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye className="h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            
+                            {/* Only show status change options if user has edit permissions */}
+                            {canEdit && (
+                              <>
+                                <DropdownMenuSeparator />
+                                
+                                {/* Status change options */}
+                                {project.status !== 'active' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'active')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Play className="h-4 w-4" />
+                                    Activate Project
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                {project.status === 'active' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'on_hold')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Pause className="h-4 w-4" />
+                                    Put On Hold
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                {project.status !== 'completed' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'completed')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <CheckCircle2 className="h-4 w-4" />
+                                    Mark Completed
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                {project.status !== 'cancelled' && project.status !== 'completed' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'cancelled')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <X className="h-4 w-4" />
+                                    Cancel Project
+                                  </DropdownMenuItem>
+                                )}
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* List View Layout */
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-900 line-clamp-1">{project.name}</h3>
+                        </div>
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {project.description}
+                        </p>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 ml-4">
+                        {canEdit && (
+                          <ProjectEditForm 
+                            project={project} 
+                            onProjectUpdated={handleProjectUpdated}
+                          />
+                        )}
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => handleViewProjectDetails(project)}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye className="h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            
+                            {/* Only show status change options if user has edit permissions */}
+                            {canEdit && (
+                              <>
+                                <DropdownMenuSeparator />
+                                
+                                {/* Status change options */}
+                                {project.status !== 'active' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'active')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Play className="h-4 w-4" />
+                                    Activate Project
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                {project.status === 'active' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'on_hold')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Pause className="h-4 w-4" />
+                                    Put On Hold
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                {project.status !== 'completed' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'completed')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <CheckCircle2 className="h-4 w-4" />
+                                    Mark Completed
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                {project.status !== 'cancelled' && project.status !== 'completed' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleProjectStatusChange(project, 'cancelled')}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <X className="h-4 w-4" />
+                                    Cancel Project
+                                  </DropdownMenuItem>
+                                )}
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  )}
                   
-                  <div className="flex gap-2 mb-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                      project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                      project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                      project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-                      'bg-red-100 text-red-800 border border-red-200'
-                    }`}>
-                      {project.status === 'active' ? 'Active' :
-                       project.status === 'completed' ? 'Completed' :
-                       project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
-                    </span>
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
-                      {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="h-4 w-4 text-gray-400" />
-                        <span className="font-medium">Due:</span>
-                        <span>{new Date(project.end_date).toLocaleDateString()}</span>
+                  {viewMode === 'card' && (
+                    <>
+                      <div className="flex gap-2 mb-4">
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                          project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                          project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                          'bg-red-100 text-red-800 border border-red-200'
+                        }`}>
+                          {project.status === 'active' ? 'Active' :
+                           project.status === 'completed' ? 'Completed' :
+                           project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
+                        </span>
+                        <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                          {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Users className="h-4 w-4 text-gray-400" />
-                        <span className="font-medium">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)}</span>
-                        <span>Members</span>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Calendar className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">Dates:</span>
+                            <span>{new Date(project.start_date).toLocaleDateString()} - {new Date(project.end_date).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Users className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)}</span>
+                            <span>Members</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">Manager:</span>
+                            <span>{project.manager.name}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <User className="h-4 w-4 text-gray-400" />
-                        <span className="font-medium">Manager:</span>
-                        <span>{project.manager.name}</span>
+                    </>
+                  )}
+
+                  {viewMode === 'list' && (
+                    <>
+                      <div className="flex gap-2 mb-4">
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                          project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                          project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                          'bg-red-100 text-red-800 border border-red-200'
+                        }`}>
+                          {project.status === 'active' ? 'Active' :
+                           project.status === 'completed' ? 'Completed' :
+                           project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
+                        </span>
+                        <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                          {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="h-4 w-4 text-gray-400" />
-                        <span className="font-medium">Started:</span>
-                        <span>{new Date(project.start_date).toLocaleDateString()}</span>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Calendar className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">Dates:</span>
+                            <span>{new Date(project.start_date).toLocaleDateString()} - {new Date(project.end_date).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Users className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)}</span>
+                            <span>Members</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">Manager:</span>
+                            <span>{project.manager.name}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
