@@ -381,7 +381,7 @@ export default function ProjectsPage() {
                     /* Card View Layout */
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
                           {project.name}
                         </h3>
                         <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
@@ -400,14 +400,14 @@ export default function ProjectsPage() {
                         
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200">
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem 
                               onClick={() => handleViewProjectDetails(project)}
-                              className="flex items-center gap-2"
+                              className="flex items-center gap-2 cursor-pointer"
                             >
                               <Eye className="h-4 w-4" />
                               View Details
@@ -422,7 +422,7 @@ export default function ProjectsPage() {
                                 {project.status !== 'active' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'active')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <Play className="h-4 w-4" />
                                     Activate Project
@@ -432,7 +432,7 @@ export default function ProjectsPage() {
                                 {project.status === 'active' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <Pause className="h-4 w-4" />
                                     Put On Hold
@@ -442,7 +442,7 @@ export default function ProjectsPage() {
                                 {project.status !== 'completed' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'completed')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <CheckCircle2 className="h-4 w-4" />
                                     Mark Completed
@@ -452,7 +452,7 @@ export default function ProjectsPage() {
                                 {project.status !== 'cancelled' && project.status !== 'completed' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <X className="h-4 w-4" />
                                     Cancel Project
@@ -487,14 +487,14 @@ export default function ProjectsPage() {
                         
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200">
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem 
                               onClick={() => handleViewProjectDetails(project)}
-                              className="flex items-center gap-2"
+                              className="flex items-center gap-2 cursor-pointer"
                             >
                               <Eye className="h-4 w-4" />
                               View Details
@@ -509,7 +509,7 @@ export default function ProjectsPage() {
                                 {project.status !== 'active' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'active')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <Play className="h-4 w-4" />
                                     Activate Project
@@ -519,7 +519,7 @@ export default function ProjectsPage() {
                                 {project.status === 'active' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <Pause className="h-4 w-4" />
                                     Put On Hold
@@ -529,7 +529,7 @@ export default function ProjectsPage() {
                                 {project.status !== 'completed' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'completed')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <CheckCircle2 className="h-4 w-4" />
                                     Mark Completed
@@ -539,7 +539,7 @@ export default function ProjectsPage() {
                                 {project.status !== 'cancelled' && project.status !== 'completed' && (
                                   <DropdownMenuItem 
                                     onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-pointer"
                                   >
                                     <X className="h-4 w-4" />
                                     Cancel Project
