@@ -12,53 +12,28 @@ This is a minimal WebSocket example demonstrating real-time communication betwee
 
 ## How to Test
 
-### Local Development
-
-#### 1. Start the Backend Server
+### 1. Start the Backend Server
 ```bash
 cd task-backend
 python -m uvicorn main:app --reload
 ```
 The server will run on `http://localhost:8000`
 
-#### 2. Start the Frontend Server
+### 2. Start the Frontend Server
 ```bash
 cd task-frontend
 npm run dev
 ```
 The frontend will run on `http://localhost:3000`
 
-#### 3. Access the WebSocket Demo
+### 3. Access the WebSocket Demo
 Navigate to: `http://localhost:3000/websocket-demo`
 
-#### 4. Test the Connection
+### 4. Test the Connection
 1. You should see "Connected to WebSocket server" message
 2. Type a message in the input field
 3. Click "Send" or press Enter
 4. The server will echo back: "Message received: [your message]"
-
-### Production Deployment
-
-#### 1. Backend Deployment (HTTPS Required)
-Your backend must be deployed with HTTPS support for WebSocket Secure (WSS) connections.
-
-**Environment Variables:**
-- Set `NEXT_PUBLIC_API_URL` to your production backend URL (e.g., `https://your-backend.herokuapp.com`)
-
-#### 2. Frontend Deployment (Vercel)
-The frontend is already configured for production at `https://task-frontend-neon.vercel.app`
-
-**Environment Variables:**
-- `NEXT_PUBLIC_API_URL`: Your production backend URL (HTTPS)
-- `NEXT_PUBLIC_API_BASE_URL`: Alternative variable name (same as above)
-
-#### 3. Access Production WebSocket Demo
-Navigate to: `https://task-frontend-neon.vercel.app/websocket-demo`
-
-#### 4. Protocol Handling
-- **Local Development**: Uses `ws://` (WebSocket)
-- **Production**: Uses `wss://` (WebSocket Secure)
-- The API service automatically detects HTTPS and switches to WSS protocol
 
 ## Architecture
 

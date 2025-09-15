@@ -33,7 +33,7 @@ import type {
 } from "@/types";
 import { getToken, clearAuth } from "@/utils/auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 // Generic fetch wrapper with error handling and authentication
 async function apiRequest<T>(
@@ -472,18 +472,8 @@ export const dashboardAPI = {
 export const websocketAPI = {
   // Create WebSocket connection
   createConnection: (onMessage?: (data: string) => void, onError?: (error: Event) => void) => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    
-    // Convert HTTP/HTTPS to WS/WSS for WebSocket connections
-    let wsUrl: string;
-    if (API_BASE_URL.startsWith('https://')) {
-      wsUrl = API_BASE_URL.replace('https://', 'wss://') + '/ws';
-    } else if (API_BASE_URL.startsWith('http://')) {
-      wsUrl = API_BASE_URL.replace('http://', 'ws://') + '/ws';
-    } else {
-      // Fallback for localhost or other cases
-      wsUrl = API_BASE_URL.replace('http', 'ws') + '/ws';
-    }
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    const wsUrl = API_BASE_URL.replace('http', 'ws') + '/ws';
     
     const ws = new WebSocket(wsUrl);
     
@@ -500,17 +490,8 @@ export const websocketAPI = {
   
   // Get WebSocket URL
   getWebSocketURL: () => {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    
-    // Convert HTTP/HTTPS to WS/WSS for WebSocket connections
-    if (API_BASE_URL.startsWith('https://')) {
-      return API_BASE_URL.replace('https://', 'wss://') + '/ws';
-    } else if (API_BASE_URL.startsWith('http://')) {
-      return API_BASE_URL.replace('http://', 'ws://') + '/ws';
-    } else {
-      // Fallback for localhost or other cases
-      return API_BASE_URL.replace('http', 'ws') + '/ws';
-    }
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    return API_BASE_URL.replace('http', 'ws') + '/ws';
   },
 };
 

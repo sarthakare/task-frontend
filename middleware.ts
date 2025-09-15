@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/auth/login", "/websocket-demo"];
+const PUBLIC_ROUTES = ["/auth/login"];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
