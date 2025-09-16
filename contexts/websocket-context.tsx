@@ -35,6 +35,29 @@ interface TaskNotificationData {
   updated_by?: string;
 }
 
+interface TeamNotificationData {
+  team_id: number;
+  team_name: string;
+  description?: string;
+  department?: string;
+  status?: string;
+  leader_name?: string;
+  member_count?: number;
+  created_by?: string;
+}
+
+interface ProjectNotificationData {
+  project_id: number;
+  project_name: string;
+  description?: string;
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+  manager_name?: string;
+  team_count?: number;
+  created_by?: string;
+}
+
 interface MessageData {
   type: string;
   content?: string;
@@ -50,6 +73,8 @@ interface MessageData {
   total_count?: number;
   notification_type?: string;
   task_data?: TaskNotificationData;
+  team_data?: TeamNotificationData;
+  project_data?: ProjectNotificationData;
 }
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
@@ -192,6 +217,108 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         case "team_task_created":
           toastType = "info";
           toastTitle = "👥 Team Task Created";
+          break;
+      }
+      
+      // Show toast notification
+      switch (toastType) {
+        case "success":
+          toast.success(toastTitle, { 
+            description: message,
+            duration: 5000
+          });
+          break;
+        case "warning":
+          toast.warning(toastTitle, { 
+            description: message,
+            duration: 5000
+          });
+          break;
+        case "info":
+        default:
+          toast.info(toastTitle, { 
+            description: message,
+            duration: 5000
+          });
+          break;
+      }
+      
+    } else if (parsedData.type === "team_notification") {
+      // Handle team notifications
+      const { notification_type, title, message, team_data } = parsedData;
+      
+      let toastType = "info";
+      let toastTitle = title;
+      
+      switch (notification_type) {
+        case "team_created":
+          toastType = "success";
+          toastTitle = "👥 New Team Created";
+          break;
+        case "team_updated":
+          toastType = "info";
+          toastTitle = "✏️ Team Updated";
+          break;
+        case "team_member_added":
+          toastType = "info";
+          toastTitle = "➕ Team Member Added";
+          break;
+        case "team_member_removed":
+          toastType = "warning";
+          toastTitle = "➖ Team Member Removed";
+          break;
+      }
+      
+      // Show toast notification
+      switch (toastType) {
+        case "success":
+          toast.success(toastTitle, { 
+            description: message,
+            duration: 5000
+          });
+          break;
+        case "warning":
+          toast.warning(toastTitle, { 
+            description: message,
+            duration: 5000
+          });
+          break;
+        case "info":
+        default:
+          toast.info(toastTitle, { 
+            description: message,
+            duration: 5000
+          });
+          break;
+      }
+      
+    } else if (parsedData.type === "project_notification") {
+      // Handle project notifications
+      const { notification_type, title, message, project_data } = parsedData;
+      
+      let toastType = "info";
+      let toastTitle = title;
+      
+      switch (notification_type) {
+        case "project_created":
+          toastType = "success";
+          toastTitle = "🚀 New Project Created";
+          break;
+        case "project_updated":
+          toastType = "info";
+          toastTitle = "✏️ Project Updated";
+          break;
+        case "project_status_changed":
+          toastType = "info";
+          toastTitle = "📊 Project Status Changed";
+          break;
+        case "project_team_added":
+          toastType = "info";
+          toastTitle = "👥 Team Added to Project";
+          break;
+        case "project_team_removed":
+          toastType = "warning";
+          toastTitle = "➖ Team Removed from Project";
           break;
       }
       
