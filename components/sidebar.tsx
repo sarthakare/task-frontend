@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { WebSocketStatus } from "./websocket-status";
 
 interface SidebarProps {
   className?: string;
@@ -236,6 +237,13 @@ export function Sidebar({ className }: SidebarProps) {
               <div className="text-xs text-gray-500">
                 <p>Task Manager v1.0</p>
                 <p className="mt-1">© 2024 All rights reserved</p>
+              </div>
+            )}
+            
+            {/* WebSocket Status */}
+            {currentUser && (
+              <div className="pt-2 border-t">
+                <WebSocketStatus />
               </div>
             )}
           </div>

@@ -470,10 +470,16 @@ export const dashboardAPI = {
 
 // WebSocket API
 export const websocketAPI = {
-  // Create WebSocket connection
+  // Create WebSocket connection with authentication
   createConnection: (onMessage?: (data: string) => void, onError?: (error: Event) => void) => {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-    const wsUrl = API_BASE_URL.replace('http', 'ws') + '/ws';
+    const token = getToken();
+    
+    // Build WebSocket URL with token if available
+    let wsUrl = API_BASE_URL.replace('http', 'ws') + '/ws';
+    if (token) {
+      wsUrl += `?token=${encodeURIComponent(token)}`;
+    }
     
     const ws = new WebSocket(wsUrl);
     
@@ -488,10 +494,17 @@ export const websocketAPI = {
     return ws;
   },
   
-  // Get WebSocket URL
+  // Get WebSocket URL with authentication
   getWebSocketURL: () => {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-    return API_BASE_URL.replace('http', 'ws') + '/ws';
+    const token = getToken();
+    
+    let wsUrl = API_BASE_URL.replace('http', 'ws') + '/ws';
+    if (token) {
+      wsUrl += `?token=${encodeURIComponent(token)}`;
+    }
+    
+    return wsUrl;
   },
 };
 

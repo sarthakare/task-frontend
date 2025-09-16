@@ -22,6 +22,7 @@ import { Eye, EyeOff, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { loginUser } from "@/lib/api-service";
 import { saveAuth } from "@/utils/auth";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,6 +32,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +60,9 @@ export default function LoginPage() {
     try {
       const data = await loginUser(email, password); // response includes token + user
       saveAuth(data, rememberMe);
+      
+      // Update auth context (this will trigger WebSocket connection)
+      login(data.access_token, data.user);
 
       toast.success(`Welcome back, ${data.user.name}!`, {
         description: `Role: ${data.user.role} | Department: ${data.user.department}`,
