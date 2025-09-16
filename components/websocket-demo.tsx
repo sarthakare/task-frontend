@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import { websocketAPI } from "@/lib/api-service";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useWebSocket } from "@/contexts/websocket-context";
 
@@ -12,42 +11,22 @@ interface ConnectedUser {
   connected_at: string;
 }
 
-interface MessageData {
-  type: string;
-  content?: string;
-  target?: string;
-  target_id?: string;
-  toast_type?: string;
-  title?: string;
-  message?: string;
-  timestamp?: string;
-  sender?: string;
-  user_info?: any;
-  users?: ConnectedUser[];
-  total_count?: number;
-  notification_type?: string;
-  task_data?: {
-    task_id: number;
-    title: string;
-    description?: string;
-    priority?: string;
-    status?: string;
-    due_date?: string;
-    project_name?: string;
-    team_name?: string;
-    creator_name?: string;
-    assignee_name?: string;
-    updated_by?: string;
-  };
+interface UserInfo {
+  user_id: number;
+  user_name: string;
+  user_role: string;
+  user_department: string;
 }
+
+
 
 export default function WebSocketDemo() {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
-  const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
+  const [connectedUsers] = useState<ConnectedUser[]>([]);
   const [messageTarget, setMessageTarget] = useState<string>("all");
   const [targetId, setTargetId] = useState<string>("");
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser] = useState<UserInfo | null>(null);
   
   // Use global WebSocket connection
   const { isConnected, connectionStatus, sendMessage: globalSendMessage, reconnect } = useWebSocket();
