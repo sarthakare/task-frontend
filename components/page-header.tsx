@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { NotificationBell } from "./notification-bell";
 
 interface PageHeaderProps {
   title: string;
@@ -29,6 +30,7 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
       </div>
       <div className="flex items-center gap-4">
         {action && <div>{action}</div>}
+        <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

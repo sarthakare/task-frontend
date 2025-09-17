@@ -15,7 +15,9 @@ import {
   Edit,
   Power,
   CheckCircle2,
-  CircleAlert
+  CircleAlert,
+  Grid3X3,
+  List
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -67,6 +69,7 @@ export default function UsersPage() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   
@@ -77,6 +80,15 @@ export default function UsersPage() {
   
   // Deactivate/Activate state
   const [isTogglingStatus, setIsTogglingStatus] = useState<number | null>(null);
+
+  // Check permissions (client-side only to avoid hydration mismatch)
+  const [canCreate, setCanCreate] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+
+  useEffect(() => {
+    setCanCreate(canCreateUsers());
+    setCanEdit(canEditUsers());
+  }, []);
 
   // Fetch users and stats on component mount
   useEffect(() => {
@@ -198,6 +210,7 @@ export default function UsersPage() {
       <PageHeader 
         title="User Management" 
         description="Manage team members and their permissions"
+        action={canCreate ? <UserCreateForm onUserCreated={handleUserCreated} /> : null}
       />
 
       {/* Search and Filters */}
@@ -226,9 +239,6 @@ export default function UsersPage() {
                   <SelectItem value="inactive">Inactive Only</SelectItem>
                 </SelectContent>
               </Select>
-              {canCreateUsers() && (
-                <UserCreateForm onUserCreated={handleUserCreated} />
-              )}
             </div>
           </div>
         </CardContent>
@@ -336,7 +346,52 @@ export default function UsersPage() {
       {/* Users List */}
       <Card>
         <CardHeader>
-          <CardTitle>All Users ({filteredUsers.length})</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <span className="text-lg font-semibold">All Users</span>
+                <div className="text-sm text-gray-500 font-normal">
+                  {filteredUsers.length !== users.length
+                    ? `Showing ${filteredUsers.length} of ${users.length} users`
+                    : `${filteredUsers.length} users total`
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* View Toggle Buttons */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('card')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${viewMode === 'card'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white'
+                    : 'text-gray-600 hover:bg-blue-200'
+                    }`}
+                >
+                  <Grid3X3 className="h-4 w-4 mr-1" />
+                  Card
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${viewMode === 'list'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white'
+                    : 'text-gray-600 hover:bg-blue-200'
+                    }`}
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  List
+                </Button>
+              </div>
+            </div>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -353,20 +408,112 @@ export default function UsersPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredUsers.map((user) => (
-                <div key={user.id} className={`p-4 border rounded-lg ${user.is_active ? 'bg-white' : 'bg-gray-50 border-gray-300'}`}>
+                <div key={user.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${viewMode === 'list' ? 'p-4' : 'p-6'
+                  } ${!user.is_active ? 'bg-gray-50 border-gray-300' : ''}`}>
+                  {viewMode === 'card' ? (
+                    /* Card View Layout */
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${user.role === 'manager' ? 'bg-purple-100' :
+                            user.role === 'team_lead' ? 'bg-blue-100' :
+                              user.role === 'member' ? 'bg-green-100' :
+                                'bg-gray-100'
+                            }`}>
+                            <span className={`font-medium text-lg ${user.role === 'manager' ? 'text-purple-600' :
+                              user.role === 'team_lead' ? 'text-blue-600' :
+                                user.role === 'member' ? 'text-green-600' :
+                                  'text-gray-600'
+                              }`}>
+                              {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                              {user.name}
+                            </h3>
+                            <p className="text-sm text-gray-600">{user.email}</p>
+                            {user.mobile && (
+                              <p className="text-sm text-gray-500">{user.mobile}</p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          {user.role.toUpperCase() !== 'CEO' && (
+                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                              user.role === 'team_lead' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                              user.role === 'manager' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+                              user.role === 'member' ? 'bg-green-100 text-green-800 border border-green-200' :
+                              'bg-green-100 text-green-800 border border-green-200'
+                            }`}>
+                              {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
+                            </span>
+                          )}
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                            user.is_active ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'
+                          }`}>
+                            {user.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                          {user.role.toUpperCase() !== 'CEO' && (
+                            <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 border border-gray-200">
+                              {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 ml-4">
+                        {canEdit && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditingUser(user);
+                              setIsEditDialogOpen(true);
+                            }}
+                            className="h-8 hover:bg-blue-50 hover:border-blue-200"
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        )}
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleToggleUserStatus(user.id, user.is_active)}
+                              disabled={isTogglingStatus === user.id}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Power className="h-4 w-4" />
+                              {isTogglingStatus === user.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : null}
+                              {user.is_active ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ) : (
+                    /* List View Layout */
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        // Assign background color based on the user's role (manager, team_lead, member)
-                        user.role === 'manager' ? 'bg-purple-100' :
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${user.role === 'manager' ? 'bg-purple-100' :
                         user.role === 'team_lead' ? 'bg-blue-100' :
                         user.role === 'member' ? 'bg-green-100' :
                         'bg-gray-100'
                       }`}>
-                        <span className={`font-medium ${
-                          user.role === 'manager' ? 'text-purple-600' :
+                          <span className={`font-medium ${user.role === 'manager' ? 'text-purple-600' :
                           user.role === 'team_lead' ? 'text-blue-600' :
                           user.role === 'member' ? 'text-green-600' :
                           'text-gray-600'
@@ -382,8 +529,7 @@ export default function UsersPage() {
                         )}
                         <div className="flex gap-2 mt-1">
                           {user.role.toUpperCase() !== 'CEO' && (
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              user.role === 'team_lead' ? 'bg-blue-100 text-blue-800' :
+                              <span className={`px-2 py-1 text-xs rounded-full ${user.role === 'team_lead' ? 'bg-blue-100 text-blue-800' :
                               user.role === 'manager' ? 'bg-purple-100 text-purple-800' :
                               user.role === 'member' ? 'bg-green-100 text-green-800' :
                               'bg-green-100 text-green-800'
@@ -391,8 +537,7 @@ export default function UsersPage() {
                               {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
                             </span>
                           )}
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            <span className={`px-2 py-1 text-xs rounded-full ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
                             {user.is_active ? 'Active' : 'Inactive'}
                           </span>
@@ -405,7 +550,7 @@ export default function UsersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {canEditUsers() && (
+                        {canEdit && (
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -418,7 +563,7 @@ export default function UsersPage() {
                           Edit
                         </Button>
                       )}
-                      {canEditUsers() && (
+                        {canEdit && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -441,6 +586,7 @@ export default function UsersPage() {
                       )}
                     </div>
                   </div>
+                  )}
                 </div>
               ))}
             </div>

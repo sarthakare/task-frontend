@@ -54,9 +54,14 @@ export default function ProjectsPage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  // Check permissions
-  const canCreate = canCreateProjects();
-  const canEdit = canEditProjects();
+  // Check permissions (client-side only to avoid hydration mismatch)
+  const [canCreate, setCanCreate] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+
+  useEffect(() => {
+    setCanCreate(canCreateProjects());
+    setCanEdit(canEditProjects());
+  }, []);
 
   useEffect(() => {
     fetchProjects();

@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/page-header";
 import { TeamCreateForm } from "@/components/team-create-form";
 import { TeamEditForm } from "@/components/team-edit-form";
 import { TeamDetailsModal } from "@/components/team-details-modal";
-import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2, Eye } from "lucide-react";
+import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2, Eye, Grid3X3, List } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api-service";
@@ -21,6 +21,7 @@ export default function TeamsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [stats, setStats] = useState({
     totalTeams: 0,
     activeTeams: 0,
@@ -28,9 +29,14 @@ export default function TeamsPage() {
     teamLeads: 0
   });
 
-  // Check permissions
-  const canCreate = canCreateTeams();
-  const canEdit = canEditTeams();
+  // Check permissions (client-side only to avoid hydration mismatch)
+  const [canCreate, setCanCreate] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+
+  useEffect(() => {
+    setCanCreate(canCreateTeams());
+    setCanEdit(canEditTeams());
+  }, []);
 
   // Team details modal state
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -127,6 +133,7 @@ export default function TeamsPage() {
       <PageHeader 
         title="Team Management" 
         description="Organize and manage your teams effectively"
+        action={canCreate && <TeamCreateForm onTeamCreated={handleTeamCreated} />}
       />
 
       {/* Search and Actions */}
@@ -155,7 +162,6 @@ export default function TeamsPage() {
                   <SelectItem value="inactive">Inactive Only</SelectItem>
                 </SelectContent>
               </Select>
-              {canCreate && <TeamCreateForm onTeamCreated={handleTeamCreated} />}
             </div>
           </div>
         </CardContent>
@@ -237,9 +243,51 @@ export default function TeamsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Teams ({filteredTeams.length})</span>
-            <div className="text-sm text-gray-500">
-              {filteredTeams.length !== teams.length && `Showing ${filteredTeams.length} of ${teams.length} teams`}
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Building2 className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <span className="text-lg font-semibold">Teams</span>
+                <div className="text-sm text-gray-500 font-normal">
+                  {filteredTeams.length !== teams.length 
+                    ? `Showing ${filteredTeams.length} of ${teams.length} teams`
+                    : `${filteredTeams.length} teams total`
+                  }
+                </div>
+              </div>
+            </div>
+            
+            {/* View Toggle Buttons */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('card')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
+                    viewMode === 'card' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                      : 'text-gray-600 hover:bg-blue-200'
+                  }`}
+                >
+                  <Grid3X3 className="h-4 w-4 mr-1" />
+                  Card
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
+                    viewMode === 'list' 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                      : 'text-gray-600 hover:bg-blue-200'
+                  }`}
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  List
+                </Button>
+              </div>
             </div>
           </CardTitle>
         </CardHeader>
@@ -252,96 +300,190 @@ export default function TeamsPage() {
               </div>
             </div>
           ) : filteredTeams.length > 0 ? (
-            <div className="space-y-4">
+            <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredTeams.map((team) => (
-                <div key={team.id} className={`p-4 border rounded-lg ${team.status === 'active' ? 'bg-white' : 'bg-gray-50 border-gray-300'} hover:shadow-md transition-shadow`}>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className={`font-medium ${team.status === 'active' ? 'text-gray-900' : 'text-gray-600'}`}>{team.name}</h3>
-                          <p className={`text-sm mt-1 ${team.status === 'active' ? 'text-gray-600' : 'text-gray-500'}`}>{team.description}</p>
+                <div key={team.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${
+                  viewMode === 'list' ? 'p-4' : 'p-6'
+                } ${team.status === 'active' ? '' : 'bg-gray-50 border-gray-300'}`}>
+                  {viewMode === 'card' ? (
+                    /* Card View Layout */
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
+                          {team.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-4">
+                          {team.description}
+                        </p>
+                        
+                        <div className="flex gap-2 mb-4">
+                          <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {team.members.length} {team.members.length === 1 ? 'Member' : 'Members'}
+                          </span>
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                            team.status === 'active' 
+                              ? 'bg-green-100 text-green-800 border border-green-200' 
+                              : 'bg-gray-100 text-gray-800 border border-gray-200'
+                          }`}>
+                            {team.status === 'active' ? 'Active' : 'Inactive'}
+                          </span>
+                          <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                            {team.department}
+                          </span>
                         </div>
                         
-                        {/* Action buttons */}
-                        <div className="flex items-center gap-2 ml-4">
-                          {canEdit && (
-                            <TeamEditForm 
-                              team={team} 
-                              onTeamUpdated={handleTeamUpdated}
-                            />
-                          )}
-                          
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem 
-                                onClick={() => handleViewTeamDetails(team)}
-                                className="flex items-center gap-2"
-                              >
-                                <Eye className="h-4 w-4" />
-                                View Details
-                              </DropdownMenuItem>
-                              
-                              {/* Only show status change options if user has edit permissions */}
-                              {canEdit && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleToggleTeamStatus(team)}
-                                  className="flex items-center gap-2"
-                                >
-                                  {team.status === 'active' ? (
-                                    <>
-                                      <PowerOff className="h-4 w-4" />
-                                      Deactivate Team
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Power className="h-4 w-4" />
-                                      Activate Team
-                                    </>
-                                  )}
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Crown className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">Lead:</span>
+                            <span>{team.leader.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Calendar className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">Created:</span>
+                            <span>{new Date(team.created_at).toLocaleDateString()}</span>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex gap-2 mt-3">
-                        <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {team.members.length} {team.members.length === 1 ? 'Member' : 'Members'}
-                        </span>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          team.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {team.status === 'active' ? 'Active' : 'Inactive'}
-                        </span>
-                        <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
-                          {team.department}
-                        </span>
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 ml-4">
+                        {canEdit && (
+                          <TeamEditForm 
+                            team={team} 
+                            onTeamUpdated={handleTeamUpdated}
+                          />
+                        )}
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => handleViewTeamDetails(team)}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Eye className="h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            
+                            {/* Only show status change options if user has edit permissions */}
+                            {canEdit && (
+                              <DropdownMenuItem 
+                                onClick={() => handleToggleTeamStatus(team)}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                {team.status === 'active' ? (
+                                  <>
+                                    <PowerOff className="h-4 w-4" />
+                                    Deactivate Team
+                                  </>
+                                ) : (
+                                  <>
+                                    <Power className="h-4 w-4" />
+                                    Activate Team
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Crown className="h-3 w-3" />
-                            <span>Lead: {team.leader.name}</span>
+                    </div>
+                  ) : (
+                    /* List View Layout */
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className={`font-medium ${team.status === 'active' ? 'text-gray-900' : 'text-gray-600'}`}>{team.name}</h3>
+                            <p className={`text-sm mt-1 ${team.status === 'active' ? 'text-gray-600' : 'text-gray-500'}`}>{team.description}</p>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Created: {new Date(team.created_at).toLocaleDateString()}</span>
+                          
+                          {/* Action buttons */}
+                          <div className="flex items-center gap-2 ml-4">
+                            {canEdit && (
+                              <TeamEditForm 
+                                team={team} 
+                                onTeamUpdated={handleTeamUpdated}
+                              />
+                            )}
+                            
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem 
+                                  onClick={() => handleViewTeamDetails(team)}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  View Details
+                                </DropdownMenuItem>
+                                
+                                {/* Only show status change options if user has edit permissions */}
+                                {canEdit && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleToggleTeamStatus(team)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    {team.status === 'active' ? (
+                                      <>
+                                        <PowerOff className="h-4 w-4" />
+                                        Deactivate Team
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Power className="h-4 w-4" />
+                                        Activate Team
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-3">
+                          <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {team.members.length} {team.members.length === 1 ? 'Member' : 'Members'}
+                          </span>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            team.status === 'active' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {team.status === 'active' ? 'Active' : 'Inactive'}
+                          </span>
+                          <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
+                            {team.department}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <div className="flex items-center gap-1">
+                              <Crown className="h-3 w-3" />
+                              <span>Lead: {team.leader.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>Created: {new Date(team.created_at).toLocaleDateString()}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>

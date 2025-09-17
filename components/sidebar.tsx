@@ -24,8 +24,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { WebSocketStatus } from "./websocket-status";
-import { NotificationBell } from "./notification-bell";
 
 interface SidebarProps {
   className?: string;
@@ -221,7 +219,6 @@ export function Sidebar({ className }: SidebarProps) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <NotificationBell />
                   <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -241,13 +238,6 @@ export function Sidebar({ className }: SidebarProps) {
               <div className="text-xs text-gray-500">
                 <p>Task Manager v1.0</p>
                 <p className="mt-1">© 2024 All rights reserved</p>
-              </div>
-            )}
-            
-            {/* WebSocket Status */}
-            {currentUser && (
-              <div className="pt-2 border-t">
-                <WebSocketStatus />
               </div>
             )}
           </div>
