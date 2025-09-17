@@ -2,7 +2,8 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { websocketAPI } from '@/lib/api-service';
 import { toast } from 'sonner';
-// import { useAuth } from './auth-context'; // We'll use localStorage directly for now
+import { useAuth } from './auth-context';
+import { getToken } from '@/utils/auth';
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -87,12 +88,17 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const maxReconnectAttempts = 5;
   const reconnectDelay = 3000; // 3 seconds
 
-  // Get auth context (you'll need to implement this or use your existing auth system)
-  // const { user, isAuthenticated } = useAuth();
+  // Get auth context
+  const { user, isAuthenticated } = useAuth();
 
   const connectWebSocket = () => {
     // Only connect if user is authenticated
-    const token = localStorage.getItem('token'); // Adjust based on your auth implementation
+    if (!isAuthenticated || !user) {
+      console.log('User not authenticated, skipping WebSocket connection');
+      return;
+    }
+
+    const token = getToken();
     if (!token) {
       console.log('No auth token found, skipping WebSocket connection');
       return;
@@ -148,6 +154,12 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleReconnection = () => {
+    if (!isAuthenticated || !user) {
+      console.log('Skipping reconnection: User not authenticated');
+      setConnectionStatus("Disconnected");
+      return;
+    }
+    
     if (reconnectAttempts.current < maxReconnectAttempts) {
       reconnectAttempts.current++;
       console.log(`Attempting to reconnect... (${reconnectAttempts.current}/${maxReconnectAttempts})`);
@@ -360,6 +372,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   };
 
   const reconnect = () => {
+    if (!isAuthenticated || !user) {
+      console.log('Cannot reconnect: User not authenticated');
+      return;
+    }
+    
     if (wsRef.current) {
       wsRef.current.close();
     }
@@ -372,9 +389,15 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   // Connect when component mounts and user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (isAuthenticated && user) {
       connectWebSocket();
+    } else {
+      // Disconnect if user is not authenticated
+      if (wsRef.current) {
+        wsRef.current.close();
+        setIsConnected(false);
+        setConnectionStatus("Disconnected");
+      }
     }
 
     return () => {
@@ -385,17 +408,17 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, []);
+  }, [isAuthenticated, user]);
 
-  // Listen for auth changes
+  // Listen for auth changes (backup mechanism)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'token') {
-        if (e.newValue) {
-          // Token was added, connect
+        if (e.newValue && isAuthenticated && user) {
+          // Token was added and user is authenticated, connect
           connectWebSocket();
         } else {
-          // Token was removed, disconnect
+          // Token was removed or user not authenticated, disconnect
           if (wsRef.current) {
             wsRef.current.close();
           }
@@ -407,7 +430,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [isAuthenticated, user]);
 
   const value: WebSocketContextType = {
     isConnected,
