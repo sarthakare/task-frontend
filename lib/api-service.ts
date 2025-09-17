@@ -29,7 +29,14 @@ import type {
   UserPerformance,
   TeamPerformance,
   ProjectProgress,
-  SystemStats
+  SystemStats,
+  Notification,
+  NotificationSummary,
+  NotificationStats,
+  NotificationCreate,
+  NotificationUpdate,
+  BulkNotificationUpdate,
+  NotificationMarkAllRead
 } from "@/types";
 import { getToken, clearAuth } from "@/utils/auth";
 
@@ -468,6 +475,83 @@ export const dashboardAPI = {
     apiRequest<{ team: Team; members_workload: Array<{ user: User; tasks: Task[]; workload_percentage: number }> }>(`/dashboard/team-workload/${teamId}`),
 };
 
+// Notification API
+export const notificationAPI = {
+  // Get user notifications with filtering
+  getNotifications: (params?: {
+    skip?: number;
+    limit?: number;
+    unread_only?: boolean;
+    notification_type?: string;
+    priority?: string;
+    include_archived?: boolean;
+  }) => {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value.toString());
+        }
+      });
+    }
+    const queryString = searchParams.toString();
+    return apiRequest<NotificationSummary[]>(`/notifications${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Get notification statistics
+  getStats: () => apiRequest<NotificationStats>('/notifications/stats'),
+
+  // Get specific notification
+  getNotification: (id: number) => apiRequest<Notification>(`/notifications/${id}`),
+
+  // Update notification
+  updateNotification: (id: number, data: NotificationUpdate) =>
+    apiRequest<Notification>(`/notifications/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  // Mark notification as read
+  markAsRead: (id: number) =>
+    apiRequest<Notification>(`/notifications/${id}/read`, {
+      method: 'PUT',
+    }),
+
+  // Bulk update notifications
+  bulkUpdate: (data: BulkNotificationUpdate) =>
+    apiRequest<{ message: string; updated_count: number }>('/notifications/bulk/update', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  // Mark all notifications as read
+  markAllAsRead: (data: NotificationMarkAllRead) =>
+    apiRequest<{ message: string; updated_count: number }>('/notifications/mark-all-read', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  // Delete notification
+  deleteNotification: (id: number) =>
+    apiRequest<{ message: string }>(`/notifications/${id}`, {
+      method: 'DELETE',
+    }),
+
+  // Bulk delete notifications
+  bulkDelete: (notificationIds: number[]) =>
+    apiRequest<{ message: string; deleted_count: number }>('/notifications/bulk/delete', {
+      method: 'DELETE',
+      body: JSON.stringify({ notification_ids: notificationIds }),
+    }),
+
+  // Create notification (admin only)
+  createNotification: (data: NotificationCreate) =>
+    apiRequest<Notification>('/notifications', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
 // WebSocket API
 export const websocketAPI = {
   // Create WebSocket connection with authentication
@@ -555,6 +639,7 @@ export const api = {
   reports: reportAPI,
   dashboard: dashboardAPI,
   websocket: websocketAPI,
+  notifications: notificationAPI,
   utils: apiUtils,
 };
 

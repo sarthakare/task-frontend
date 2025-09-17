@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { WebSocketStatus } from "./websocket-status";
+import { NotificationBell } from "./notification-bell";
 
 interface SidebarProps {
   className?: string;
@@ -219,7 +220,9 @@ export function Sidebar({ className }: SidebarProps) {
                     {currentUser.role}
                   </p>
                 </div>
-                <DropdownMenu>
+                <div className="flex items-center gap-2">
+                  <NotificationBell />
+                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                       <UserCircle className="h-4 w-4" />
@@ -231,7 +234,8 @@ export function Sidebar({ className }: SidebarProps) {
                       <span className="text-red-600">Logout</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                  </DropdownMenu>
+                </div>
               </div>
             ) : (
               <div className="text-xs text-gray-500">

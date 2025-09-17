@@ -10,6 +10,7 @@ interface WebSocketContextType {
   connectionStatus: string;
   sendMessage: (message: any) => void;
   reconnect: () => void;
+  notificationRefreshTrigger: number;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -82,6 +83,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<string>("Disconnected");
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+  const [notificationRefreshTrigger, setNotificationRefreshTrigger] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
@@ -90,6 +93,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   // Get auth context
   const { user, isAuthenticated } = useAuth();
+
+  // Ensure component only initializes on client side
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const connectWebSocket = () => {
     // Only connect if user is authenticated
@@ -205,6 +213,9 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     } else if (parsedData.type === "task_notification") {
       // Handle task notifications
       const { notification_type, title, message, task_data } = parsedData;
+      
+      // Trigger notification refresh
+      setNotificationRefreshTrigger(prev => prev + 1);
       
       let toastType = "info";
       let toastTitle = title;
@@ -389,6 +400,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   // Connect when component mounts and user is authenticated
   useEffect(() => {
+    if (!isMounted) return;
+    
     if (isAuthenticated && user) {
       connectWebSocket();
     } else {
@@ -408,10 +421,12 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [isAuthenticated, user]);
+  }, [isMounted, isAuthenticated, user]);
 
   // Listen for auth changes (backup mechanism)
   useEffect(() => {
+    if (!isMounted) return;
+    
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'token') {
         if (e.newValue && isAuthenticated && user) {
@@ -430,13 +445,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [isAuthenticated, user]);
+  }, [isMounted, isAuthenticated, user]);
 
   const value: WebSocketContextType = {
     isConnected,
     connectionStatus,
     sendMessage,
     reconnect,
+    notificationRefreshTrigger,
   };
 
   return (

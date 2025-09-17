@@ -341,3 +341,94 @@ export interface SystemStats {
     user_productivity: number;
   };
 }
+
+// Notification types
+export type NotificationType = 
+  | "task_assigned"
+  | "task_updated"
+  | "task_status_changed"
+  | "task_due_soon"
+  | "task_overdue"
+  | "team_member_added"
+  | "team_member_removed"
+  | "project_created"
+  | "project_updated"
+  | "reminder"
+  | "system"
+  | "message";
+
+export type NotificationPriority = "low" | "medium" | "high" | "urgent";
+
+export interface Notification {
+  id: number;
+  user_id: number;
+  title: string;
+  message: string;
+  notification_type: NotificationType;
+  priority: NotificationPriority;
+  is_read: boolean;
+  is_archived: boolean;
+  related_entity_type?: string;
+  related_entity_id?: number;
+  created_at: string;
+  read_at?: string;
+  expires_at?: string;
+  extra_data?: Record<string, any>;
+}
+
+export interface NotificationSummary {
+  id: number;
+  title: string;
+  message: string;
+  notification_type: NotificationType;
+  priority: NotificationPriority;
+  is_read: boolean;
+  created_at: string;
+  related_entity_type?: string;
+  related_entity_id?: number;
+}
+
+export interface NotificationStats {
+  total_notifications: number;
+  unread_count: number;
+  read_count: number;
+  archived_count: number;
+  by_type: Record<string, number>;
+  by_priority: Record<string, number>;
+}
+
+export interface NotificationCreate {
+  user_id: number;
+  title: string;
+  message: string;
+  notification_type: NotificationType;
+  priority: NotificationPriority;
+  related_entity_type?: string;
+  related_entity_id?: number;
+  expires_at?: string;
+  extra_data?: Record<string, any>;
+}
+
+export interface NotificationUpdate {
+  title?: string;
+  message?: string;
+  notification_type?: NotificationType;
+  priority?: NotificationPriority;
+  is_read?: boolean;
+  is_archived?: boolean;
+  related_entity_type?: string;
+  related_entity_id?: number;
+  expires_at?: string;
+  extra_data?: Record<string, any>;
+}
+
+export interface BulkNotificationUpdate {
+  notification_ids: number[];
+  is_read?: boolean;
+  is_archived?: boolean;
+}
+
+export interface NotificationMarkAllRead {
+  user_id: number;
+  notification_type?: NotificationType;
+}
