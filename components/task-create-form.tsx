@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Plus, XCircle, Loader2, Upload, X, FileText, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
+import { FileValidator } from "@/lib/file-validation";
 import type { User, Team, Project, TaskCreate, TaskStatus, TaskPriority } from "@/types";
 
 interface TaskCreateFormProps {
@@ -109,7 +110,42 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setAttachments(prev => [...prev, ...files]);
+    
+    // Use enhanced file validation
+    const validationResult = FileValidator.validateFiles(files, {
+      maxFileSize: 10 * 1024 * 1024, // 10MB
+      maxFiles: 10,
+      checkContent: true,
+    });
+    
+    if (!validationResult.isValid) {
+      toast.error('File validation failed', {
+        description: validationResult.errors.join(', '),
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
+      });
+    }
+    
+    if (validationResult.warnings.length > 0) {
+      toast.warning('File validation warnings', {
+        description: validationResult.warnings.join(', '),
+        icon: <CircleAlert className="text-yellow-600" />,
+      });
+    }
+    
+    if (validationResult.isValid) {
+      setAttachments(prev => [...prev, ...files]);
+      
+      if (files.length > 0) {
+        toast.success('Files added successfully', {
+          description: `${files.length} file(s) ready for upload`,
+          icon: <CheckCircle2 className="text-green-600" />,
+        });
+      }
+    }
+    
+    // Clear the input
+    event.target.value = '';
   };
 
   const removeAttachment = (index: number) => {
@@ -187,7 +223,6 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
         due_date: formData.due_date,
         follow_up_date: formData.follow_up_date,
         tags: formData.tags,
-        attachments: attachments.length > 0 ? attachments : undefined,
       };
 
       // Add optional fields if they have values
@@ -199,7 +234,8 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
         taskData.team_id = parseInt(formData.team_id);
       }
 
-      const newTask = await api.tasks.createTask(taskData);
+      // Create task with optional files
+      const newTask = await api.tasks.createTask(taskData, attachments.length > 0 ? attachments : undefined);
       console.log('Task created successfully:', newTask);
 
       // Reset form
@@ -222,8 +258,9 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       setIsDialogOpen(false);
 
       // Show success toast
+      const fileMessage = attachments.length > 0 ? ` with ${attachments.length} file(s) uploaded` : '';
       toast.success('Task created successfully!', {
-        description: `${formData.title} has been created and assigned.`,
+        description: `${formData.title} has been created and assigned${fileMessage}.`,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -559,7 +596,12 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                             </div>
                             <div className="flex flex-col">
                               <span className="text-sm font-medium text-gray-700">{file.name}</span>
-                              <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
+                              <span className="text-xs text-gray-500">
+                                {file.size > 1024 * 1024 
+                                  ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                                  : `${(file.size / 1024).toFixed(1)} KB`
+                                }
+                              </span>
                             </div>
                           </div>
                           <Button

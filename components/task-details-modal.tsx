@@ -17,9 +17,11 @@ import {
   CheckCircle2,
   Pause,
   X,
-  FileText
+  FileText,
+  Paperclip
 } from "lucide-react";
-import type { Task, TaskStatus, TaskPriority } from "@/types";
+import type { Task, TaskStatus, TaskPriority, TaskAttachment } from "@/types";
+import { TaskAttachmentDisplay } from "./task-attachment-display";
 
 interface TaskDetailsModalProps {
   task: Task;
@@ -28,6 +30,7 @@ interface TaskDetailsModalProps {
 
 export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [attachments, setAttachments] = useState<TaskAttachment[]>(task.attachments || []);
 
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
@@ -369,6 +372,25 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Attachments */}
+            <Separator />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Paperclip className="h-5 w-5 text-indigo-600" />
+                <h3 className="text-lg font-medium text-gray-900">Attachments</h3>
+              </div>
+
+              <TaskAttachmentDisplay
+                attachments={attachments}
+                taskId={task.id}
+                canEdit={false} // Disable editing in view mode
+                onAttachmentDeleted={() => {
+                  // Refresh attachments from the task
+                  setAttachments(task.attachments || []);
+                }}
+              />
             </div>
 
             {/* Task Logs */}

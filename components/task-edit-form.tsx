@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Edit, XCircle, Loader2, CheckCircle2, CircleAlert, Upload, X, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
-import type { User, Team, Project, Task, TaskUpdate, TaskStatus, TaskPriority } from "@/types";
+import type { User, Team, Project, Task, TaskUpdate, TaskStatus, TaskPriority, TaskAttachment } from "@/types";
+import { TaskAttachmentDisplay } from "./task-attachment-display";
 
 interface TaskEditFormProps {
   task: Task;
@@ -28,6 +29,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [existingAttachments, setExistingAttachments] = useState<TaskAttachment[]>(task.attachments || []);
   
   const [formData, setFormData] = useState({
     title: task.title,
@@ -58,6 +60,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       due_date: task.due_date.split('T')[0],
       follow_up_date: task.follow_up_date.split('T')[0],
     });
+    setExistingAttachments(task.attachments || []);
   }, [task]);
 
   // Fetch data when component mounts or dialog opens
@@ -217,22 +220,56 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
         taskData.team_id = formData.team_id ? parseInt(formData.team_id) : undefined;
       }
 
-      // Only update if there are changes
-      if (Object.keys(taskData).length === 0) {
+      // Only update if there are changes (including new attachments)
+      if (Object.keys(taskData).length === 0 && attachments.length === 0) {
         toast.info('No changes to save');
         setIsDialogOpen(false);
         return;
       }
 
-      const updatedTask = await api.tasks.updateTask(task.id, taskData);
-      console.log('Task updated successfully:', updatedTask);
+      // Update task if there are form changes
+      if (Object.keys(taskData).length > 0) {
+        const updatedTask = await api.tasks.updateTask(task.id, taskData);
+        console.log('Task updated successfully:', updatedTask);
+      }
+
+      // Upload new attachments if any
+      if (attachments.length > 0) {
+        const uploadPromises = attachments.map(file => 
+          api.tasks.uploadAttachmentToTask(task.id, file)
+        );
+        
+        try {
+          await Promise.all(uploadPromises);
+          console.log('Attachments uploaded successfully');
+        } catch (uploadError) {
+          console.error('Error uploading attachments:', uploadError);
+          // Don't fail the entire operation if only attachment upload fails
+          toast.warning('Task updated but some attachments failed to upload', {
+            description: 'Please try uploading the files again.',
+          });
+        }
+      }
 
       // Close dialog
       setIsDialogOpen(false);
 
       // Show success toast
-      toast.success('Task updated successfully!', {
-        description: `${formData.title} has been updated.`,
+      const hasFormChanges = Object.keys(taskData).length > 0;
+      const hasNewAttachments = attachments.length > 0;
+      
+      let successMessage = 'Task updated successfully!';
+      let description = `${formData.title} has been updated.`;
+      
+      if (hasFormChanges && hasNewAttachments) {
+        description = `${formData.title} has been updated and ${attachments.length} file(s) uploaded.`;
+      } else if (hasNewAttachments) {
+        successMessage = 'Files uploaded successfully!';
+        description = `${attachments.length} file(s) have been uploaded to ${formData.title}.`;
+      }
+
+      toast.success(successMessage, {
+        description: description,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
@@ -272,6 +309,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       follow_up_date: task.follow_up_date.split('T')[0],
     });
     setAttachments([]);
+    setExistingAttachments(task.attachments || []);
     setErrors({});
   };
 
@@ -536,8 +574,24 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                 Attachments
               </h3>
               
+              {/* Existing Attachments */}
+              {existingAttachments.length > 0 && (
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-gray-700">Existing Files</Label>
+                  <TaskAttachmentDisplay
+                    attachments={existingAttachments}
+                    taskId={task.id}
+                    canEdit={true}
+                    onAttachmentDeleted={() => {
+                      // Refresh existing attachments from the task
+                      setExistingAttachments(task.attachments || []);
+                    }}
+                  />
+                </div>
+              )}
+              
               <div className="space-y-3">
-                <Label htmlFor="attachments" className="text-sm font-medium text-gray-700">Upload Files</Label>
+                <Label htmlFor="attachments" className="text-sm font-medium text-gray-700">Upload New Files</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     id="attachments"

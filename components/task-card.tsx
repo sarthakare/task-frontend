@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Edit,
   RefreshCw,
+  Paperclip,
 } from "lucide-react";
 import type { Task, TaskStatus, TaskPriority } from "@/types";
 
@@ -145,6 +146,12 @@ export function TaskCard({
                 <div className="flex items-center gap-2 mb-1">
                   {getStatusIcon(task.status)}
                   <h3 className="font-semibold text-gray-900 line-clamp-1">{task.title}</h3>
+                  {task.attachments && task.attachments.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
+                      <Paperclip className="h-3 w-3" />
+                      <span>{task.attachments.length}</span>
+                    </div>
+                  )}
                   {isTaskOverdue && (
                     <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
                   )}
@@ -241,6 +248,12 @@ export function TaskCard({
                 <div className="flex items-center gap-2">
                   {getStatusIcon(task.status)}
                   <h3 className="font-semibold text-gray-900 line-clamp-1">{task.title}</h3>
+                  {task.attachments && task.attachments.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
+                      <Paperclip className="h-3 w-3" />
+                      <span>{task.attachments.length}</span>
+                    </div>
+                  )}
                   {isTaskOverdue && (
                     <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
                   )}

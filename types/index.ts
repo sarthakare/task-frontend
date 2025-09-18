@@ -37,6 +37,7 @@ export interface Task {
   created_at: string
   updated_at?: string | null
   logs: TaskLog[];
+  attachments: TaskAttachment[];
 }
 
 export type TaskStatus = 'NEW' | 'IN_PROGRESS' | 'PENDING' | 'FINISHED' | 'STOPPED' | 'CANCELLED';
@@ -121,6 +122,17 @@ export interface TaskUpdate {
   follow_up_date?: string;
   tags?: string[];
   attachments?: File[];
+}
+
+export interface TaskAttachment {
+  id: number;
+  task_id: number;
+  filename: string;
+  original_filename: string;
+  file_size: number;
+  mime_type: string;
+  uploaded_by: number;
+  created_at: string;
 }
 
 export interface ProjectCreate {

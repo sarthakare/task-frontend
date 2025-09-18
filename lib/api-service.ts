@@ -14,6 +14,7 @@ import type {
   TaskUpdate,
   TaskLog,
   TaskLogCreate,
+  TaskAttachment,
   Project,
   ProjectCreate,
   ProjectUpdate,
@@ -57,6 +58,60 @@ async function apiRequest<T>(
         ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers,
       },
+      ...options,
+    });
+
+    // Handle 401 Unauthorized
+    if (response.status === 401) {
+      clearAuth();
+      if (typeof window !== "undefined") {
+        window.location.href = "/auth/login";
+      }
+      throw new Error("Unauthorized");
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.detail || `HTTP ${response.status}: ${response.statusText}`;
+      
+      // Handle specific error cases
+      if (response.status === 400 && errorMessage.includes("deactivated")) {
+        clearAuth();
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('An unexpected error occurred');
+  }
+}
+
+// Generic fetch wrapper for multipart form data with error handling and authentication
+async function apiRequestMultipart<T>(
+  endpoint: string, 
+  formData: FormData,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const token = getToken();
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        // Don't set Content-Type for FormData - let browser set it with boundary
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...options.headers,
+      },
+      body: formData,
       ...options,
     });
 
@@ -243,11 +298,44 @@ export const taskAPI = {
   // Get specific task
   getTask: (id: number) => apiRequest<Task>(`/tasks/${id}`),
   
-  // Create new task
-  createTask: (taskData: TaskCreate) => apiRequest<Task>('/tasks/', {
-    method: 'POST',
-    body: JSON.stringify(taskData),
-  }),
+  // Create new task (supports both JSON and multipart form data)
+  createTask: (taskData: TaskCreate, files?: File[]) => {
+    if (files && files.length > 0) {
+      // Use multipart form data when files are provided
+      const formData = new FormData();
+      
+      // Add task data fields
+      formData.append('title', taskData.title);
+      formData.append('description', taskData.description);
+      formData.append('assigned_to', taskData.assigned_to.toString());
+      formData.append('status', taskData.status);
+      formData.append('priority', taskData.priority);
+      formData.append('start_date', taskData.start_date);
+      formData.append('due_date', taskData.due_date);
+      formData.append('follow_up_date', taskData.follow_up_date);
+      
+      // Add optional fields if they exist
+      if (taskData.project_id) {
+        formData.append('project_id', taskData.project_id.toString());
+      }
+      if (taskData.team_id) {
+        formData.append('team_id', taskData.team_id.toString());
+      }
+      
+      // Add files
+      files.forEach(file => {
+        formData.append('files', file);
+      });
+      
+      return apiRequestMultipart<Task>('/tasks/', formData);
+    } else {
+      // Use JSON when no files are provided
+      return apiRequest<Task>('/tasks/', {
+        method: 'POST',
+        body: JSON.stringify(taskData),
+      });
+    }
+  },
   
   // Update task
   updateTask: (id: number, taskData: TaskUpdate) => apiRequest<Task>(`/tasks/${id}`, {
@@ -299,6 +387,66 @@ export const taskAPI = {
   
   // Get task logs
   getTaskLogs: (taskId: number) => apiRequest<TaskLog[]>(`/tasks/${taskId}/logs`),
+  
+  // File Attachment Management
+  // Get task attachments
+  getTaskAttachments: (taskId: number) => apiRequest<TaskAttachment[]>(`/tasks/${taskId}/attachments`),
+  
+  // Download attachment
+  downloadAttachment: async (attachmentId: number) => {
+    const url = `${API_BASE_URL}/tasks/attachments/${attachmentId}/download`;
+    const token = getToken();
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+      }
+      
+      // Get the filename from the Content-Disposition header or use a default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'download';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      // Create blob and download
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      throw error;
+    }
+  },
+  
+  // Upload attachment to existing task
+  uploadAttachmentToTask: (taskId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiRequestMultipart<TaskAttachment>(`/tasks/${taskId}/attachments`, formData);
+  },
+  
+  // Delete attachment
+  deleteAttachment: (attachmentId: number) => apiRequest<{ message: string }>(`/tasks/attachments/${attachmentId}`, {
+    method: 'DELETE',
+  }),
 };
 
 // Project Management API
