@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +8,8 @@ import { PageHeader } from "@/components/page-header";
 import { ProjectCreateForm } from "@/components/project-create-form";
 import { ProjectEditForm } from "@/components/project-edit-form";
 import { ProjectDetailsModal } from "@/components/project-details-modal";
-import { 
-  FolderOpen, 
+import {
+  FolderOpen,
   Search,
   Calendar,
   Users,
@@ -72,13 +72,13 @@ export default function ProjectsPage() {
     try {
       const data = await api.projects.getAllProjects();
       setProjects(data);
-      
+
       // Calculate stats
       const active = data.filter(project => project.status === 'active').length;
       const completed = data.filter(project => project.status === 'completed').length;
       const onHold = data.filter(project => project.status === 'on_hold').length;
       const cancelled = data.filter(project => project.status === 'cancelled').length;
-      
+
       setStats({
         totalProjects: data.length,
         activeProjects: active,
@@ -114,22 +114,22 @@ export default function ProjectsPage() {
   const handleProjectStatusChange = async (project: Project, newStatus: 'active' | 'on_hold' | 'completed' | 'cancelled') => {
     try {
       await api.projects.updateProject(project.id, { status: newStatus });
-      
-      const statusText = newStatus === 'on_hold' ? 'put on hold' : 
-                        newStatus === 'completed' ? 'marked as completed' :
-                        newStatus === 'cancelled' ? 'cancelled' : 'activated';
-      
+
+      const statusText = newStatus === 'on_hold' ? 'put on hold' :
+        newStatus === 'completed' ? 'marked as completed' :
+          newStatus === 'cancelled' ? 'cancelled' : 'activated';
+
       toast.success(`Project ${statusText} successfully!`, {
         description: `${project.name} has been ${statusText}.`,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
-      
+
       fetchProjects(); // Refresh the projects list
     } catch (error) {
       console.error(`Error updating project status:`, error);
       const errorMessage = error instanceof Error ? error.message : `Failed to update project status`;
-      
+
       toast.error(`Failed to update project status`, {
         description: errorMessage,
         icon: <CircleAlert className="text-red-600" />,
@@ -157,73 +157,13 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Project Management" 
+      <PageHeader
+        title="Project Management"
         description="Track and manage all your projects effectively"
         action={
           canCreate ? <ProjectCreateForm onProjectCreated={handleProjectCreated} /> : null
         }
       />
-
-      {/* Search and Filters */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader className="">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Search className="h-5 w-5 text-blue-600" />
-            </div>
-            Search & Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search Bar - 55% width on large screens */}
-            <div className="relative flex-1 lg:w-[55%]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search projects, descriptions, managers, or teams..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-9 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
-              />
-            </div>
-
-            {/* Filters - 45% width on large screens, arranged in 2 columns */}
-            <div className="flex flex-col sm:flex-row gap-4 flex-1 lg:w-[45%]">
-              <div className="flex-1">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
-                    <SelectValue placeholder="All Statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="on_hold">On Hold</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex-1">
-                <Select value={managerFilter} onValueChange={setManagerFilter}>
-                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
-                    <SelectValue placeholder="All Managers" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Managers</SelectItem>
-                    {uniqueManagers.map((manager) => (
-                      <SelectItem key={manager} value={manager}>
-                        {manager}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Project Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -315,6 +255,58 @@ export default function ProjectsPage() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Search and Filters */}
+      <Card className="border-0 shadow-sm">
+        <CardContent>
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Bar - 55% width on large screens */}
+            <div className="relative flex-1 lg:w-[55%]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search projects, descriptions, managers, or teams..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-9 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
+              />
+            </div>
+
+            {/* Filters - 45% width on large screens, arranged in 2 columns */}
+            <div className="flex flex-col sm:flex-row gap-4 flex-1 lg:w-[45%]">
+              <div className="flex-1">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="on_hold">On Hold</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1">
+                <Select value={managerFilter} onValueChange={setManagerFilter}>
+                  <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                    <SelectValue placeholder="All Managers" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Managers</SelectItem>
+                    {uniqueManagers.map((manager) => (
+                      <SelectItem key={manager} value={manager}>
+                        {manager}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Projects List */}
       <Card className="border-0 shadow-sm">
@@ -327,14 +319,14 @@ export default function ProjectsPage() {
               <div>
                 <span className="text-lg font-semibold">Projects</span>
                 <div className="text-sm text-gray-500 font-normal">
-                  {filteredProjects.length !== projects.length 
+                  {filteredProjects.length !== projects.length
                     ? `Showing ${filteredProjects.length} of ${projects.length} projects`
                     : `${filteredProjects.length} projects total`
                   }
                 </div>
               </div>
             </div>
-            
+
             {/* View Toggle Buttons */}
             <div className="flex items-center gap-2">
               <div className="flex bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-1">
@@ -342,11 +334,10 @@ export default function ProjectsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('card')}
-                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
-                    viewMode === 'card' 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${viewMode === 'card'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white'
                       : 'text-gray-600 hover:bg-blue-200'
-                  }`}
+                    }`}
                 >
                   <Grid3X3 className="h-4 w-4 mr-1" />
                   Card
@@ -355,11 +346,10 @@ export default function ProjectsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
-                    viewMode === 'list' 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${viewMode === 'list'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white'
                       : 'text-gray-600 hover:bg-blue-200'
-                  }`}
+                    }`}
                 >
                   <List className="h-4 w-4 mr-1" />
                   List
@@ -379,9 +369,8 @@ export default function ProjectsPage() {
           ) : filteredProjects.length > 0 ? (
             <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredProjects.map((project) => (
-                <div key={project.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${
-                  viewMode === 'list' ? 'p-4' : 'p-6'
-                }`}>
+                <div key={project.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${viewMode === 'list' ? 'p-4' : 'p-6'
+                  }`}>
                   {viewMode === 'card' ? (
                     /* Card View Layout */
                     <div className="flex justify-between items-start mb-4">
@@ -393,16 +382,16 @@ export default function ProjectsPage() {
                           {project.description}
                         </p>
                       </div>
-                      
+
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
-                        {canEdit && ( 
-                          <ProjectEditForm 
-                            project={project} 
+                        {canEdit && (
+                          <ProjectEditForm
+                            project={project}
                             onProjectUpdated={handleProjectUpdated}
                           />
                         )}
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
@@ -410,22 +399,22 @@ export default function ProjectsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => handleViewProjectDetails(project)}
                               className="flex items-center gap-2 cursor-pointer"
                             >
                               <Eye className="h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
-                            
+
                             {/* Only show status change options if user has edit permissions */}
                             {canEdit && (
                               <>
                                 <DropdownMenuSeparator />
-                                
+
                                 {/* Status change options */}
                                 {project.status !== 'active' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'active')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -433,9 +422,9 @@ export default function ProjectsPage() {
                                     Activate Project
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {project.status === 'active' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'on_hold')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -443,9 +432,9 @@ export default function ProjectsPage() {
                                     Put On Hold
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {project.status !== 'completed' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'completed')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -453,9 +442,9 @@ export default function ProjectsPage() {
                                     Mark Completed
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'cancelled')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -484,12 +473,12 @@ export default function ProjectsPage() {
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
                         {canEdit && (
-                          <ProjectEditForm 
-                            project={project} 
+                          <ProjectEditForm
+                            project={project}
                             onProjectUpdated={handleProjectUpdated}
                           />
                         )}
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
@@ -497,22 +486,22 @@ export default function ProjectsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => handleViewProjectDetails(project)}
                               className="flex items-center gap-2 cursor-pointer"
                             >
                               <Eye className="h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
-                            
+
                             {/* Only show status change options if user has edit permissions */}
                             {canEdit && (
                               <>
                                 <DropdownMenuSeparator />
-                                
+
                                 {/* Status change options */}
                                 {project.status !== 'active' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'active')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -520,9 +509,9 @@ export default function ProjectsPage() {
                                     Activate Project
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {project.status === 'active' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'on_hold')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -530,9 +519,9 @@ export default function ProjectsPage() {
                                     Put On Hold
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {project.status !== 'completed' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'completed')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -540,9 +529,9 @@ export default function ProjectsPage() {
                                     Mark Completed
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleProjectStatusChange(project, 'cancelled')}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -557,25 +546,24 @@ export default function ProjectsPage() {
                       </div>
                     </div>
                   )}
-                  
+
                   {viewMode === 'card' && (
                     <>
                       <div className="flex gap-2 mb-4">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                          project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                          project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                          project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-                          'bg-red-100 text-red-800 border border-red-200'
-                        }`}>
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                            project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                              project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                                'bg-red-100 text-red-800 border border-red-200'
+                          }`}>
                           {project.status === 'active' ? 'Active' :
-                           project.status === 'completed' ? 'Completed' :
-                           project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
+                            project.status === 'completed' ? 'Completed' :
+                              project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
                         </span>
                         <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
                           {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2 text-gray-600">
@@ -589,7 +577,7 @@ export default function ProjectsPage() {
                             <span>Members</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2 text-gray-600">
                             <User className="h-4 w-4 text-gray-400" />
@@ -604,21 +592,20 @@ export default function ProjectsPage() {
                   {viewMode === 'list' && (
                     <>
                       <div className="flex gap-2 mb-4">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                          project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                          project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                          project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-                          'bg-red-100 text-red-800 border border-red-200'
-                        }`}>
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${project.status === 'active' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                            project.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                              project.status === 'on_hold' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                                'bg-red-100 text-red-800 border border-red-200'
+                          }`}>
                           {project.status === 'active' ? 'Active' :
-                           project.status === 'completed' ? 'Completed' :
-                           project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
+                            project.status === 'completed' ? 'Completed' :
+                              project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
                         </span>
                         <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
                           {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2 text-gray-600">
@@ -632,7 +619,7 @@ export default function ProjectsPage() {
                             <span>Members</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2 text-gray-600">
                             <User className="h-4 w-4 text-gray-400" />
@@ -655,13 +642,13 @@ export default function ProjectsPage() {
                 {projects.length === 0 ? "No projects yet" : "No projects found"}
               </h3>
               <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                {projects.length === 0 
+                {projects.length === 0
                   ? "Create your first project to start organizing your work effectively and track progress with your team."
                   : "Try adjusting your search criteria or filters to find what you're looking for."
                 }
               </p>
               {projects.length === 0 && canCreate && (
-                <ProjectCreateForm 
+                <ProjectCreateForm
                   onProjectCreated={handleProjectCreated}
                   trigger={
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
@@ -677,7 +664,7 @@ export default function ProjectsPage() {
       </Card>
 
       {/* Project Details Modal */}
-      <ProjectDetailsModal 
+      <ProjectDetailsModal
         project={selectedProject}
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetailsModal}

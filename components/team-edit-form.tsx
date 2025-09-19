@@ -6,13 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Edit, XCircle, Users, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
-import { canEditTeams } from "@/utils/auth";
-import { useUser } from "@/components/user-provider";
 import type { User, Team, TeamUpdate } from "@/types";
 
 interface TeamEditFormProps {
@@ -22,7 +20,6 @@ interface TeamEditFormProps {
 }
 
 export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps) {
-  const { currentUser } = useUser();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -144,16 +141,6 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check permissions before submitting
-    if (!canEditTeams()) {
-      toast.error('Access Denied', {
-        description: 'Only admin and CEO users can edit teams.',
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-      return;
-    }
-
     if (!validateForm()) {
       return;
     }
@@ -234,17 +221,7 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
     <Button 
       variant="outline" 
       size="sm" 
-      onClick={() => {
-        if (!canEditTeams()) {
-          toast.error('Access Denied', {
-            description: 'Only admin and CEO users can edit teams.',
-            icon: <CircleAlert className="text-red-600" />,
-            style: { color: "red" },
-          });
-          return;
-        }
-        setIsEditDialogOpen(true);
-      }}
+      onClick={() => setIsEditDialogOpen(true)}
     >
       <Edit className="h-4 w-4 mr-1" />
       Edit
@@ -261,145 +238,196 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-hidden">
-        <DialogHeader className="pb-4 border-b">
-          <DialogTitle className="text-xl font-semibold text-gray-900">
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
+        <DialogHeader className="pb-6 border-b border-gray-100">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">
+              <Edit className="h-5 w-5 text-white" />
+            </div>
             Edit Team: {team.name}
           </DialogTitle>
+          <DialogDescription className="text-gray-600 mt-2">
+            Update the team details, leadership, and member assignments as needed.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
           <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <div className="grid grid-cols-1 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700">Team Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Enter team name"
-                  className={`transition-colors ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
-                />
-                {errors.name && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.name}
-                </p>}
-              </div>
+            
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-indigo-500 to-blue-600 rounded-full"></div>
+                Basic Information
+              </h3>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">Team Name *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    placeholder="Enter team name"
+                    className={`h-10 bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
+                  />
+                  {errors.name && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.name}
+                  </p>}
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Enter team description and purpose"
-                  rows={3}
-                  className={`transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
-                />
-                {errors.description && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.description}
-                </p>}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description *</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="Enter team description and purpose"
+                    rows={3}
+                    className={`bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
+                  />
+                  {errors.description && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.description}
+                  </p>}
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Department & Status */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+                Department & Status
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+                  <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
+                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                      <SelectValue placeholder={isLoadingDepartments ? "Loading..." : "Select department"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.department}
+                  </p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-sm font-medium text-gray-700">Status</Label>
+                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Team Leadership */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+                Team Leadership
+              </h3>
+              
               <div className="space-y-2">
-                <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department</Label>
-                <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
-                  <SelectTrigger className={`transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
-                    <SelectValue placeholder={isLoadingDepartments ? "Loading..." : "Select department"} />
+                <Label htmlFor="leader_id" className="text-sm font-medium text-gray-700">Team Lead *</Label>
+                <Select value={formData.leader_id} onValueChange={(value) => handleInputChange('leader_id', value)}>
+                  <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-green-300 transition-colors ${errors.leader_id ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}>
+                    <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select team lead"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept} value={dept}>
-                        {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                    {filteredUsers.map((user) => (
+                      <SelectItem key={user.id} value={user.id.toString()}>
+                        <div className="flex flex-col max-w-[200px]">
+                          <span className="font-medium truncate" title={user.name}>
+                            {user.name.length > 25 ? `${user.name.substring(0, 25)}...` : user.name}
+                          </span>
+                          <span className="text-xs text-gray-500 truncate" title={`${user.role} • ${user.department}`}>
+                            {user.role} • {user.department.length > 15 ? `${user.department.substring(0, 15)}...` : user.department}
+                          </span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
+                {errors.leader_id && <p className="text-sm text-red-500 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
-                  {errors.department}
+                  {errors.leader_id}
                 </p>}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status" className="text-sm font-medium text-gray-700">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="leader_id" className="text-sm font-medium text-gray-700">Team Lead</Label>
-              <Select value={formData.leader_id} onValueChange={(value) => handleInputChange('leader_id', value)}>
-                <SelectTrigger className={`transition-colors ${errors.leader_id ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
-                  <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select team lead"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredUsers.map((user) => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      <div className="flex">
-                        <span className="font-medium">{user.name} <span className="text-sm text-gray-500">({user.role} • {user.department})</span></span>
+            {/* Team Members */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></div>
+                Team Members
+              </h3>
+              
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-700">Select Team Members *</Label>
+                <div className="border rounded-lg p-4 max-h-48 overflow-y-auto bg-gray-50">
+                  {isLoadingUsers ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                        <span className="text-sm text-gray-600">Loading team members...</span>
                       </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.leader_id && <p className="text-sm text-red-500 flex items-center gap-1">
-                <XCircle className="h-4 w-4" />
-                {errors.leader_id}
-              </p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">Team Members</Label>
-              <div className="border rounded-lg p-4 max-h-48 overflow-y-auto bg-gray-50">
-                {filteredUsers.length > 0 ? (
-                  <div className="space-y-3">
-                    {filteredUsers.map((user) => (
-                      <div key={user.id} className="flex items-center space-x-3">
-                        <Checkbox
-                          id={`member-${user.id}`}
-                          checked={formData.member_ids.includes(user.id)}
-                          onCheckedChange={(checked) => handleMemberToggle(user.id, checked as boolean)}
-                        />
-                        <label htmlFor={`member-${user.id}`} className="flex-1 cursor-pointer">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-900">{user.name}</span>
-                            <span className="text-sm text-gray-500">{user.role}</span>
-                          </div>
-                          <div className="text-sm text-gray-600">{user.email}</div>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <Users className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">
-                      {formData.department ? 'No users available in selected department' : 'Select a department to see available users'}
-                    </p>
-                  </div>
+                    </div>
+                  ) : filteredUsers.length > 0 ? (
+                    <div className="space-y-0">
+                      {filteredUsers.map((user) => (
+                        <div key={user.id} className="flex items-center space-x-3 p-2 hover:bg-white rounded-md transition-colors">
+                          <Checkbox
+                            id={`member-${user.id}`}
+                            checked={formData.member_ids.includes(user.id)}
+                            onCheckedChange={(checked) => handleMemberToggle(user.id, checked as boolean)}
+                          />
+                          <label htmlFor={`member-${user.id}`} className="flex-1 cursor-pointer">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-900">{user.name}</span>
+                              <span className="text-sm text-gray-500">{user.role}</span>
+                            </div>
+                            <div className="text-sm text-gray-600">{user.email}</div>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">
+                      <Users className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">
+                        {formData.department ? 'No users available in selected department' : 'Select a department to see available users'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {errors.member_ids && <p className="text-sm text-red-500 flex items-center gap-1">
+                  <XCircle className="h-4 w-4" />
+                  {errors.member_ids}
+                </p>}
+                {formData.member_ids.length > 0 && (
+                  <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
+                    {formData.member_ids.length} member(s) selected
+                  </p>
                 )}
               </div>
-              {errors.member_ids && <p className="text-sm text-red-500 flex items-center gap-1">
-                <XCircle className="h-4 w-4" />
-                {errors.member_ids}
-              </p>}
-              {formData.member_ids.length > 0 && (
-                <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
-                  {formData.member_ids.length} member(s) selected
-                </p>
-              )}
             </div>
 
             {errors.submit && (
@@ -411,7 +439,7 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
               </div>
             )}
 
-            <div className="flex justify-end space-x-3 pt-6 border-t">
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
               <Button
                 type="button"
                 variant="outline"
@@ -420,14 +448,14 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
                   setIsEditDialogOpen(false);
                 }}
                 disabled={isSubmitting}
-                className="px-6"
+                className="px-6 h-10 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 bg-blue-600 hover:bg-blue-700"
+                className="px-6 h-10 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {isSubmitting ? (
                   <>
@@ -435,7 +463,10 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
                     Updating...
                   </>
                 ) : (
-                  'Update Team'
+                  <>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Update Team
+                  </>
                 )}
               </Button>
             </div>

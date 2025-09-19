@@ -404,14 +404,6 @@ export default function TasksPage() {
 
       {/* Search and Filters */}
       <Card className="border-0 shadow-sm">
-        <CardHeader className="">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Filter className="h-5 w-5 text-blue-600" />
-            </div>
-            Search & Filters
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar - 55% width on large screens */}

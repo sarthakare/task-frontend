@@ -30,10 +30,10 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
       </div>
       <div className="flex items-center gap-4">
         {action && <div>{action}</div>}
-        <NotificationBell />
+        <NotificationBell className="cursor-pointer"/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" className="cursor-pointer">
               <UserCircle className="h-4 w-4 mr-2" />
               {currentUser?.name || "User"}
             </Button>

@@ -8,19 +8,23 @@ import { PageHeader } from "@/components/page-header";
 import { TeamCreateForm } from "@/components/team-create-form";
 import { TeamEditForm } from "@/components/team-edit-form";
 import { TeamDetailsModal } from "@/components/team-details-modal";
-import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2, Eye, Grid3X3, List } from "lucide-react";
+import { Users, UserCheck, Building2, Crown, Calendar, MoreHorizontal, Power, PowerOff, Search, CheckCircle2, CircleAlert, Loader2, Eye, Grid3X3, List, Edit } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
-import { canCreateTeams, canEditTeams } from "@/utils/auth";
+import { canCreateTeams, canManageTeams } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 import type { Team } from "@/types";
 
 export default function TeamsPage() {
+  const { currentUser } = useUser();
   const [teams, setTeams] = useState<Team[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [stats, setStats] = useState({
     totalTeams: 0,
@@ -31,12 +35,12 @@ export default function TeamsPage() {
 
   // Check permissions (client-side only to avoid hydration mismatch)
   const [canCreate, setCanCreate] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
+  const [isAdminOrCEO, setIsAdminOrCEO] = useState(false);
 
   useEffect(() => {
     setCanCreate(canCreateTeams());
-    setCanEdit(canEditTeams());
-  }, []);
+    setIsAdminOrCEO(canManageTeams());
+  }, [currentUser]);
 
   // Team details modal state
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -49,16 +53,21 @@ export default function TeamsPage() {
   const fetchTeams = async () => {
     setIsLoading(true);
     try {
-      const data = await api.teams.getAllTeams();
-      setTeams(data);
+      const [teamsData, departmentsData] = await Promise.all([
+        api.teams.getAllTeams(),
+        api.users.getDepartments()
+      ]);
+      
+      setTeams(teamsData);
+      setDepartments(departmentsData);
       
       // Calculate stats
-      const activeTeams = data.filter(team => team.status === 'active').length;
-      const totalMembers = data.reduce((sum, team) => sum + team.members.length, 0);
-      const teamLeads = data.length; // Each team has one lead
+      const activeTeams = teamsData.filter(team => team.status === 'active').length;
+      const totalMembers = teamsData.reduce((sum, team) => sum + team.members.length, 0);
+      const teamLeads = teamsData.length; // Each team has one lead
       
       setStats({
-        totalTeams: data.length,
+        totalTeams: teamsData.length,
         activeTeams,
         totalMembers,
         teamLeads
@@ -114,7 +123,7 @@ export default function TeamsPage() {
     }
   };
 
-  // Filter teams based on search term and status
+  // Filter teams based on search term, status, and department
   const filteredTeams = teams.filter(team => {
     const matchesSearch = team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       team.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -125,7 +134,10 @@ export default function TeamsPage() {
       (statusFilter === "active" && team.status === "active") ||
       (statusFilter === "inactive" && team.status === "inactive");
     
-    return matchesSearch && matchesStatus;
+    const matchesDepartment = departmentFilter === "all" || 
+      team.department === departmentFilter;
+    
+    return matchesSearch && matchesStatus && matchesDepartment;
   });
 
   return (
@@ -135,37 +147,6 @@ export default function TeamsPage() {
         description="Organize and manage your teams effectively"
         action={canCreate && <TeamCreateForm onTeamCreated={handleTeamCreated} />}
       />
-
-      {/* Search and Actions */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search teams..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Teams</SelectItem>
-                  <SelectItem value="active">Active Only</SelectItem>
-                  <SelectItem value="inactive">Inactive Only</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Team Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -239,8 +220,53 @@ export default function TeamsPage() {
         </Card>
       </div>
 
+            {/* Search and Actions */}
+            <Card className="border-0 shadow-sm">
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search teams..."
+                  className="pl-10 h-9 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Teams</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={departmentFilter} onValueChange={(value: string) => setDepartmentFilter(value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Teams List */}
-      <Card>
+      <Card className="border-0 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -349,30 +375,36 @@ export default function TeamsPage() {
                       
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
-                        {canEdit && (
-                          <TeamEditForm 
-                            team={team} 
-                            onTeamUpdated={handleTeamUpdated}
-                          />
-                        )}
-                        
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem 
-                              onClick={() => handleViewTeamDetails(team)}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Eye className="h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-                            
-                            {/* Only show status change options if user has edit permissions */}
-                            {canEdit && (
+                        {isAdminOrCEO ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem 
+                                onClick={() => handleViewTeamDetails(team)}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <Eye className="h-4 w-4" />
+                                View Details
+                              </DropdownMenuItem>
+                              
+                              <TeamEditForm 
+                                team={team} 
+                                onTeamUpdated={handleTeamUpdated}
+                                trigger={
+                                  <DropdownMenuItem 
+                                    onSelect={(e) => e.preventDefault()}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                    Edit Team
+                                  </DropdownMenuItem>
+                                }
+                              />
+                              
                               <DropdownMenuItem 
                                 onClick={() => handleToggleTeamStatus(team)}
                                 className="flex items-center gap-2 cursor-pointer"
@@ -389,9 +421,18 @@ export default function TeamsPage() {
                                   </>
                                 )}
                               </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer"
+                            onClick={() => handleViewTeamDetails(team)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -406,30 +447,36 @@ export default function TeamsPage() {
                           
                           {/* Action buttons */}
                           <div className="flex items-center gap-2 ml-4">
-                            {canEdit && (
-                              <TeamEditForm 
-                                team={team} 
-                                onTeamUpdated={handleTeamUpdated}
-                              />
-                            )}
-                            
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem 
-                                  onClick={() => handleViewTeamDetails(team)}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                  View Details
-                                </DropdownMenuItem>
-                                
-                                {/* Only show status change options if user has edit permissions */}
-                                {canEdit && (
+                            {isAdminOrCEO ? (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="outline" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem 
+                                    onClick={() => handleViewTeamDetails(team)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                    View Details
+                                  </DropdownMenuItem>
+                                  
+                                  <TeamEditForm 
+                                    team={team} 
+                                    onTeamUpdated={handleTeamUpdated}
+                                    trigger={
+                                      <DropdownMenuItem 
+                                        onSelect={(e) => e.preventDefault()}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                        Edit Team
+                                      </DropdownMenuItem>
+                                    }
+                                  />
+                                  
                                   <DropdownMenuItem 
                                     onClick={() => handleToggleTeamStatus(team)}
                                     className="flex items-center gap-2"
@@ -446,9 +493,17 @@ export default function TeamsPage() {
                                       </>
                                     )}
                                   </DropdownMenuItem>
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            ) : (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleViewTeamDetails(team)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            )}
                           </div>
                         </div>
                         
