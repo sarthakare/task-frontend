@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Eye, EyeOff, CheckCircle, XCircle, CheckCircle2, CircleAlert } from "lucide-react";
+import { Plus, Eye, EyeOff, CheckCircle, XCircle, CheckCircle2, CircleAlert, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 
@@ -291,7 +291,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
   };
 
   const defaultTrigger = (
-    <Button onClick={() => setIsCreateDialogOpen(true)}>
+    <Button onClick={() => setIsCreateDialogOpen(true)} className="cursor-pointer">
       <Plus className="h-4 w-4 mr-2" />
       Add User
     </Button>
@@ -302,243 +302,286 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden">
-        <DialogHeader className="pb-4 border-b">
-          <DialogTitle className="text-xl font-semibold text-gray-900">Create New User</DialogTitle>
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
+        <DialogHeader className="pb-6 border-b border-gray-100">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+              <Plus className="h-5 w-5 text-white" />
+            </div>
+            Create New User
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 mt-2">
+            Fill out the form below to create a new user account with all necessary details and permissions.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
           <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <div className="grid grid-cols-1 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Enter full name"
-                  className={`transition-colors ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
-                />
-                {errors.name && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.name}
-                </p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="Enter email address"
-                  className={`transition-colors ${errors.email ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
-                />
-                {errors.email && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.email}
-                </p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">Mobile Number</Label>
-                <Input
-                  id="mobile"
-                  type="tel"
-                  value={formData.mobile}
-                  onChange={(e) => handleInputChange('mobile', e.target.value)}
-                  placeholder="Enter mobile number"
-                  className={`transition-colors ${errors.mobile ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
-                />
-                {errors.mobile && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.mobile}
-                </p>}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="role" className="text-sm font-medium text-gray-700">Role/Designation</Label>
-                <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-                  <SelectTrigger className={`transition-colors ${errors.role ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
-                    <SelectValue placeholder={isLoadingRoles ? "Loading..." : "Select role"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role.charAt(0).toUpperCase() + role.replace('_', ' ').slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {currentUser?.role?.toUpperCase() === 'ADMIN' && roles.includes('CEO') && (
-                  <p className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
-                    As admin, you can create CEO users. CEO will have access to all departments.
-                  </p>
-                )}
-                {errors.role && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.role}
-                </p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department</Label>
-                <Select 
-                  value={formData.department} 
-                  onValueChange={(value) => handleInputChange('department', value)}
-                  disabled={formData.role === 'CEO'}
-                >
-                  <SelectTrigger className={`transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'} ${formData.role === 'CEO' ? 'bg-gray-100' : ''}`}>
-                    <SelectValue placeholder={isLoadingDepartments ? "Loading..." : "Select department"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept} value={dept}>
-                        {dept.charAt(0).toUpperCase() + dept.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formData.role === 'CEO' && (
-                  <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
-                    CEO role automatically gets &quot;All&quot; departments access
-                  </p>
-                )}
-                {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.department}
-                </p>}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="supervisor" className="text-sm font-medium text-gray-700">
-                Supervisor {formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN' && '(Optional for CEO)'}
-              </Label>
-              <Select value={formData.supervisor} onValueChange={(value) => handleInputChange('supervisor', value)}>
-                <SelectTrigger className={`transition-colors ${errors.supervisor ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
-                  <SelectValue placeholder={isLoadingSupervisors ? "Loading..." : "Select supervisor/manager"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {supervisors.map((supervisor) => (
-                    <SelectItem key={supervisor.id} value={supervisor.id.toString()}>
-                      <div className="flex">
-                        <span className="font-medium">{supervisor.name} <span className="text-sm text-gray-500">({supervisor.role} • {supervisor.department})</span> </span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN' && (
-                <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
-                  CEO users typically don&apos;t have a supervisor. You can leave this blank.
-                </p>
-              )}
-              {errors.supervisor && <p className="text-sm text-red-500 flex items-center gap-1">
-                <XCircle className="h-4 w-4" />
-                {errors.supervisor}
-              </p>}
-              {supervisors.length === 0 && !isLoadingSupervisors && (
-                <p className="text-sm text-yellow-600 bg-yellow-50 p-3 rounded-md border border-yellow-200">
-                  No users available. Please create some users first.
-                </p>
-              )}
-            </div>
-
+            {/* Basic Information */}
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
-                <div className="relative">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
+                Basic Information
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name *</Label>
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    placeholder="Enter password"
-                    className={`pr-10 transition-colors ${errors.password ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    placeholder="Enter full name"
+                    className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                  {errors.name && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.name}
+                  </p>}
                 </div>
 
-                {/* Password Strength Meter */}
-                {formData.password && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Password strength:</span>
-                      <span className={`font-medium ${passwordStrength.strength === 'strong' ? 'text-green-600' :
-                          passwordStrength.strength === 'medium' ? 'text-yellow-600' :
-                            passwordStrength.strength === 'fair' ? 'text-orange-600' : 'text-red-600'
-                        }`}>
-                        {passwordStrength.strength.charAt(0).toUpperCase() + passwordStrength.strength.slice(1)}
-                      </span>
-                    </div>
-                    <Progress value={passwordStrength.percentage} className="h-2" />
-                    <div className="flex flex-wrap gap-2">
-                      {passwordStrength.feedback.map((item, index) => (
-                        <span key={index} className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {errors.password && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.password}
-                </p>}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="Enter email address"
+                    className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.email ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                  />
+                  {errors.email && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.email}
+                  </p>}
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</Label>
-                <div className="relative">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">Mobile Number *</Label>
                   <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    placeholder="Confirm password"
-                    className={`transition-colors ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    id="mobile"
+                    type="tel"
+                    value={formData.mobile}
+                    onChange={(e) => handleInputChange('mobile', e.target.value)}
+                    placeholder="Enter mobile number"
+                    className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.mobile ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  {errors.mobile && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.mobile}
+                  </p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Role & Department */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></div>
+                Role & Department
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="role" className="text-sm font-medium text-gray-700">Role/Designation *</Label>
+                  <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-purple-300 transition-colors ${errors.role ? 'border-red-500 focus:border-red-500' : 'focus:border-purple-500'}`}>
+                      <SelectValue placeholder={isLoadingRoles ? "Loading..." : "Select role"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role.charAt(0).toUpperCase() + role.replace('_', ' ').slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {currentUser?.role?.toUpperCase() === 'ADMIN' && roles.includes('CEO') && (
+                    <p className="text-sm text-green-600 bg-green-50 p-2 rounded-md border border-green-200">
+                      As admin, you can create CEO users. CEO will have access to all departments.
+                    </p>
+                  )}
+                  {errors.role && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.role}
+                  </p>}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+                  <Select 
+                    value={formData.department} 
+                    onValueChange={(value) => handleInputChange('department', value)}
+                    disabled={formData.role === 'CEO'}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-purple-300 transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-purple-500'} ${formData.role === 'CEO' ? 'bg-gray-100' : ''}`}>
+                      <SelectValue placeholder={isLoadingDepartments ? "Loading..." : "Select department"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {formData.role === 'CEO' && (
+                    <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md border border-blue-200">
+                      CEO role automatically gets &quot;All&quot; departments access
+                    </p>
+                  )}
+                  {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.department}
+                  </p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Supervisor Assignment */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+                Supervisor Assignment
+              </h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="supervisor" className="text-sm font-medium text-gray-700">
+                  Supervisor {formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN' && '(Optional for CEO)'}
+                </Label>
+                <Select value={formData.supervisor} onValueChange={(value) => handleInputChange('supervisor', value)}>
+                  <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-green-300 transition-colors ${errors.supervisor ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}>
+                    <SelectValue placeholder={isLoadingSupervisors ? "Loading..." : "Select supervisor/manager"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {supervisors.map((supervisor) => (
+                      <SelectItem key={supervisor.id} value={supervisor.id.toString()}>
+                        <div className="flex">
+                          <span className="font-medium">{supervisor.name} <span className="text-sm text-gray-500">({supervisor.role} • {supervisor.department})</span> </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.role === 'CEO' && currentUser?.role?.toUpperCase() === 'ADMIN' && (
+                  <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md border border-blue-200">
+                    CEO users typically don&apos;t have a supervisor. You can leave this blank.
+                  </p>
+                )}
+                {errors.supervisor && <p className="text-sm text-red-500 flex items-center gap-1">
+                  <XCircle className="h-4 w-4" />
+                  {errors.supervisor}
+                </p>}
+                {supervisors.length === 0 && !isLoadingSupervisors && (
+                  <p className="text-sm text-yellow-600 bg-yellow-50 p-3 rounded-md border border-yellow-200">
+                    No users available. Please create some users first.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Security Settings */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-600 rounded-full"></div>
+                Security Settings
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      placeholder="Enter password"
+                      className={`h-10 pr-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.password ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+
+                  {/* Password Strength Meter */}
+                  {formData.password && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Password strength:</span>
+                        <span className={`font-medium ${passwordStrength.strength === 'strong' ? 'text-green-600' :
+                            passwordStrength.strength === 'medium' ? 'text-yellow-600' :
+                              passwordStrength.strength === 'fair' ? 'text-orange-600' : 'text-red-600'
+                          }`}>
+                          {passwordStrength.strength.charAt(0).toUpperCase() + passwordStrength.strength.slice(1)}
+                        </span>
+                      </div>
+                      <Progress value={passwordStrength.percentage} className="h-2" />
+                      <div className="flex flex-wrap gap-2">
+                        {passwordStrength.feedback.map((item, index) => (
+                          <span key={index} className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {errors.password && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.password}
+                  </p>}
                 </div>
 
-                {/* Password Match Indicator */}
-                {formData.confirmPassword && (
-                  <div className={`flex items-center gap-2 text-sm ${passwordsMatch ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                    {passwordsMatch ? (
-                      <>
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Passwords match</span>
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-4 w-4" />
-                        <span>Passwords do not match</span>
-                      </>
-                    )}
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                      placeholder="Confirm password"
+                      className={`h-10 pr-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
-                )}
 
-                {errors.confirmPassword && <p className="text-sm text-red-500 flex items-center gap-1">
-                  <XCircle className="h-4 w-4" />
-                  {errors.confirmPassword}
-                </p>}
+                  {/* Password Match Indicator */}
+                  {formData.confirmPassword && (
+                    <div className={`flex items-center gap-2 text-sm ${passwordsMatch ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                      {passwordsMatch ? (
+                        <>
+                          <CheckCircle className="h-4 w-4" />
+                          <span>Passwords match</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4" />
+                          <span>Passwords do not match</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {errors.confirmPassword && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.confirmPassword}
+                  </p>}
+                </div>
               </div>
             </div>
 
@@ -551,7 +594,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
               </div>
             )}
 
-            <div className="flex justify-end space-x-3 pt-6 border-t">
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
               <Button
                 type="button"
                 variant="outline"
@@ -560,16 +603,26 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                   setIsCreateDialogOpen(false);
                 }}
                 disabled={isSubmitting}
-                className="px-6"
+                className="px-6 h-10"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || !passwordsMatch}
-                className="px-6 bg-blue-600 hover:bg-blue-700"
+                className="px-6 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
               >
-                {isSubmitting ? 'Creating...' : 'Create User'}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Create User
+                  </>
+                )}
               </Button>
             </div>
           </form>

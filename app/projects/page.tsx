@@ -257,11 +257,11 @@ export default function ProjectsPage() {
       </div>
       
       {/* Search and Filters */}
-      <Card className="border-0 shadow-sm">
+      <Card>
         <CardContent>
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar - 55% width on large screens */}
-            <div className="relative flex-1 lg:w-[55%]">
+            <div className="relative flex-1 lg:w-[55%]">   
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search projects, descriptions, managers, or teams..."
@@ -309,7 +309,7 @@ export default function ProjectsPage() {
       </Card>
 
       {/* Projects List */}
-      <Card className="border-0 shadow-sm">
+      <Card>
         <CardHeader className="">
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-3">

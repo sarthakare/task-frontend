@@ -26,12 +26,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,6 +35,7 @@ import {
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import { canCreateUsers, canEditUsers } from "@/utils/auth";
+import { useUser } from "@/components/user-provider";
 
 // Types based on backend schemas
 interface User {
@@ -65,21 +60,20 @@ interface UserStats {
 }
 
 export default function UsersPage() {
+  const { currentUser } = useUser();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   
-  // Edit user state
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
   // Deactivate/Activate state
   const [isTogglingStatus, setIsTogglingStatus] = useState<number | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   // Check permissions (client-side only to avoid hydration mismatch)
   const [canCreate, setCanCreate] = useState(false);
@@ -130,7 +124,7 @@ export default function UsersPage() {
     }
   };
 
-  // Filter users based on search term and status
+  // Filter users based on search term, status, department, and role
   const filteredUsers = users.filter(user => {
     // Search filter
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -143,7 +137,15 @@ export default function UsersPage() {
       (statusFilter === "active" && user.is_active) ||
       (statusFilter === "inactive" && !user.is_active);
     
-    return matchesSearch && matchesStatus;
+    // Department filter
+    const matchesDepartment = departmentFilter === "all" || 
+      user.department.toLowerCase() === departmentFilter.toLowerCase();
+    
+    // Role filter
+    const matchesRole = roleFilter === "all" || 
+      user.role.toLowerCase() === roleFilter.toLowerCase();
+    
+    return matchesSearch && matchesStatus && matchesDepartment && matchesRole;
   });
 
   // Handle user refresh after creation
@@ -152,33 +154,6 @@ export default function UsersPage() {
     fetchStats();
   };
 
-  // Edit user function
-  const handleEditUser = async (userData: Partial<User>) => {
-    if (!editingUser) return;
-    
-    setIsSubmitting(true);
-    try {
-      await api.users.updateUser(editingUser.id, userData);
-      toast.success('User updated successfully!', {
-        description: `${editingUser.name} has been updated.`,
-        icon: <CheckCircle2 className="text-green-600" />,
-        style: { color: "green" },
-      });
-      setIsEditDialogOpen(false);
-      setEditingUser(null);
-      fetchUsers();
-      fetchStats();
-    } catch (error) {
-      console.error('Error updating user:', error);
-      toast.error('Failed to update user', {
-        description: api.utils.handleError(error),
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   // Toggle user status (activate/deactivate)
   const handleToggleUserStatus = async (userId: number, currentStatus: boolean) => {
@@ -213,36 +188,6 @@ export default function UsersPage() {
         action={canCreate ? <UserCreateForm onUserCreated={handleUserCreated} /> : null}
       />
 
-      {/* Search and Filters */}
-      <Card className="mb-6">
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search users..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Users</SelectItem>
-                  <SelectItem value="active">Active Only</SelectItem>
-                  <SelectItem value="inactive">Inactive Only</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* User Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
@@ -343,6 +288,65 @@ export default function UsersPage() {
         </Card>
       </div>
 
+      {/* Search and Filters */}
+      <Card>
+        <CardContent>
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search users by name, email, department, or role..."
+                  className="pl-10 h-9 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
+                <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                  <SelectValue placeholder="Department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {stats?.users_by_department && Object.keys(stats.users_by_department).map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  {stats?.users_by_role && Object.keys(stats.users_by_role).map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Users List */}
       <Card>
         <CardHeader>
@@ -410,13 +414,13 @@ export default function UsersPage() {
           ) : (
             <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredUsers.map((user) => (
-                <div key={user.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${viewMode === 'list' ? 'p-4' : 'p-6'
+                <div key={user.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${viewMode === 'list' ? 'p-4' : 'p-4'
                   } ${!user.is_active ? 'bg-gray-50 border-gray-300' : ''}`}>
                   {viewMode === 'card' ? (
                     /* Card View Layout */
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-3 mb-1">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${user.role === 'manager' ? 'bg-purple-100' :
                             user.role === 'team_lead' ? 'bg-blue-100' :
                               user.role === 'member' ? 'bg-green-100' :
@@ -431,7 +435,7 @@ export default function UsersPage() {
                             </span>
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                            <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
                               {user.name}
                             </h3>
                             <p className="text-sm text-gray-600">{user.email}</p>
@@ -467,41 +471,37 @@ export default function UsersPage() {
 
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
-                        {canEdit && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingUser(user);
-                              setIsEditDialogOpen(true);
-                            }}
-                            className="h-8 hover:bg-blue-50 hover:border-blue-200"
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
+                        {(currentUser?.role.toUpperCase() === 'ADMIN' || currentUser?.role.toUpperCase() === 'CEO') && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {canEdit && (
+                                <DropdownMenuItem 
+                                  onClick={() => setEditingUser(user)}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={() => handleToggleUserStatus(user.id, user.is_active)}
+                                disabled={isTogglingStatus === user.id}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <Power className="h-4 w-4" />
+                                {isTogglingStatus === user.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : null}
+                                {user.is_active ? 'Deactivate' : 'Activate'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         )}
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleToggleUserStatus(user.id, user.is_active)}
-                              disabled={isTogglingStatus === user.id}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Power className="h-4 w-4" />
-                              {isTogglingStatus === user.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : null}
-                              {user.is_active ? 'Deactivate' : 'Activate'}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </div>
                     </div>
                   ) : (
@@ -550,20 +550,7 @@ export default function UsersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        {canEdit && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setEditingUser(user);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                      )}
-                        {canEdit && (
+                        {(currentUser?.role.toUpperCase() === 'ADMIN' || currentUser?.role.toUpperCase() === 'CEO') && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -571,13 +558,23 @@ export default function UsersPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
+                            {canEdit && (
+                              <DropdownMenuItem 
+                                onClick={() => setEditingUser(user)}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <Edit className="h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem 
                               onClick={() => handleToggleUserStatus(user.id, user.is_active)}
                               disabled={isTogglingStatus === user.id}
+                              className="flex items-center gap-2 cursor-pointer"
                             >
-                              <Power className="h-4 w-4 mr-2" />
+                              <Power className="h-4 w-4" />
                               {isTogglingStatus === user.id ? (
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                               ) : null}
                               {user.is_active ? 'Deactivate' : 'Activate'}
                             </DropdownMenuItem>
@@ -595,26 +592,15 @@ export default function UsersPage() {
       </Card>
 
       {/* Edit User Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden">
-          <DialogHeader className="pb-4 border-b">
-            <DialogTitle>Edit User: {editingUser?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="overflow-y-auto max-h-[calc(90vh-120px)] pr-2">
-            {editingUser && (
-              <UserEditForm 
-                user={editingUser} 
-                onSubmit={handleEditUser}
-                onCancel={() => {
-                  setIsEditDialogOpen(false);
-                  setEditingUser(null);
-                }}
-                isSubmitting={isSubmitting}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {editingUser && (
+        <UserEditForm 
+          user={editingUser}
+          onUserUpdated={() => {
+            fetchUsers();
+            setEditingUser(null);
+          }}
+        />
+      )}
     </div>
   );
 }

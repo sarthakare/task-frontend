@@ -57,15 +57,15 @@ export default function TeamsPage() {
         api.teams.getAllTeams(),
         api.users.getDepartments()
       ]);
-      
+
       setTeams(teamsData);
       setDepartments(departmentsData);
-      
+
       // Calculate stats
       const activeTeams = teamsData.filter(team => team.status === 'active').length;
       const totalMembers = teamsData.reduce((sum, team) => sum + team.members.length, 0);
       const teamLeads = teamsData.length; // Each team has one lead
-      
+
       setStats({
         totalTeams: teamsData.length,
         activeTeams,
@@ -100,21 +100,21 @@ export default function TeamsPage() {
   const handleToggleTeamStatus = async (team: Team) => {
     const newStatus = team.status === 'active' ? 'inactive' : 'active';
     const actionText = newStatus === 'active' ? 'activate' : 'deactivate';
-    
+
     try {
       await api.teams.updateTeam(team.id, { status: newStatus });
-      
+
       toast.success(`Team ${actionText}d successfully!`, {
         description: `${team.name} is now ${newStatus}.`,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
-      
+
       fetchTeams(); // Refresh the teams list
     } catch (error) {
       console.error(`Error ${actionText}ing team:`, error);
       const errorMessage = error instanceof Error ? error.message : `Failed to ${actionText} team`;
-      
+
       toast.error(`Failed to ${actionText} team`, {
         description: errorMessage,
         icon: <CircleAlert className="text-red-600" />,
@@ -129,21 +129,21 @@ export default function TeamsPage() {
       team.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       team.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
       team.leader.name.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || 
+
+    const matchesStatus = statusFilter === "all" ||
       (statusFilter === "active" && team.status === "active") ||
       (statusFilter === "inactive" && team.status === "inactive");
-    
-    const matchesDepartment = departmentFilter === "all" || 
+
+    const matchesDepartment = departmentFilter === "all" ||
       team.department === departmentFilter;
-    
+
     return matchesSearch && matchesStatus && matchesDepartment;
   });
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Team Management" 
+      <PageHeader
+        title="Team Management"
         description="Organize and manage your teams effectively"
         action={canCreate && <TeamCreateForm onTeamCreated={handleTeamCreated} />}
       />
@@ -220,8 +220,8 @@ export default function TeamsPage() {
         </Card>
       </div>
 
-            {/* Search and Actions */}
-            <Card className="border-0 shadow-sm">
+      {/* Search and Actions */}
+      <Card>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
@@ -237,7 +237,7 @@ export default function TeamsPage() {
             </div>
             <div className="flex items-center gap-2">
               <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -246,9 +246,9 @@ export default function TeamsPage() {
                   <SelectItem value="inactive">Inactive Only</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={departmentFilter} onValueChange={(value: string) => setDepartmentFilter(value)}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="h-11 border-gray-200 focus:border-blue-300 focus:ring-blue-200 w-full cursor-pointer">
                   <SelectValue placeholder="Filter by department" />
                 </SelectTrigger>
                 <SelectContent>
@@ -276,14 +276,14 @@ export default function TeamsPage() {
               <div>
                 <span className="text-lg font-semibold">Teams</span>
                 <div className="text-sm text-gray-500 font-normal">
-                  {filteredTeams.length !== teams.length 
+                  {filteredTeams.length !== teams.length
                     ? `Showing ${filteredTeams.length} of ${teams.length} teams`
                     : `${filteredTeams.length} teams total`
                   }
                 </div>
               </div>
             </div>
-            
+
             {/* View Toggle Buttons */}
             <div className="flex items-center gap-2">
               <div className="flex bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-1">
@@ -291,11 +291,10 @@ export default function TeamsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('card')}
-                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
-                    viewMode === 'card' 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${viewMode === 'card'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white'
                       : 'text-gray-600 hover:bg-blue-200'
-                  }`}
+                    }`}
                 >
                   <Grid3X3 className="h-4 w-4 mr-1" />
                   Card
@@ -304,11 +303,10 @@ export default function TeamsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${
-                    viewMode === 'list' 
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white' 
+                  className={`h-8 px-3 transition-all duration-200 cursor-pointer ${viewMode === 'list'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:from-purple-600 hover:to-blue-600 hover:text-white'
                       : 'text-gray-600 hover:bg-blue-200'
-                  }`}
+                    }`}
                 >
                   <List className="h-4 w-4 mr-1" />
                   List
@@ -328,9 +326,8 @@ export default function TeamsPage() {
           ) : filteredTeams.length > 0 ? (
             <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-3'}>
               {filteredTeams.map((team) => (
-                <div key={team.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${
-                  viewMode === 'list' ? 'p-4' : 'p-6'
-                } ${team.status === 'active' ? '' : 'bg-gray-50 border-gray-300'}`}>
+                <div key={team.id} className={`group border border-gray-200 rounded-xl bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-200 ${viewMode === 'list' ? 'p-4' : 'p-6'
+                  } ${team.status === 'active' ? '' : 'bg-gray-50 border-gray-300'}`}>
                   {viewMode === 'card' ? (
                     /* Card View Layout */
                     <div className="flex justify-between items-start">
@@ -341,24 +338,23 @@ export default function TeamsPage() {
                         <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-4">
                           {team.description}
                         </p>
-                        
+
                         <div className="flex gap-2 mb-4">
                           <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
                             <Users className="h-3 w-3" />
                             {team.members.length} {team.members.length === 1 ? 'Member' : 'Members'}
                           </span>
-                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                            team.status === 'active' 
-                              ? 'bg-green-100 text-green-800 border border-green-200' 
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${team.status === 'active'
+                              ? 'bg-green-100 text-green-800 border border-green-200'
                               : 'bg-gray-100 text-gray-800 border border-gray-200'
-                          }`}>
+                            }`}>
                             {team.status === 'active' ? 'Active' : 'Inactive'}
                           </span>
                           <span className="px-3 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
                             {team.department}
                           </span>
                         </div>
-                        
+
                         <div className="space-y-3">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Crown className="h-4 w-4 text-gray-400" />
@@ -372,7 +368,7 @@ export default function TeamsPage() {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
                         {isAdminOrCEO ? (
@@ -383,19 +379,19 @@ export default function TeamsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => handleViewTeamDetails(team)}
                                 className="flex items-center gap-2 cursor-pointer"
                               >
                                 <Eye className="h-4 w-4" />
                                 View Details
                               </DropdownMenuItem>
-                              
-                              <TeamEditForm 
-                                team={team} 
+
+                              <TeamEditForm
+                                team={team}
                                 onTeamUpdated={handleTeamUpdated}
                                 trigger={
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onSelect={(e) => e.preventDefault()}
                                     className="flex items-center gap-2 cursor-pointer"
                                   >
@@ -404,8 +400,8 @@ export default function TeamsPage() {
                                   </DropdownMenuItem>
                                 }
                               />
-                              
-                              <DropdownMenuItem 
+
+                              <DropdownMenuItem
                                 onClick={() => handleToggleTeamStatus(team)}
                                 className="flex items-center gap-2 cursor-pointer"
                               >
@@ -424,9 +420,9 @@ export default function TeamsPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer"
                             onClick={() => handleViewTeamDetails(team)}
                           >
@@ -444,7 +440,7 @@ export default function TeamsPage() {
                             <h3 className={`font-medium ${team.status === 'active' ? 'text-gray-900' : 'text-gray-600'}`}>{team.name}</h3>
                             <p className={`text-sm mt-1 ${team.status === 'active' ? 'text-gray-600' : 'text-gray-500'}`}>{team.description}</p>
                           </div>
-                          
+
                           {/* Action buttons */}
                           <div className="flex items-center gap-2 ml-4">
                             {isAdminOrCEO ? (
@@ -455,19 +451,19 @@ export default function TeamsPage() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => handleViewTeamDetails(team)}
                                     className="flex items-center gap-2"
                                   >
                                     <Eye className="h-4 w-4" />
                                     View Details
                                   </DropdownMenuItem>
-                                  
-                                  <TeamEditForm 
-                                    team={team} 
+
+                                  <TeamEditForm
+                                    team={team}
                                     onTeamUpdated={handleTeamUpdated}
                                     trigger={
-                                      <DropdownMenuItem 
+                                      <DropdownMenuItem
                                         onSelect={(e) => e.preventDefault()}
                                         className="flex items-center gap-2 cursor-pointer"
                                       >
@@ -476,8 +472,8 @@ export default function TeamsPage() {
                                       </DropdownMenuItem>
                                     }
                                   />
-                                  
-                                  <DropdownMenuItem 
+
+                                  <DropdownMenuItem
                                     onClick={() => handleToggleTeamStatus(team)}
                                     className="flex items-center gap-2"
                                   >
@@ -496,8 +492,8 @@ export default function TeamsPage() {
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             ) : (
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => handleViewTeamDetails(team)}
                               >
@@ -506,24 +502,23 @@ export default function TeamsPage() {
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2 mt-3">
                           <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 flex items-center gap-1">
                             <Users className="h-3 w-3" />
                             {team.members.length} {team.members.length === 1 ? 'Member' : 'Members'}
                           </span>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            team.status === 'active' 
-                              ? 'bg-green-100 text-green-800' 
+                          <span className={`px-2 py-1 text-xs rounded-full ${team.status === 'active'
+                              ? 'bg-green-100 text-green-800'
                               : 'bg-gray-100 text-gray-800'
-                          }`}>
+                            }`}>
                             {team.status === 'active' ? 'Active' : 'Inactive'}
                           </span>
                           <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
                             {team.department}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between mt-3">
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <div className="flex items-center gap-1">
@@ -549,13 +544,13 @@ export default function TeamsPage() {
                 {teams.length === 0 ? "No teams yet" : "No teams found"}
               </h3>
               <p className="text-sm text-gray-500 mb-6">
-                {teams.length === 0 
+                {teams.length === 0
                   ? "Create your first team to start organizing your work effectively"
                   : "Try adjusting your search criteria or filters."
                 }
               </p>
               {teams.length === 0 && canCreate && (
-                <TeamCreateForm 
+                <TeamCreateForm
                   onTeamCreated={handleTeamCreated}
                   trigger={
                     <Button>
@@ -571,7 +566,7 @@ export default function TeamsPage() {
       </Card>
 
       {/* Team Details Modal */}
-      <TeamDetailsModal 
+      <TeamDetailsModal
         team={selectedTeam}
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetailsModal}
