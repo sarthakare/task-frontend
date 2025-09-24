@@ -84,26 +84,6 @@ export function NotificationBell({ className }: NotificationBellProps) {
     }
   };
 
-  // Mark all as read
-  const markAllAsRead = async () => {
-    try {
-      await api.notifications.markAllAsRead({ user_id: 0 }); // Will be replaced with actual user ID
-      setNotifications(prev => 
-        prev.map(notif => ({ ...notif, is_read: true }))
-      );
-      if (stats) {
-        setStats(prev => prev ? {
-          ...prev,
-          unread_count: 0,
-          read_count: prev.read_count + prev.unread_count
-        } : null);
-      }
-      toast.success('All notifications marked as read');
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      toast.error('Failed to mark all notifications as read');
-    }
-  };
 
   // Delete notification
   const deleteNotification = async (notificationId: number) => {
@@ -259,16 +239,6 @@ export function NotificationBell({ className }: NotificationBellProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            {stats && stats.unread_count > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={markAllAsRead}
-                className="text-xs"
-              >
-                Mark all read
-              </Button>
-            )}
             <Button
               variant="ghost"
               size="sm"

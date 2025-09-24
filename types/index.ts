@@ -439,8 +439,3 @@ export interface BulkNotificationUpdate {
   is_read?: boolean;
   is_archived?: boolean;
 }
-
-export interface NotificationMarkAllRead {
-  user_id: number;
-  notification_type?: NotificationType;
-}

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Loader2, CheckCircle2, CircleAlert } from "lucide-react";
+import { Plus, Loader2, CheckCircle2, CircleAlert, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import { User, Task, ReminderCreate } from "@/types";
@@ -17,11 +17,12 @@ interface ReminderCreateFormProps {
 }
 
 export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProps) {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loadingData, setLoadingData] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState<ReminderCreate & { task_id: number | undefined }>({
     title: "",
@@ -32,31 +33,140 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
     task_id: undefined,
   });
 
-  const fetchData = async () => {
-    setLoadingData(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Fetch data when component mounts or dialog opens
+  useEffect(() => {
+    if (isDialogOpen) {
+      fetchUsers();
+      fetchTasks();
+    }
+  }, [isDialogOpen]);
+
+  const fetchUsers = async () => {
+    setIsLoadingUsers(true);
     try {
-      const [usersResponse, tasksResponse] = await Promise.all([
-        api.users.getAllUsers(),
-        api.tasks.getAllTasks()
-      ]);
-      setUsers(usersResponse);
-      setTasks(tasksResponse);
+      const data = await api.users.getAllUsers();
+      setUsers(data.filter(user => user.is_active));
     } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Failed to load users and tasks", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
+      console.error('Error fetching users:', error);
+      setUsers([]);
     } finally {
-      setLoadingData(false);
+      setIsLoadingUsers(false);
     }
   };
 
-  const handleDialogOpen = (open: boolean) => {
-    setOpen(open);
-    if (open) {
-      fetchData();
-      // Reset form when opening
+  const fetchTasks = async () => {
+    setIsLoadingTasks(true);
+    try {
+      const data = await api.tasks.getAllTasks();
+      setTasks(data);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      setTasks([]);
+    } finally {
+      setIsLoadingTasks(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string | number | undefined) => {
+    // Log datetime values for debugging
+    if (field === 'due_date') {
+      console.log('=== DATETIME INPUT DEBUG ===');
+      console.log('Raw input value:', value);
+      console.log('Input type:', typeof value);
+      if (value) {
+        const dateObj = new Date(value as string);
+        console.log('Date object:', dateObj);
+        console.log('Date ISO string:', dateObj.toISOString());
+        console.log('Date local string:', dateObj.toLocaleString());
+        console.log('Date IST string:', dateObj.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'}));
+        console.log('Timezone offset (minutes):', dateObj.getTimezoneOffset());
+        console.log('========================');
+      }
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = 'Reminder title is required';
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+
+    if (!formData.due_date) {
+      newErrors.due_date = 'Due date is required';
+    }
+
+    if (!formData.user_id || formData.user_id === 0) {
+      newErrors.user_id = 'Please select a user';
+    }
+
+    // Validate due date is today or in the future (using IST)
+    if (formData.due_date) {
+      const dueDate = new Date(formData.due_date);
+      
+      // Get current IST date (start of day)
+      const now = new Date();
+      const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+      const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
+      
+      if (dueDate < today) {
+        newErrors.due_date = 'Due date cannot be in the past';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Parse the date input and set time to end of day in IST
+      const [year, month, day] = formData.due_date.split('-').map(Number);
+      
+      // Create date object for end of day in IST (23:59:59)
+      const istDate = new Date(year, month - 1, day, 23, 59, 59);
+      
+      console.log('=== FORM SUBMISSION DEBUG ===');
+      console.log('Original formData.due_date:', formData.due_date);
+      console.log('Parsed IST date (end of day):', istDate);
+      console.log('IST date ISO:', istDate.toISOString());
+      console.log('IST date local:', istDate.toLocaleString());
+      console.log('IST date IST:', istDate.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'}));
+      console.log('=============================');
+      
+      await api.reminders.createReminder({
+        ...formData,
+        due_date: istDate.toISOString(),
+      });
+      
+      // Reset form
       setFormData({
         title: "",
         description: "",
@@ -65,210 +175,281 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
         user_id: 0,
         task_id: undefined,
       });
-    }
-  };
+      setErrors({});
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validation
-    if (!formData.title.trim()) {
-      toast.error("Title is required", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-      return;
-    }
-    if (!formData.description.trim()) {
-      toast.error("Description is required", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-      return;
-    }
-    if (!formData.due_date) {
-      toast.error("Due date is required", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-      return;
-    }
-    if (!formData.user_id || formData.user_id === 0) {
-      toast.error("Please select a user", {
-        icon: <CircleAlert className="text-red-600" />,
-        style: { color: "red" },
-      });
-      return;
-    }
+      // Close dialog
+      setIsDialogOpen(false);
 
-    setLoading(true);
-    try {
-      await api.reminders.createReminder({
-        ...formData,
-        due_date: new Date(formData.due_date).toISOString(),
-      });
-      
+      // Show success toast
       toast.success("Reminder created successfully!", {
-        description: "The reminder has been created and will notify the assigned user.",
+        description: `${formData.title} has been created and will notify the assigned user.`,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
-      setOpen(false);
-      onReminderCreated?.();
+
+      // Call callback to refresh parent component
+      if (onReminderCreated) {
+        onReminderCreated();
+      }
     } catch (error: unknown) {
       console.error("Error creating reminder:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to create reminder", {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create reminder";
+      setErrors({ submit: errorMessage });
+
+      // Show error toast
+      toast.error("Failed to create reminder", {
+        description: errorMessage,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  const getCurrentDateTime = () => {
+  const getCurrentDate = () => {
+    // Get current date in Indian Standard Time (IST)
     const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    return now.toISOString().slice(0, 16);
+    const istTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    return istTime.toISOString().slice(0, 10);
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      due_date: "",
+      priority: "MEDIUM",
+      user_id: 0,
+      task_id: undefined,
+    });
+    setErrors({});
+  };
+
+  const defaultTrigger = (
+    <Button onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
+      <Plus className="h-4 w-4 mr-2" />
+      Create Reminder
+    </Button>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={handleDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Reminder
-        </Button>
+        {defaultTrigger}
       </DialogTrigger>
-      
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Create New Reminder</DialogTitle>
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
+        <DialogHeader className="pb-6 border-b border-gray-100">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg">
+              <Plus className="h-5 w-5 text-white" />
+            </div>
+            Create New Reminder
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 mt-2">
+            Fill out the form below to create a new reminder with all necessary details and assignments.
+          </DialogDescription>
         </DialogHeader>
 
-        {loadingData ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin mr-2" />
-            Loading data...
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Title */}
-              <div className="md:col-span-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Enter reminder title"
-                  required
-                />
-              </div>
+        <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
+          <form onSubmit={handleSubmit} className="space-y-6 py-4">
+            
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-600 rounded-full"></div>
+                Basic Information
+              </h3>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Reminder Title *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    placeholder="Enter reminder title"
+                    className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.title ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
+                  />
+                  {errors.title && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.title}
+                  </p>}
+                </div>
 
-              {/* Description */}
-              <div className="md:col-span-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Enter reminder description"
-                  rows={3}
-                  required
-                />
-              </div>
-
-              {/* Due Date */}
-              <div>
-                <Label htmlFor="due_date">Due Date & Time</Label>
-                <Input
-                  id="due_date"
-                  type="datetime-local"
-                  value={formData.due_date}
-                  onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  min={getCurrentDateTime()}
-                  required
-                />
-              </div>
-
-              {/* Priority */}
-              <div>
-                <Label htmlFor="priority">Priority</Label>
-                <Select
-                  value={formData.priority}
-                  onValueChange={(value) => setFormData({ ...formData, priority: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="LOW">Low</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="HIGH">High</SelectItem>
-                    <SelectItem value="CRITICAL">Critical</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Assigned User */}
-              <div>
-                <Label htmlFor="user_id">Assign To</Label>
-                <Select
-                  value={formData.user_id === 0 ? "" : formData.user_id.toString()}
-                  onValueChange={(value) => setFormData({ ...formData, user_id: parseInt(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select user" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id.toString()}>
-                        {user.name} ({user.email})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Related Task (Optional) */}
-              <div>
-                <Label htmlFor="task_id">Related Task (Optional)</Label>
-                <Select
-                  value={formData.task_id?.toString() || "none"}
-                  onValueChange={(value) => 
-                    setFormData({ 
-                      ...formData, 
-                      task_id: value === "none" ? undefined : parseInt(value) 
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select task (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No task selected</SelectItem>
-                    {tasks.map((task) => (
-                      <SelectItem key={task.id} value={task.id.toString()}>
-                        {task.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description *</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="Enter reminder description and details"
+                    rows={3}
+                    className={`bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
+                  />
+                  {errors.description && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.description}
+                  </p>}
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-2 pt-4">
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                Create Reminder
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            {/* Assignment & Context */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+                Assignment & Context
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="user_id" className="text-sm font-medium text-gray-700">Assign To *</Label>
+                  <Select
+                    value={formData.user_id === 0 ? "" : formData.user_id.toString()}
+                    onValueChange={(value) => handleInputChange('user_id', parseInt(value))}
+                  >
+                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.user_id ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                      <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select user"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id.toString()}>
+                          <div className="flex flex-col max-w-[200px]">
+                            <span className="font-medium truncate" title={user.name}>
+                              {user.name.length > 25 ? `${user.name.substring(0, 25)}...` : user.name}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate" title={`${user.role} • ${user.department}`}>
+                              {user.role} • {user.department.length > 15 ? `${user.department.substring(0, 15)}...` : user.department}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.user_id && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.user_id}
+                  </p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="task_id" className="text-sm font-medium text-gray-700">Related Task (Optional)</Label>
+                  <Select
+                    value={formData.task_id?.toString() || "none"}
+                    onValueChange={(value) => 
+                      handleInputChange('task_id', value === "none" ? undefined : parseInt(value))
+                    }
+                  >
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
+                      <SelectValue placeholder={isLoadingTasks ? "Loading..." : "Select task (optional)"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No task selected</SelectItem>
+                      {tasks.map((task) => (
+                        <SelectItem key={task.id} value={task.id.toString()}>
+                          <div className="flex flex-col max-w-[200px]">
+                            <span className="font-medium truncate" title={task.title}>
+                              {task.title.length > 25 ? `${task.title.substring(0, 25)}...` : task.title}
+                            </span>
+                            <span className="text-xs text-gray-500 truncate" title={`Status: ${task.status} • Priority: ${task.priority}`}>
+                              {task.status} • {task.priority}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Priority & Due Date */}
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+                Priority & Due Date
+              </h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="priority" className="text-sm font-medium text-gray-700">Priority</Label>
+                  <Select
+                    value={formData.priority}
+                    onValueChange={(value) => handleInputChange('priority', value)}
+                  >
+                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-green-300 transition-colors">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="LOW">Low</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                      <SelectItem value="CRITICAL">Critical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="due_date" className="text-sm font-medium text-gray-700">Due Date *</Label>
+                  <Input
+                    id="due_date"
+                    type="date"
+                    value={formData.due_date}
+                    onChange={(e) => handleInputChange('due_date', e.target.value)}
+                    min={getCurrentDate()}
+                    className={`h-10 bg-white border-gray-200 hover:border-green-300 transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}
+                  />
+                  {errors.due_date && <p className="text-sm text-red-500 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    {errors.due_date}
+                  </p>}
+                </div>
+              </div>
+            </div>
+
+            {errors.submit && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600 flex items-center gap-2">
+                  <XCircle className="h-5 w-5" />
+                  {errors.submit}
+                </p>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                  setIsDialogOpen(false);
+                }}
+                disabled={isSubmitting}
+                className="px-6 h-10 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+              >
                 Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 h-10 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Reminder
+                  </>
+                )}
               </Button>
             </div>
           </form>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );

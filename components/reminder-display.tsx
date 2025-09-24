@@ -30,7 +30,14 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
   const [loading, setLoading] = useState(false);
 
   const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString();
+    // Convert to IST (Indian Standard Time) and show date only
+    const date = new Date(dateTime);
+    return date.toLocaleDateString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
   };
 
   const getPriorityColor = (priority: string) => {
@@ -53,19 +60,18 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
       return "bg-green-50 border-green-200";
     }
     
+    // Get current IST date
     const now = new Date();
+    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
     const due = new Date(dueDate);
+    const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
     
-    if (due < now) {
+    if (dueDateOnly < today) {
       return "bg-red-50 border-red-200";
     }
     
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-    
-    if (due >= startOfToday && due <= today) {
+    if (dueDateOnly.getTime() === today.getTime()) {
       return "bg-blue-50 border-blue-200";
     }
     
@@ -77,27 +83,25 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
       return { label: "Completed", color: "bg-green-100 text-green-800" };
     }
     
+    // Get current IST date
     const now = new Date();
+    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
     const due = new Date(dueDate);
+    const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
     
-    if (due < now) {
+    if (dueDateOnly < today) {
       return { label: "Overdue", color: "bg-red-100 text-red-800" };
     }
     
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-    
-    if (due >= startOfToday && due <= today) {
+    if (dueDateOnly.getTime() === today.getTime()) {
       return { label: "Today", color: "bg-blue-100 text-blue-800" };
     }
     
-    const tomorrow = new Date();
+    const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(23, 59, 59, 999);
     
-    if (due <= tomorrow) {
+    if (dueDateOnly.getTime() === tomorrow.getTime()) {
       return { label: "Tomorrow", color: "bg-green-100 text-green-800" };
     }
     

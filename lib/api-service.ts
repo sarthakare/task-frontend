@@ -36,8 +36,7 @@ import type {
   NotificationStats,
   NotificationCreate,
   NotificationUpdate,
-  BulkNotificationUpdate,
-  NotificationMarkAllRead
+  BulkNotificationUpdate
 } from "@/types";
 import { getToken, clearAuth } from "@/utils/auth";
 
@@ -672,12 +671,6 @@ export const notificationAPI = {
       body: JSON.stringify(data),
     }),
 
-  // Mark all notifications as read
-  markAllAsRead: (data: NotificationMarkAllRead) =>
-    apiRequest<{ message: string; updated_count: number }>('/notifications/mark-all-read', {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
 
   // Delete notification
   deleteNotification: (id: number) =>

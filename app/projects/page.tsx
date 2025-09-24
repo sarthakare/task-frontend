@@ -26,7 +26,8 @@ import {
   CircleAlert,
   Loader2,
   Grid3X3,
-  List
+  List,
+  Edit
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -56,11 +57,11 @@ export default function ProjectsPage() {
 
   // Check permissions (client-side only to avoid hydration mismatch)
   const [canCreate, setCanCreate] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
+  const [isAdminOrCEO, setIsAdminOrCEO] = useState(false);
 
   useEffect(() => {
     setCanCreate(canCreateProjects());
-    setCanEdit(canEditProjects());
+    setIsAdminOrCEO(canEditProjects());
   }, []);
 
   useEffect(() => {
@@ -385,77 +386,90 @@ export default function ProjectsPage() {
 
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
-                        {canEdit && (
-                          <ProjectEditForm
-                            project={project}
-                            onProjectUpdated={handleProjectUpdated}
-                          />
+                        {isAdminOrCEO ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleViewProjectDetails(project)}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <Eye className="h-4 w-4" />
+                                View Details
+                              </DropdownMenuItem>
+
+                              <ProjectEditForm
+                                project={project}
+                                onProjectUpdated={handleProjectUpdated}
+                                trigger={
+                                  <DropdownMenuItem
+                                    onSelect={(e) => e.preventDefault()}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                    Edit Project
+                                  </DropdownMenuItem>
+                                }
+                              />
+
+                              <DropdownMenuSeparator />
+
+                              {/* Status change options */}
+                              {project.status !== 'active' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'active')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Play className="h-4 w-4" />
+                                  Activate Project
+                                </DropdownMenuItem>
+                              )}
+
+                              {project.status === 'active' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'on_hold')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Pause className="h-4 w-4" />
+                                  Put On Hold
+                                </DropdownMenuItem>
+                              )}
+
+                              {project.status !== 'completed' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'completed')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <CheckCircle2 className="h-4 w-4" />
+                                  Mark Completed
+                                </DropdownMenuItem>
+                              )}
+
+                              {project.status !== 'cancelled' && project.status !== 'completed' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'cancelled')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <X className="h-4 w-4" />
+                                  Cancel Project
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer"
+                            onClick={() => handleViewProjectDetails(project)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
                         )}
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewProjectDetails(project)}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Eye className="h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-
-                            {/* Only show status change options if user has edit permissions */}
-                            {canEdit && (
-                              <>
-                                <DropdownMenuSeparator />
-
-                                {/* Status change options */}
-                                {project.status !== 'active' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'active')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Play className="h-4 w-4" />
-                                    Activate Project
-                                  </DropdownMenuItem>
-                                )}
-
-                                {project.status === 'active' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Pause className="h-4 w-4" />
-                                    Put On Hold
-                                  </DropdownMenuItem>
-                                )}
-
-                                {project.status !== 'completed' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'completed')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    Mark Completed
-                                  </DropdownMenuItem>
-                                )}
-
-                                {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <X className="h-4 w-4" />
-                                    Cancel Project
-                                  </DropdownMenuItem>
-                                )}
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </div>
                     </div>
                   ) : (
@@ -472,77 +486,90 @@ export default function ProjectsPage() {
 
                       {/* Action buttons */}
                       <div className="flex items-center gap-2 ml-4">
-                        {canEdit && (
-                          <ProjectEditForm
-                            project={project}
-                            onProjectUpdated={handleProjectUpdated}
-                          />
+                        {isAdminOrCEO ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleViewProjectDetails(project)}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <Eye className="h-4 w-4" />
+                                View Details
+                              </DropdownMenuItem>
+
+                              <ProjectEditForm
+                                project={project}
+                                onProjectUpdated={handleProjectUpdated}
+                                trigger={
+                                  <DropdownMenuItem
+                                    onSelect={(e) => e.preventDefault()}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                    Edit Project
+                                  </DropdownMenuItem>
+                                }
+                              />
+
+                              <DropdownMenuSeparator />
+
+                              {/* Status change options */}
+                              {project.status !== 'active' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'active')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Play className="h-4 w-4" />
+                                  Activate Project
+                                </DropdownMenuItem>
+                              )}
+
+                              {project.status === 'active' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'on_hold')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Pause className="h-4 w-4" />
+                                  Put On Hold
+                                </DropdownMenuItem>
+                              )}
+
+                              {project.status !== 'completed' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'completed')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <CheckCircle2 className="h-4 w-4" />
+                                  Mark Completed
+                                </DropdownMenuItem>
+                              )}
+
+                              {project.status !== 'cancelled' && project.status !== 'completed' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleProjectStatusChange(project, 'cancelled')}
+                                  className="flex items-center gap-2 cursor-pointer"
+                                >
+                                  <X className="h-4 w-4" />
+                                  Cancel Project
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer"
+                            onClick={() => handleViewProjectDetails(project)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
                         )}
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 cursor-pointer">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewProjectDetails(project)}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <Eye className="h-4 w-4" />
-                              View Details
-                            </DropdownMenuItem>
-
-                            {/* Only show status change options if user has edit permissions */}
-                            {canEdit && (
-                              <>
-                                <DropdownMenuSeparator />
-
-                                {/* Status change options */}
-                                {project.status !== 'active' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'active')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Play className="h-4 w-4" />
-                                    Activate Project
-                                  </DropdownMenuItem>
-                                )}
-
-                                {project.status === 'active' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'on_hold')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Pause className="h-4 w-4" />
-                                    Put On Hold
-                                  </DropdownMenuItem>
-                                )}
-
-                                {project.status !== 'completed' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'completed')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    Mark Completed
-                                  </DropdownMenuItem>
-                                )}
-
-                                {project.status !== 'cancelled' && project.status !== 'completed' && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleProjectStatusChange(project, 'cancelled')}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <X className="h-4 w-4" />
-                                    Cancel Project
-                                  </DropdownMenuItem>
-                                )}
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </div>
                     </div>
                   )}
