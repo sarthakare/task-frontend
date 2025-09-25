@@ -7,6 +7,7 @@ import { TaskStatusUpdate } from "@/components/task-status-update";
 import { TaskDetailsModal } from "@/components/task-details-modal";
 import { TaskLogCreateForm } from "@/components/task-log-create-form";
 import { TaskLogDisplay } from "@/components/task-log-display";
+import { TaskProgressBar } from "@/components/task-progress-bar";
 import {
   Calendar,
   User,
@@ -489,6 +490,17 @@ export function TaskCard({
              </div>
            </div>
          )}
+
+        {/* Task Progress Bar */}
+        {shownLogs.has(task.id) && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <TaskProgressBar
+              taskId={task.id}
+              taskTitle={task.title}
+              refreshTrigger={logRefreshTrigger}
+            />
+          </div>
+        )}
 
         {/* Task Logs Display */}
         {shownLogs.has(task.id) && (

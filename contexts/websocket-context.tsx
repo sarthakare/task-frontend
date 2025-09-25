@@ -196,17 +196,29 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       
       switch (toast_type) {
         case "success":
-          toast.success(toastTitle, { description: message });
+          toast.success(toastTitle, { 
+            description: message,
+            style: { color: "green" }
+          });
           break;
         case "error":
-          toast.error(toastTitle, { description: message });
+          toast.error(toastTitle, { 
+            description: message,
+            style: { color: "red" }
+          });
           break;
         case "warning":
-          toast.warning(toastTitle, { description: message });
+          toast.warning(toastTitle, { 
+            description: message,
+            style: { color: "white" }
+          });
           break;
         case "info":
         default:
-          toast.info(toastTitle, { description: message });
+          toast.info(toastTitle, { 
+            description: message,
+            style: { color: "white" }
+          });
           break;
       }
       
@@ -248,20 +260,23 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         case "success":
           toast.success(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "green" }
           });
           break;
         case "warning":
           toast.warning(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "white" }
           });
           break;
         case "info":
         default:
           toast.info(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "white" }
           });
           break;
       }
@@ -297,20 +312,23 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         case "success":
           toast.success(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "green" }
           });
           break;
         case "warning":
           toast.warning(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "white" }
           });
           break;
         case "info":
         default:
           toast.info(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "white" }
           });
           break;
       }
@@ -350,20 +368,23 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         case "success":
           toast.success(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "green" }
           });
           break;
         case "warning":
           toast.warning(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "white" }
           });
           break;
         case "info":
         default:
           toast.info(toastTitle, { 
             description: message,
-            duration: 5000
+            duration: 5000,
+            style: { color: "white" }
           });
           break;
       }

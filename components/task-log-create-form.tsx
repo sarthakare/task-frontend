@@ -31,6 +31,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
     description: "",
     start_time: "",
     end_time: "",
+    percentage: undefined,
   });
 
   const handleDialogOpen = async (open: boolean) => {
@@ -44,6 +45,7 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
         description: "",
         start_time: "",
         end_time: "",
+        percentage: undefined,
       });
     }
   };
@@ -91,8 +93,10 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
         description: formData.description.trim(),
         start_time: formData.start_time,
         end_time: formData.end_time,
+        percentage: formData.percentage,
       };
 
+      console.log("Sending log data:", logData);  // Debug log
       await api.tasks.createTaskLog(taskId, logData);
       
       toast.success("Task log created successfully", {
@@ -256,6 +260,39 @@ export function TaskLogCreateForm({ taskId, taskTitle, onLogCreated, trigger }: 
                         required
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* Progress Section */}
+                <div className="space-y-4">
+                  <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></div>
+                    Work Progress
+                  </h3>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="percentage" className="text-sm font-medium text-gray-700">
+                      Percentage Completed (0-100%)
+                    </Label>
+                    <Input
+                      id="percentage"
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="0"
+                      value={formData.percentage || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          percentage: value === "" ? undefined : parseInt(value) || 0 
+                        }));
+                      }}
+                      className="h-10 bg-white border-gray-200 hover:border-purple-300 transition-colors focus:border-purple-500"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Enter the percentage of work completed for this subtask (0-100)
+                    </p>
                   </div>
                 </div>
               </div>

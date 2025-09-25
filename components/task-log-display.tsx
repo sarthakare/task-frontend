@@ -148,6 +148,7 @@ export function TaskLogDisplay({ taskId, refreshTrigger }: TaskLogDisplayProps) 
                 <TableHead className="font-semibold min-w-[80px]">Start Time</TableHead>
                 <TableHead className="font-semibold min-w-[80px]">End Time</TableHead>
                 <TableHead className="font-semibold min-w-[90px]">Duration</TableHead>
+                <TableHead className="font-semibold min-w-[100px]">Progress</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -205,6 +206,23 @@ export function TaskLogDisplay({ taskId, refreshTrigger }: TaskLogDisplayProps) 
                         <Timer className="h-3 w-3 mr-1" />
                         {duration}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="min-w-[100px]">
+                      {log.percentage !== null && log.percentage !== undefined ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${log.percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-medium text-gray-700 min-w-[35px]">
+                            {log.percentage}%
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

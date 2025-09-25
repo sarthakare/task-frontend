@@ -71,6 +71,7 @@ export interface TaskLog {
   description: string;
   start_time: string;
   end_time?: string;
+  percentage?: number;
   created_at: string;
 }
 
@@ -79,6 +80,7 @@ export interface TaskLogCreate {
   description: string;
   start_time: string;
   end_time?: string;
+  percentage?: number;
 }
 
 export interface HierarchyUser {
