@@ -620,6 +620,9 @@ export const dashboardAPI = {
   // Get team workload
   getTeamWorkload: (teamId: number) => 
     apiRequest<{ team: Team; members_workload: Array<{ user: User; tasks: Task[]; workload_percentage: number }> }>(`/dashboard/team-workload/${teamId}`),
+  
+  // Get scoped projects for dashboard
+  getProjects: () => apiRequest<Project[]>('/dashboard/projects'),
 };
 
 // Notification API

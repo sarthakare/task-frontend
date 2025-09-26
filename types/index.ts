@@ -290,6 +290,7 @@ export interface Reminder {
 }
 
 export interface DashboardOverview {
+  user_role: string;
   total_tasks: number;
   completed_tasks: number;
   pending_tasks: number;
@@ -298,6 +299,33 @@ export interface DashboardOverview {
   active_projects: number;
   total_users: number;
   active_users: number;
+  direct_subordinates_count?: number;
+  team_info?: {
+    team_name: string;
+    department: string;
+    member_count: number;
+  };
+  scope_description?: {
+    user_role: string;
+    scope_description: string;
+    viewable_user_count: number;
+    viewable_users: Array<{
+      id: number;
+      name: string;
+      role: string;
+      department: string;
+    }>;
+  };
+  scope_details?: {
+    total_teams_leading: number;
+    total_teams_member: number;
+    total_direct_reports: number;
+    total_subordinates: number;
+    department_info?: {
+      department: string;
+      total_members: number;
+    };
+  };
 }
 
 export interface Activity {

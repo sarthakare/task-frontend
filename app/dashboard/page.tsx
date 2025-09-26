@@ -49,7 +49,7 @@ export default function Dashboard() {
       const [overviewData, activitiesData, projectsData, deadlinesData] = await Promise.allSettled([
         api.dashboard.getOverview(),
         api.dashboard.getRecentActivities(5),
-        api.projects.getAllProjects(),
+        api.dashboard.getProjects(),
         api.dashboard.getUpcomingDeadlines(7)
       ]);
 
@@ -177,18 +177,60 @@ export default function Dashboard() {
     return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
   };
 
+  const getRoleBasedTitle = (role: string) => {
+    switch (role) {
+      case 'ADMIN':
+        return 'Admin Dashboard';
+      case 'CEO':
+        return 'CEO Dashboard';
+      case 'MANAGER':
+        return 'Manager Dashboard';
+      case 'TEAM_LEAD':
+        return 'Team Lead Dashboard';
+      case 'MEMBER':
+        return 'My Dashboard';
+      default:
+        return 'Dashboard';
+    }
+  };
+
+  const getRoleBasedDescription = (role: string, overview: DashboardOverview | null) => {
+    if (!overview) return "Loading your personalized dashboard...";
+    
+    switch (role) {
+      case 'ADMIN':
+        return "Complete system overview with all users, projects, and tasks.";
+      case 'CEO':
+        return "Executive overview of organizational performance and key metrics.";
+      case 'MANAGER':
+        return `Managing ${overview.direct_subordinates_count || 0} direct reports and their teams.`;
+      case 'TEAM_LEAD':
+        return overview.team_info 
+          ? `Leading ${overview.team_info.team_name} (${overview.team_info.member_count} members) in ${overview.team_info.department}.`
+          : "Leading your team and managing tasks.";
+      case 'MEMBER':
+        return "Your personal task overview and upcoming deadlines.";
+      default:
+        return "Here's what's happening with your projects and teams.";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader 
-        title="Dashboard" 
-        description="Welcome back! Here's what's happening with your projects and teams."
+        title={getRoleBasedTitle(overview?.user_role || '')} 
+        description={getRoleBasedDescription(overview?.user_role || '', overview)}
       />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-900">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium text-blue-900">
+              {overview?.user_role === 'MEMBER' ? 'My Tasks' : 
+               overview?.user_role === 'TEAM_LEAD' ? 'Team Members' :
+               overview?.user_role === 'MANAGER' ? 'Direct Reports' : 'Total Users'}
+            </CardTitle>
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -199,10 +241,18 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-blue-900">{overview?.total_users || 0}</div>
+                <div className="text-2xl font-bold text-blue-900">
+                  {overview?.user_role === 'MEMBER' ? overview?.total_tasks || 0 :
+                   overview?.user_role === 'TEAM_LEAD' ? overview?.team_info?.member_count || 0 :
+                   overview?.user_role === 'MANAGER' ? overview?.direct_subordinates_count || 0 :
+                   overview?.total_users || 0}
+                </div>
                 <div className="flex items-center text-xs text-blue-700 mt-1">
                   <Users className="h-3 w-3 mr-1" />
-                  {`${overview?.active_users || 0} active`}
+                  {overview?.user_role === 'MEMBER' ? `${overview?.completed_tasks || 0} completed` :
+                   overview?.user_role === 'TEAM_LEAD' ? `${overview?.active_users || 0} active` :
+                   overview?.user_role === 'MANAGER' ? `${overview?.active_users || 0} active` :
+                   `${overview?.active_users || 0} active`}
                 </div>
               </>
             )}
@@ -211,7 +261,9 @@ export default function Dashboard() {
 
         <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-900">Total Projects</CardTitle>
+            <CardTitle className="text-sm font-medium text-green-900">
+              {overview?.user_role === 'MEMBER' ? 'Completed Tasks' : 'Total Projects'}
+            </CardTitle>
             <FolderOpen className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -222,10 +274,14 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-green-900">{overview?.total_projects || 0}</div>
+                <div className="text-2xl font-bold text-green-900">
+                  {overview?.user_role === 'MEMBER' ? overview?.completed_tasks || 0 : overview?.total_projects || 0}
+                </div>
                 <div className="flex items-center text-xs text-green-700 mt-1">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  {`${overview?.active_projects || 0} active`}
+                  {overview?.user_role === 'MEMBER' ? 
+                    `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate` :
+                    `${overview?.active_projects || 0} active`}
                 </div>
               </>
             )}
@@ -234,7 +290,9 @@ export default function Dashboard() {
 
         <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-900">Completed Tasks</CardTitle>
+            <CardTitle className="text-sm font-medium text-purple-900">
+              {overview?.user_role === 'MEMBER' ? 'Pending Tasks' : 'Completed Tasks'}
+            </CardTitle>
             <CheckCircle2 className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
@@ -245,10 +303,14 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-purple-900">{overview?.completed_tasks || 0}</div>
+                <div className="text-2xl font-bold text-purple-900">
+                  {overview?.user_role === 'MEMBER' ? overview?.pending_tasks || 0 : overview?.completed_tasks || 0}
+                </div>
                 <div className="flex items-center text-xs text-purple-700 mt-1">
                   <Target className="h-3 w-3 mr-1" />
-                  {`${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate`}
+                  {overview?.user_role === 'MEMBER' ? 
+                    `${overview?.overdue_tasks || 0} overdue` :
+                    `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate`}
                 </div>
               </>
             )}
@@ -257,7 +319,9 @@ export default function Dashboard() {
 
         <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-900">Pending Tasks</CardTitle>
+            <CardTitle className="text-sm font-medium text-orange-900">
+              {overview?.user_role === 'MEMBER' ? 'Overdue Tasks' : 'Pending Tasks'}
+            </CardTitle>
             <Clock className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
@@ -268,16 +332,107 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-orange-900">{overview?.pending_tasks || 0}</div>
+                <div className="text-2xl font-bold text-orange-900">
+                  {overview?.user_role === 'MEMBER' ? overview?.overdue_tasks || 0 : overview?.pending_tasks || 0}
+                </div>
                 <div className="flex items-center text-xs text-orange-700 mt-1">
                   <AlertCircle className="h-3 w-3 mr-1" />
-                  {`${overview?.overdue_tasks || 0} overdue`}
+                  {overview?.user_role === 'MEMBER' ? 
+                    'Need attention' :
+                    `${overview?.overdue_tasks || 0} overdue`}
                 </div>
               </>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Comprehensive Access Scope Info */}
+      {overview?.scope_description && (
+        <Card className="bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-gray-700">Your Access Scope</span>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {overview.scope_description.user_role}
+                </Badge>
+                {overview.team_info && (
+                  <span className="text-xs text-gray-500">
+                    {overview.team_info.team_name} • {overview.team_info.department}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs text-gray-400">
+                {overview.scope_description.scope_description}
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* People in Scope */}
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                <Users className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+                <div className="text-lg font-semibold text-gray-900">{overview.scope_description.viewable_user_count}</div>
+                <div className="text-xs text-gray-500">People in Scope</div>
+              </div>
+
+              {/* Projects */}
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                <FolderOpen className="h-5 w-5 text-green-600 mx-auto mb-1" />
+                <div className="text-lg font-semibold text-gray-900">{overview.total_projects}</div>
+                <div className="text-xs text-gray-500">Projects</div>
+              </div>
+
+              {/* Tasks */}
+              <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                <CheckCircle2 className="h-5 w-5 text-purple-600 mx-auto mb-1" />
+                <div className="text-lg font-semibold text-gray-900">{overview.total_tasks}</div>
+                <div className="text-xs text-gray-500">Tasks</div>
+              </div>
+
+              {/* Direct Reports */}
+              {overview.scope_details && overview.scope_details.total_direct_reports > 0 && (
+                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                  <Users className="h-5 w-5 text-orange-600 mx-auto mb-1" />
+                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.total_direct_reports}</div>
+                  <div className="text-xs text-gray-500">Direct Reports</div>
+                </div>
+              )}
+
+              {/* Teams Leading */}
+              {overview.scope_details && overview.scope_details.total_teams_leading > 0 && (
+                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                  <Users className="h-5 w-5 text-indigo-600 mx-auto mb-1" />
+                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.total_teams_leading}</div>
+                  <div className="text-xs text-gray-500">Teams Leading</div>
+                </div>
+              )}
+
+              {/* Department Members */}
+              {overview.scope_details?.department_info && (
+                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                  <Users className="h-5 w-5 text-teal-600 mx-auto mb-1" />
+                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.department_info.total_members}</div>
+                  <div className="text-xs text-gray-500">Dept. Members</div>
+                </div>
+              )}
+
+              {/* Total Subordinates */}
+              {overview.scope_details && overview.scope_details.total_subordinates > 0 && (
+                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                  <Users className="h-5 w-5 text-red-600 mx-auto mb-1" />
+                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.total_subordinates}</div>
+                  <div className="text-xs text-gray-500">Total Subordinates</div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -506,49 +661,164 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Role-based Quick Actions */}
       <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-indigo-600" />
-            Quick Actions
+            {overview?.user_role === 'MEMBER' ? 'My Quick Actions' : 'Quick Actions'}
           </CardTitle>
-          <p className="text-sm text-muted-foreground">Common tasks and shortcuts</p>
+          <p className="text-sm text-muted-foreground">
+            {overview?.user_role === 'MEMBER' ? 'Common tasks and shortcuts for your work' : 'Common tasks and shortcuts'}
+          </p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button 
-              variant="outline" 
-              className="h-20 flex-col bg-white hover:bg-gray-50"
-              onClick={() => window.location.href = '/users'}
-            >
-              <Users className="h-6 w-6 mb-2 text-blue-600" />
-              <span className="text-sm">Manage Users</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex-col bg-white hover:bg-gray-50"
-              onClick={() => window.location.href = '/projects'}
-            >
-              <FolderOpen className="h-6 w-6 mb-2 text-green-600" />
-              <span className="text-sm">Projects</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex-col bg-white hover:bg-gray-50"
-              onClick={() => window.location.href = '/teams'}
-            >
-              <Users className="h-6 w-6 mb-2 text-purple-600" />
-              <span className="text-sm">Teams</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex-col bg-white hover:bg-gray-50"
-              onClick={() => window.location.href = '/tasks'}
-            >
-              <CheckCircle2 className="h-6 w-6 mb-2 text-orange-600" />
-              <span className="text-sm">Tasks</span>
-            </Button>
+            {overview?.user_role === 'MEMBER' ? (
+              // Member-specific actions
+              <>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/tasks'}
+                >
+                  <CheckCircle2 className="h-6 w-6 mb-2 text-blue-600" />
+                  <span className="text-sm">My Tasks</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/reminders'}
+                >
+                  <Bell className="h-6 w-6 mb-2 text-green-600" />
+                  <span className="text-sm">Reminders</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/reports'}
+                >
+                  <BarChart3 className="h-6 w-6 mb-2 text-purple-600" />
+                  <span className="text-sm">My Reports</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/projects'}
+                >
+                  <FolderOpen className="h-6 w-6 mb-2 text-orange-600" />
+                  <span className="text-sm">Projects</span>
+                </Button>
+              </>
+            ) : overview?.user_role === 'TEAM_LEAD' ? (
+              // Team Lead actions
+              <>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/teams'}
+                >
+                  <Users className="h-6 w-6 mb-2 text-blue-600" />
+                  <span className="text-sm">My Team</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/tasks'}
+                >
+                  <CheckCircle2 className="h-6 w-6 mb-2 text-green-600" />
+                  <span className="text-sm">Team Tasks</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/users'}
+                >
+                  <Users className="h-6 w-6 mb-2 text-purple-600" />
+                  <span className="text-sm">Team Members</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/reports'}
+                >
+                  <BarChart3 className="h-6 w-6 mb-2 text-orange-600" />
+                  <span className="text-sm">Team Reports</span>
+                </Button>
+              </>
+            ) : overview?.user_role === 'MANAGER' ? (
+              // Manager actions
+              <>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/users'}
+                >
+                  <Users className="h-6 w-6 mb-2 text-blue-600" />
+                  <span className="text-sm">Manage Users</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/teams'}
+                >
+                  <Users className="h-6 w-6 mb-2 text-green-600" />
+                  <span className="text-sm">Manage Teams</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/projects'}
+                >
+                  <FolderOpen className="h-6 w-6 mb-2 text-purple-600" />
+                  <span className="text-sm">Projects</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/reports'}
+                >
+                  <BarChart3 className="h-6 w-6 mb-2 text-orange-600" />
+                  <span className="text-sm">Reports</span>
+                </Button>
+              </>
+            ) : (
+              // Admin/CEO actions
+              <>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/users'}
+                >
+                  <Users className="h-6 w-6 mb-2 text-blue-600" />
+                  <span className="text-sm">Manage Users</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/projects'}
+                >
+                  <FolderOpen className="h-6 w-6 mb-2 text-green-600" />
+                  <span className="text-sm">Projects</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/teams'}
+                >
+                  <Users className="h-6 w-6 mb-2 text-purple-600" />
+                  <span className="text-sm">Teams</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col bg-white hover:bg-gray-50"
+                  onClick={() => window.location.href = '/tasks'}
+                >
+                  <CheckCircle2 className="h-6 w-6 mb-2 text-orange-600" />
+                  <span className="text-sm">Tasks</span>
+                </Button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
