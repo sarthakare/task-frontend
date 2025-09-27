@@ -25,6 +25,59 @@ import {
   MetricCard, 
   TrendIndicator 
 } from "@/components/analytics-charts";
+<<<<<<< HEAD
+=======
+import type { DashboardOverview } from "@/types";
+
+interface UserStats {
+  total_users: number;
+  active_users: number;
+  inactive_users: number;
+  users_by_department: Record<string, number>;
+  users_by_role: Record<string, number>;
+}
+
+interface ProjectStats {
+  total: number;
+  active: number;
+  completed: number;
+}
+
+interface TeamStats {
+  total_teams: number;
+  active_teams: number;
+  inactive_teams: number;
+  department_counts: Record<string, number>;
+}
+
+interface RecentActivity {
+  id: string | number;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  action: string;
+  description: string;
+  created_at: string;
+}
+
+interface AnalyticsData {
+  overview: DashboardOverview | null;
+  userStats: UserStats | null;
+  projectStats: ProjectStats | null;
+  teamStats: TeamStats | null;
+  recentActivities: RecentActivity[];
+  loading: {
+    overview: boolean;
+    userStats: boolean;
+    projectStats: boolean;
+    teamStats: boolean;
+    activities: boolean;
+  };
+  error: string | null;
+}
+>>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
 
 export default function ReportsPage() {
   const [data, setData] = useState<AnalyticsData>({

@@ -235,7 +235,11 @@ export class AnalyticsService {
     }));
   }
 
+<<<<<<< HEAD
   private processUserActivityData(tasks: Array<{ created_at?: string; updated_at?: string | null; assigned_to?: number }>): Array<{
+=======
+  private processUserActivityData(tasks: Array<{ created_at?: string; updated_at?: string; assigned_to?: number }>): Array<{
+>>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
     date: string;
     tasks_completed: number;
     tasks_created: number;
