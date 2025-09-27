@@ -9,7 +9,6 @@ import {
   TrendingUp, 
   Calendar, 
   Download,
-  Filter,
   RefreshCw,
   Loader2,
   FileText,
@@ -18,15 +17,11 @@ import {
   Clock,
   AlertCircle
 } from "lucide-react";
-import { api } from "@/lib/api-service";
 import { analyticsService, AnalyticsData } from "@/lib/analytics-service";
 import { 
   AnalyticsOverview, 
-  MetricCard, 
-  TrendIndicator 
+  MetricCard
 } from "@/components/analytics-charts";
-<<<<<<< HEAD
-=======
 import type { DashboardOverview } from "@/types";
 
 interface UserStats {
@@ -62,22 +57,6 @@ interface RecentActivity {
   created_at: string;
 }
 
-interface AnalyticsData {
-  overview: DashboardOverview | null;
-  userStats: UserStats | null;
-  projectStats: ProjectStats | null;
-  teamStats: TeamStats | null;
-  recentActivities: RecentActivity[];
-  loading: {
-    overview: boolean;
-    userStats: boolean;
-    projectStats: boolean;
-    teamStats: boolean;
-    activities: boolean;
-  };
-  error: string | null;
-}
->>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
 
 export default function ReportsPage() {
   const [data, setData] = useState<AnalyticsData>({

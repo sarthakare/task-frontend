@@ -21,10 +21,7 @@ interface TaskStatusData {
   name: string;
   value: number;
   color: string;
-<<<<<<< HEAD
   [key: string]: string | number;
-=======
->>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
 }
 
 interface UserActivityData {
@@ -74,11 +71,7 @@ export function TaskStatusChart({ data, loading }: { data: TaskStatusData[]; loa
           cx="50%"
           cy="50%"
           labelLine={false}
-<<<<<<< HEAD
           label={({ name, percent }: { name?: string; percent?: number }) => `${name || 'Unknown'} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-=======
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
->>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
@@ -146,11 +139,7 @@ export function ProjectProgressChart({ data, loading }: { data: ProjectProgressD
         <XAxis type="number" domain={[0, 100]} />
         <YAxis dataKey="name" type="category" width={100} />
         <Tooltip 
-<<<<<<< HEAD
-          formatter={(value: number) => [`${value}%`, 'Progress']}
-=======
           formatter={(value: number, _name: string) => [`${value}%`, 'Progress']}
->>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
           labelFormatter={(label: string) => `Project: ${label}`}
         />
         <Bar dataKey="percentage" fill="#8884d8" />

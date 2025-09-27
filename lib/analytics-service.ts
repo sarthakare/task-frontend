@@ -219,7 +219,7 @@ export class AnalyticsService {
   }
 
   private processTaskStatusData(tasks: Array<{ status?: string }>): Array<{ name: string; value: number; color: string }> {
-    const statusCounts = tasks.reduce((acc, task) => {
+    const statusCounts = tasks.reduce((acc: Record<string, number>, task) => {
       const status = task.status || 'UNKNOWN';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
@@ -235,11 +235,7 @@ export class AnalyticsService {
     }));
   }
 
-<<<<<<< HEAD
-  private processUserActivityData(tasks: Array<{ created_at?: string; updated_at?: string | null; assigned_to?: number }>): Array<{
-=======
-  private processUserActivityData(tasks: Array<{ created_at?: string; updated_at?: string; assigned_to?: number }>): Array<{
->>>>>>> 414dbd2b19af1dee86f45d017990f2ed66f89a1f
+  private processUserActivityData(tasks: Array<{ created_at?: string; updated_at?: string | null; assigned_to?: number; status?: string }>): Array<{
     date: string;
     tasks_completed: number;
     tasks_created: number;
@@ -255,7 +251,9 @@ export class AnalyticsService {
       const dateStr = date.toISOString().split('T')[0];
       
       const dayTasks = tasks.filter(task => {
-        const taskDate = new Date(task.created_at || task.updated_at);
+        const dateValue = task.created_at || task.updated_at;
+        if (!dateValue) return false;
+        const taskDate = new Date(dateValue);
         return taskDate.toISOString().split('T')[0] === dateStr;
       });
 
