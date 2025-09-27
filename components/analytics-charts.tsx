@@ -12,12 +12,10 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   Area,
   AreaChart
 } from "recharts";
-import { TrendingUp, TrendingDown, Users, Calendar, Target } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface TaskStatusData {
   name: string;
@@ -54,7 +52,6 @@ interface AnalyticsChartsProps {
   loading?: boolean;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 export function TaskStatusChart({ data, loading }: { data: TaskStatusData[]; loading?: boolean }) {
   if (loading) {
@@ -141,7 +138,7 @@ export function ProjectProgressChart({ data, loading }: { data: ProjectProgressD
         <XAxis type="number" domain={[0, 100]} />
         <YAxis dataKey="name" type="category" width={100} />
         <Tooltip 
-          formatter={(value: number, name: string) => [`${value}%`, 'Progress']}
+          formatter={(value: number, _name: string) => [`${value}%`, 'Progress']}
           labelFormatter={(label: string) => `Project: ${label}`}
         />
         <Bar dataKey="percentage" fill="#8884d8" />
@@ -189,7 +186,7 @@ export function TrendIndicator({
   current: number; 
   previous: number; 
   label: string; 
-  icon?: any;
+  icon?: React.ComponentType<{ className?: string }>;
 }) {
   const change = current - previous;
   const changePercent = previous > 0 ? ((change / previous) * 100) : 0;
@@ -218,7 +215,7 @@ export function MetricCard({
   value: string | number;
   change?: number;
   changeLabel?: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   color?: string;
 }) {
   const colorClasses = {
