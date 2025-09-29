@@ -15,8 +15,7 @@ import {
   FileAudio,
   File,
   MoreVertical,
-  Calendar,
-  User
+  Calendar
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,14 +30,13 @@ import type { TaskAttachment } from "@/types";
 
 interface TaskAttachmentDisplayProps {
   attachments: TaskAttachment[];
-  taskId: number;
+  taskId?: number;
   canEdit?: boolean;
   onAttachmentDeleted?: () => void;
 }
 
 export function TaskAttachmentDisplay({ 
   attachments, 
-  taskId, 
   canEdit = false, 
   onAttachmentDeleted 
 }: TaskAttachmentDisplayProps) {

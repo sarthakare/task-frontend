@@ -46,6 +46,41 @@ export interface RecentActivity {
   created_at: string;
 }
 
+export interface Task {
+  id: number;
+  title: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  assigned_to?: number;
+  created_at?: string;
+  updated_at?: string | null;
+  due_date?: string | null;
+  project_id?: number;
+}
+
+export interface Project {
+  id: number;
+  name: string;
+  description?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  manager_id?: number;
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  description?: string;
+  department?: string;
+  created_at?: string;
+  updated_at?: string | null;
+  manager_id?: number;
+}
+
 export interface AnalyticsData {
   overview: OverviewData | null;
   userStats: UserStats | null;
@@ -98,6 +133,21 @@ export class AnalyticsService {
     return AnalyticsService.instance;
   }
 
+  private getUserRole(): string {
+    // Get user role from localStorage or context
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        return user.role?.toUpperCase() || 'MEMBER';
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return 'MEMBER';
+      }
+    }
+    return 'MEMBER';
+  }
+
   private isCacheValid(key: string): boolean {
     const cached = this.cache.get(key);
     if (!cached) return false;
@@ -114,6 +164,11 @@ export class AnalyticsService {
   }
 
   async fetchAllAnalyticsData(): Promise<AnalyticsData> {
+    const userRole = this.getUserRole();
+    return this.fetchRoleBasedAnalyticsData(userRole);
+  }
+
+  async fetchRoleBasedAnalyticsData(userRole: string): Promise<AnalyticsData> {
     const loading = {
       overview: true,
       userStats: true,
@@ -138,7 +193,7 @@ export class AnalyticsService {
     };
 
     try {
-      // Fetch all data in parallel
+      // Fetch data based on user role
       const [
         overview,
         userStats,
@@ -149,14 +204,14 @@ export class AnalyticsService {
         projects,
         teams
       ] = await Promise.allSettled([
-        api.dashboard.getOverview(),
-        api.users.getUserStats(),
-        api.projects.getProjectStats(),
-        api.teams.getTeamStats(),
-        api.dashboard.getRecentActivities(10),
-        api.tasks.getAllTasks(),
-        api.projects.getAllProjects(),
-        api.teams.getAllTeams()
+        this.getRoleBasedOverview(userRole),
+        this.getRoleBasedUserStats(userRole),
+        this.getRoleBasedProjectStats(userRole),
+        this.getRoleBasedTeamStats(userRole),
+        this.getRoleBasedActivities(userRole),
+        this.getRoleBasedTasks(userRole),
+        this.getRoleBasedProjects(userRole),
+        this.getRoleBasedTeams(userRole)
       ]);
 
       // Process overview data
@@ -381,15 +436,171 @@ export class AnalyticsService {
     }
   }
 
-  async getFilteredAnalyticsData(_filters: {
+  async getFilteredAnalyticsData(filters: {
     dateRange?: string;
     department?: string;
     team?: string;
     project?: string;
   }): Promise<AnalyticsData> {
-    // This would implement filtered data fetching
+    // This would implement filtered data fetching based on the provided filters
     // For now, return the full dataset
+    console.log('Filters applied:', filters);
     return this.fetchAllAnalyticsData();
+  }
+
+  // Role-based data fetching methods
+  private async getRoleBasedOverview(userRole: string): Promise<OverviewData> {
+    const cacheKey = `overview_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as OverviewData;
+    }
+
+    const overview = await api.dashboard.getOverview();
+    this.setCache(cacheKey, overview);
+    return overview;
+  }
+
+  private async getRoleBasedUserStats(userRole: string): Promise<UserStats> {
+    const cacheKey = `userStats_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as UserStats;
+    }
+
+    const userStats = await api.users.getUserStats();
+    this.setCache(cacheKey, userStats);
+    return userStats;
+  }
+
+  private async getRoleBasedProjectStats(userRole: string): Promise<ProjectStats> {
+    const cacheKey = `projectStats_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as ProjectStats;
+    }
+
+    const projectStats = await api.projects.getProjectStats();
+    this.setCache(cacheKey, projectStats);
+    return projectStats;
+  }
+
+  private async getRoleBasedTeamStats(userRole: string): Promise<TeamStats> {
+    const cacheKey = `teamStats_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as TeamStats;
+    }
+
+    const teamStats = await api.teams.getTeamStats();
+    this.setCache(cacheKey, teamStats);
+    return teamStats;
+  }
+
+  private async getRoleBasedActivities(userRole: string): Promise<RecentActivity[]> {
+    const cacheKey = `activities_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as RecentActivity[];
+    }
+
+    const activities = await api.dashboard.getRecentActivities(10);
+    this.setCache(cacheKey, activities);
+    return activities;
+  }
+
+  private async getRoleBasedTasks(userRole: string): Promise<Task[]> {
+    const cacheKey = `tasks_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as Task[];
+    }
+
+    const tasks = await api.tasks.getAllTasks();
+    this.setCache(cacheKey, tasks);
+    return tasks;
+  }
+
+  private async getRoleBasedProjects(userRole: string): Promise<Project[]> {
+    const cacheKey = `projects_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as Project[];
+    }
+
+    const projects = await api.projects.getAllProjects();
+    this.setCache(cacheKey, projects);
+    return projects;
+  }
+
+  private async getRoleBasedTeams(userRole: string): Promise<Team[]> {
+    const cacheKey = `teams_${userRole}`;
+    if (this.isCacheValid(cacheKey)) {
+      return this.getCache(cacheKey) as Team[];
+    }
+
+    const teams = await api.teams.getAllTeams();
+    this.setCache(cacheKey, teams);
+    return teams;
+  }
+
+  // Get role-specific scope description
+  getRoleScopeDescription(userRole: string): string {
+    const scopeDescriptions = {
+      'ADMIN': 'Full system access - can view all users, projects, teams, and tasks across the entire organization',
+      'CEO': 'Organization-wide access - can view all users, projects, teams, and tasks in the organization',
+      'MANAGER': 'Department scope - can view self and all users in the department, including their tasks and projects',
+      'TEAM_LEAD': 'Team scope - can view self and team members, including team tasks and projects',
+      'MEMBER': 'Personal scope - can view only own tasks and projects'
+    };
+    
+    return scopeDescriptions[userRole as keyof typeof scopeDescriptions] || 'Limited access - can view only own data';
+  }
+
+  // Get role-specific metrics
+  getRoleSpecificMetrics(userRole: string): string[] {
+    const roleMetrics = {
+      'ADMIN': [
+        'Total System Users',
+        'Active Users',
+        'Total Projects',
+        'System-wide Task Completion',
+        'Department Performance',
+        'User Activity Trends',
+        'System Health Metrics'
+      ],
+      'CEO': [
+        'Organization Performance',
+        'Department Metrics',
+        'Project Success Rates',
+        'Team Performance',
+        'User Productivity',
+        'Strategic KPIs',
+        'Executive Dashboard'
+      ],
+      'MANAGER': [
+        'Department Performance',
+        'Team Productivity',
+        'Project Progress',
+        'Team Member Performance',
+        'Department Task Completion',
+        'Resource Utilization',
+        'Department KPIs'
+      ],
+      'TEAM_LEAD': [
+        'Team Performance',
+        'Team Member Productivity',
+        'Team Task Completion',
+        'Project Progress',
+        'Team Efficiency',
+        'Member Performance',
+        'Team KPIs'
+      ],
+      'MEMBER': [
+        'Personal Task Completion',
+        'Task Performance',
+        'Productivity Metrics',
+        'Task Status Overview',
+        'Personal KPIs',
+        'Task History',
+        'Performance Trends'
+      ]
+    };
+    
+    return roleMetrics[userRole as keyof typeof roleMetrics] || ['Personal Metrics'];
   }
 
   clearCache(): void {

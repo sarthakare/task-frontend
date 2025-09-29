@@ -22,6 +22,8 @@ import {
   AnalyticsOverview, 
   MetricCard
 } from "@/components/analytics-charts";
+import { RoleBasedReports } from "@/components/role-based-reports";
+import { useAuth } from "@/contexts/auth-context";
 import type { DashboardOverview } from "@/types";
 
 interface UserStats {
@@ -59,6 +61,7 @@ interface RecentActivity {
 
 
 export default function ReportsPage() {
+  const { user } = useAuth();
   const [data, setData] = useState<AnalyticsData>({
     overview: null,
     userStats: null,
@@ -89,6 +92,8 @@ export default function ReportsPage() {
     pdf: false,
     excel: false
   });
+
+  const userRole = user?.role?.toUpperCase() || 'MEMBER';
 
   const fetchAnalyticsData = async () => {
     try {
@@ -173,7 +178,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <PageHeader 
         title="Reports & Analytics" 
-        description="Comprehensive insights and performance metrics"
+        description={`Role-based insights and performance metrics for ${userRole.charAt(0) + userRole.slice(1).toLowerCase()}`}
       />
 
       {/* Error Display */}
@@ -250,6 +255,13 @@ export default function ReportsPage() {
           Refresh Data
         </Button>
       </div>
+
+      {/* Role-based Reports */}
+      <RoleBasedReports 
+        userRole={userRole} 
+        data={data} 
+        loading={data.loading.overview} 
+      />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

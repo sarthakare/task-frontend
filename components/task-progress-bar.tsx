@@ -10,11 +10,11 @@ import type { TaskLog } from "@/types";
 
 interface TaskProgressBarProps {
   taskId: number;
-  taskTitle: string;
+  taskTitle?: string;
   refreshTrigger?: number;
 }
 
-export function TaskProgressBar({ taskId, taskTitle, refreshTrigger }: TaskProgressBarProps) {
+export function TaskProgressBar({ taskId, refreshTrigger }: TaskProgressBarProps) {
   const [logs, setLogs] = useState<TaskLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [overallProgress, setOverallProgress] = useState(0);
@@ -135,7 +135,7 @@ export function TaskProgressBar({ taskId, taskTitle, refreshTrigger }: TaskProgr
           <div className="space-y-2">
             <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">Recent Progress</h4>
             <div className="space-y-1 max-h-20 overflow-y-auto">
-              {logs.slice(0, 3).map((log, index) => (
+              {logs.slice(0, 3).map((log) => (
                 <div key={log.id} className="flex items-center justify-between text-xs">
                   <span className="text-gray-600 truncate flex-1 mr-2" title={log.title}>
                     {log.title}

@@ -129,7 +129,7 @@ export function TaskAttachmentUpload({ taskId, onAttachmentUploaded }: TaskAttac
     setIsUploading(false);
   };
 
-  const formatFileSize = (bytes: number) => FileValidator.formatFileSize(bytes);
+  // const formatFileSize = (bytes: number) => FileValidator.formatFileSize(bytes);
 
   const isFileUploading = (file: File) => {
     const fileKey = `${file.name}-${file.size}`;
