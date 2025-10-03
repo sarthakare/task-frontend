@@ -83,7 +83,7 @@ export function canDeleteUsers(): boolean {
 export function canManageProjects(): boolean {
   const user = getUser();
   if (!user) return false;
-  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO";
+  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO" || user.role.toUpperCase() === "MANAGER";
 }
 
 export function canCreateProjects(): boolean {
@@ -102,7 +102,7 @@ export function canDeleteProjects(): boolean {
 export function canManageTeams(): boolean {
   const user = getUser();
   if (!user) return false;
-  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO";
+  return user.role.toUpperCase() === "ADMIN" || user.role.toUpperCase() === "CEO" || user.role.toUpperCase() === "MANAGER";
 }
 
 export function canCreateTeams(): boolean {
