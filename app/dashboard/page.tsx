@@ -22,12 +22,19 @@ import {
   AlertCircle,
   CircleAlert,
   Loader2,
+  User,
+  Building,
+  Shield,
 } from "lucide-react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import type { DashboardOverview, Activity as ActivityType, Task, Project } from "@/types";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function Dashboard() {
+  // Get current user from auth context
+  const { user } = useAuth();
+  
   // State for dashboard data
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [recentActivities, setRecentActivities] = useState<ActivityType[]>([]);
@@ -221,6 +228,59 @@ export default function Dashboard() {
         title={getRoleBasedTitle(overview?.user_role || '')} 
         description={getRoleBasedDescription(overview?.user_role || '', overview)}
       />
+
+      {/* User Info Section */}
+      {user && (
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* User Name */}
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <User className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Name</p>
+                  <p className="text-sm text-gray-600">{user.name}</p>
+                </div>
+              </div>
+
+              {/* Department */}
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Building className="h-4 w-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Department</p>
+                  <p className="text-sm text-gray-600">{user.department}</p>
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Shield className="h-4 w-4 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Role</p>
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-xs mt-1 ${
+                      user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :
+                      user.role === 'CEO' ? 'bg-purple-100 text-purple-800' :
+                      user.role === 'MANAGER' ? 'bg-blue-100 text-blue-800' :
+                      user.role === 'TEAM_LEAD' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {user.role.replace('_', ' ')}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
