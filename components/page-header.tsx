@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "./ui/button";
 import { useUser } from "./user-provider";
-import { LogOut } from "lucide-react";
+import { LogOut, Smartphone } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,7 +54,7 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
               </div>
               {currentUser?.mobile && (
                 <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                  <span>📱</span>
+                  <Smartphone className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   <span>{currentUser.mobile}</span>
                 </div>
               )}
