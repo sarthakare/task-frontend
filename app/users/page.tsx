@@ -379,7 +379,7 @@ export default function UsersPage() {
             {/* View Toggle Buttons */}
             <div className="flex bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg p-1">
               <button
-                onClick={() => setViewMode('card')}
+                  onClick={() => setViewMode('card')}
                 className={`h-9 px-4 rounded-lg flex items-center gap-2 transition-all duration-200 cursor-pointer ${viewMode === 'card'
                   ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
@@ -389,7 +389,7 @@ export default function UsersPage() {
                 <span className="text-sm font-medium">Card</span>
               </button>
               <button
-                onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode('list')}
                 className={`h-9 px-4 rounded-lg flex items-center gap-2 transition-all duration-200 cursor-pointer ${viewMode === 'list'
                   ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
@@ -398,8 +398,8 @@ export default function UsersPage() {
                 <List className="h-4 w-4" />
                 <span className="text-sm font-medium">List</span>
               </button>
+              </div>
             </div>
-          </div>
 
           {/* Content */}
           <div className="p-4">
@@ -505,76 +505,76 @@ export default function UsersPage() {
                     </div>
                   ) : (
                     /* List View Layout - Modern */
-                    <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start">
                       <div className="flex items-center gap-4">
                         <div className="relative">
                           <UserAvatar name={user.name} size="md" />
                           <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white dark:border-slate-800 ${user.is_active ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                        </div>
-                        <div>
+                      </div>
+                      <div>
                           <h3 className="font-semibold text-gray-900 dark:text-white">{user.name}</h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
-                          {user.mobile && (
+                        {user.mobile && (
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">📱 {user.mobile}</p>
-                          )}
+                        )}
                           <div className="flex gap-2 mt-2">
-                            {user.role.toUpperCase() !== 'CEO' && (
+                          {user.role.toUpperCase() !== 'CEO' && (
                               <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg shadow-sm ${
                                 user.role === 'team_lead' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' :
                                 user.role === 'manager' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
                                 user.role === 'member' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' :
                                 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
-                              }`}>
-                                {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
-                              </span>
-                            )}
+                            }`}>
+                              {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
+                            </span>
+                          )}
                             <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg shadow-sm ${
                               user.is_active ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' : 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
-                            }`}>
-                              {user.is_active ? 'Active' : 'Inactive'}
-                            </span>
-                            {user.role.toUpperCase() !== 'CEO' && (
+                          }`}>
+                            {user.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                          {user.role.toUpperCase() !== 'CEO' && (
                               <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white/80 dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-600 shadow-sm">
-                                {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
-                              </span>
-                            )}
-                          </div>
+                              {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                    </div>
+                    <div className="flex items-center gap-2">
                         {(currentUser?.role.toUpperCase() === 'ADMIN' || currentUser?.role.toUpperCase() === 'CEO') && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
                               <button className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                               </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              {canEdit && (
-                                <DropdownMenuItem 
-                                  onClick={() => setEditingUser(user)}
-                                  className="flex items-center gap-2 cursor-pointer"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                              )}
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            {canEdit && (
                               <DropdownMenuItem 
-                                onClick={() => handleToggleUserStatus(user.id, user.is_active)}
-                                disabled={isTogglingStatus === user.id}
+                                onClick={() => setEditingUser(user)}
                                 className="flex items-center gap-2 cursor-pointer"
                               >
-                                <Power className="h-4 w-4" />
-                                {isTogglingStatus === user.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : null}
-                                {user.is_active ? 'Deactivate' : 'Activate'}
+                                <Edit className="h-4 w-4" />
+                                Edit
                               </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
-                      </div>
+                            )}
+                            <DropdownMenuItem 
+                              onClick={() => handleToggleUserStatus(user.id, user.is_active)}
+                              disabled={isTogglingStatus === user.id}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Power className="h-4 w-4" />
+                              {isTogglingStatus === user.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : null}
+                              {user.is_active ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
+                  </div>
                   )}
                 </div>
               ))}

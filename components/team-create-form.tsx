@@ -205,7 +205,7 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
   };
 
   const defaultTrigger = (
-    <Button 
+    <button 
       onClick={() => {
         if (!canCreateTeams()) {
           toast.error('Access Denied', {
@@ -217,11 +217,13 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
         }
         setIsCreateDialogOpen(true);
       }}
-      className="cursor-pointer"
+      className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 cursor-pointer"
     >
-      <Plus className="h-4 w-4 mr-2" />
-      Create Team
-    </Button>
+      <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+        <Plus className="h-4 w-4" />
+      </div>
+      <span>Create Team</span>
+    </button>
   );
 
   // Filter users by department if a department is selected
