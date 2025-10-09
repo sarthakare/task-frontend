@@ -305,10 +305,15 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
   };
 
   const defaultTrigger = (
-    <Button onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
-      <Plus className="h-4 w-4 mr-2" />
-      Create Task
-    </Button>
+    <button 
+      onClick={() => setIsDialogOpen(true)} 
+      className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:ring-offset-2 cursor-pointer"
+    >
+      <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+        <Plus className="h-4 w-4" />
+      </div>
+      <span>Create Task</span>
+    </button>
   );
 
   return (
