@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   BarChart, 
   Bar, 
@@ -195,11 +194,11 @@ export function TrendIndicator({
   
   return (
     <div className="flex items-center space-x-2">
-      <Icon className={`h-4 w-4 ${isPositive ? 'text-green-600' : 'text-red-600'}`} />
-      <span className={`text-sm font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+      <Icon className={`h-4 w-4 ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`} />
+      <span className={`text-sm font-medium ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
         {isPositive ? '+' : ''}{changePercent.toFixed(1)}%
       </span>
-      <span className="text-sm text-gray-600">{label}</span>
+      <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
     </div>
   );
 }
@@ -220,36 +219,61 @@ export function MetricCard({
   color?: string;
 }) {
   const colorClasses = {
-    blue: "from-blue-50 to-blue-100 border-blue-200 text-blue-900",
-    green: "from-green-50 to-green-100 border-green-200 text-green-900",
-    purple: "from-purple-50 to-purple-100 border-purple-200 text-purple-900",
-    orange: "from-orange-50 to-orange-100 border-orange-200 text-orange-900",
-    red: "from-red-50 to-red-100 border-red-200 text-red-900"
+    blue: {
+      gradient: "from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5",
+      iconBg: "from-blue-500 to-indigo-600",
+      iconShadow: "group-hover:shadow-blue-500/50"
+    },
+    green: {
+      gradient: "from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5",
+      iconBg: "from-green-500 to-emerald-600",
+      iconShadow: "group-hover:shadow-green-500/50"
+    },
+    purple: {
+      gradient: "from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5",
+      iconBg: "from-purple-500 to-pink-600",
+      iconShadow: "group-hover:shadow-purple-500/50"
+    },
+    orange: {
+      gradient: "from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5",
+      iconBg: "from-orange-500 to-amber-600",
+      iconShadow: "group-hover:shadow-orange-500/50"
+    },
+    red: {
+      gradient: "from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5",
+      iconBg: "from-red-500 to-rose-600",
+      iconShadow: "group-hover:shadow-red-500/50"
+    }
   };
 
+  const colors = colorClasses[color as keyof typeof colorClasses];
+
   return (
-    <Card className={`bg-gradient-to-r ${colorClasses[color as keyof typeof colorClasses]}`}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="h-4 w-4" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+    <div className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${colors.gradient} backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer`}>
+      <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient.replace('/10', '/5').replace('/5', '/2')} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+      <div className="relative p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className={`p-2.5 bg-gradient-to-br ${colors.iconBg} rounded-xl shadow-lg ${colors.iconShadow} transition-all group-hover:scale-110`}>
+            <Icon className="h-5 w-5 text-white" />
+          </div>
+        </div>
+        <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">{title}</h3>
+        <div className="text-3xl font-bold text-gray-900 dark:text-white">{value}</div>
         {change !== undefined && changeLabel && (
-          <div className="flex items-center space-x-1 mt-1">
+          <div className="flex items-center gap-1 mt-2">
             {change >= 0 ? (
-              <TrendingUp className="h-3 w-3 text-green-600" />
+              <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
             ) : (
-              <TrendingDown className="h-3 w-3 text-red-600" />
+              <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />
             )}
-            <span className={`text-xs ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <span className={`text-xs font-medium ${change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {change >= 0 ? '+' : ''}{change}%
             </span>
-            <span className="text-xs text-gray-600">{changeLabel}</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400">{changeLabel}</span>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -261,46 +285,58 @@ export function AnalyticsOverview({
   loading = false 
 }: AnalyticsChartsProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Task Status Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Task Status Distribution</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TaskStatusChart data={taskStatusData} loading={loading} />
-        </CardContent>
-      </Card>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+        <div className="relative">
+          <div className="p-4 border-b border-white/20 dark:border-white/10">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Task Status Distribution</h3>
+          </div>
+          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
+            <TaskStatusChart data={taskStatusData} loading={loading} />
+          </div>
+        </div>
+      </div>
 
       {/* User Activity Trends */}
-      <Card>
-        <CardHeader>
-          <CardTitle>User Activity Trends</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <UserActivityChart data={userActivityData} loading={loading} />
-        </CardContent>
-      </Card>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+        <div className="relative">
+          <div className="p-4 border-b border-white/20 dark:border-white/10">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">User Activity Trends</h3>
+          </div>
+          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
+            <UserActivityChart data={userActivityData} loading={loading} />
+          </div>
+        </div>
+      </div>
 
       {/* Project Progress */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Project Progress Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ProjectProgressChart data={projectProgressData} loading={loading} />
-        </CardContent>
-      </Card>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+        <div className="relative">
+          <div className="p-4 border-b border-white/20 dark:border-white/10">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Project Progress Overview</h3>
+          </div>
+          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
+            <ProjectProgressChart data={projectProgressData} loading={loading} />
+          </div>
+        </div>
+      </div>
 
       {/* Team Performance */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Team Performance Metrics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TeamPerformanceChart data={teamPerformanceData} loading={loading} />
-        </CardContent>
-      </Card>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+        <div className="relative">
+          <div className="p-4 border-b border-white/20 dark:border-white/10">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Team Performance Metrics</h3>
+          </div>
+          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
+            <TeamPerformanceChart data={teamPerformanceData} loading={loading} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

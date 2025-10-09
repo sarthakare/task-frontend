@@ -1,7 +1,5 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/user-avatar";
 import { TaskEditForm } from "@/components/task-edit-form";
 import { TaskStatusUpdate } from "@/components/task-status-update";
 import { TaskDetailsModal } from "@/components/task-details-modal";
@@ -55,51 +53,23 @@ export function TaskCard({
 
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
-      case "NEW": return "bg-blue-50 text-blue-700 border-blue-200";
-      case "IN_PROGRESS": return "bg-amber-50 text-amber-700 border-amber-200";
-      case "PENDING": return "bg-orange-50 text-orange-700 border-orange-200";
-      case "FINISHED": return "bg-emerald-50 text-emerald-700 border-emerald-200";
-      case "STOPPED": return "bg-gray-50 text-gray-700 border-gray-200";
-      case "CANCELLED": return "bg-red-50 text-red-700 border-red-200";
-      default: return "bg-gray-50 text-gray-700 border-gray-200";
-    }
-  };
-
-  const getStatusBorderColor = (status: TaskStatus) => {
-    switch (status) {
-      case "NEW": return "border-l-blue-500 bg-blue-50 hover:bg-blue-50/50";
-      case "IN_PROGRESS": return "border-l-amber-500 bg-amber-50 hover:bg-amber-50/50";
-      case "PENDING": return "border-l-orange-500 bg-orange-50 hover:bg-orange-50/50";
-      case "FINISHED": return "border-l-emerald-500 bg-emerald-50 hover:bg-emerald-50/50";
-      case "STOPPED": return "border-l-gray-500 bg-gray-50 hover:bg-gray-50/50";
-      case "CANCELLED": return "border-l-red-500 bg-red-50 hover:bg-red-50/50";
-      default: return "border-l-gray-500 bg-gray-50 hover:bg-gray-50/50";
-    }
-  };
-
-  const getOverdueColor = () => {
-    return "border-l-red-500 bg-red-50/30 ring-2 ring-red-200/50";
-  };
-
-  const getOverdueBadgeColor = (status: TaskStatus) => {
-    switch (status) {
-      case "NEW": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "IN_PROGRESS": return "bg-amber-100 text-amber-800 border-amber-200";
-      case "PENDING": return "bg-orange-100 text-orange-800 border-orange-200";
-      case "FINISHED": return "bg-emerald-100 text-emerald-800 border-emerald-200";
-      case "STOPPED": return "bg-gray-100 text-gray-800 border-gray-200";
-      case "CANCELLED": return "bg-red-100 text-red-800 border-red-200";
-      default: return "bg-red-100 text-red-800 border-red-200";
+      case "NEW": return "bg-gradient-to-r from-blue-500 to-indigo-500 text-white";
+      case "IN_PROGRESS": return "bg-gradient-to-r from-amber-500 to-orange-500 text-white";
+      case "PENDING": return "bg-gradient-to-r from-orange-500 to-red-500 text-white";
+      case "FINISHED": return "bg-gradient-to-r from-emerald-500 to-green-500 text-white";
+      case "STOPPED": return "bg-gradient-to-r from-gray-500 to-slate-500 text-white";
+      case "CANCELLED": return "bg-gradient-to-r from-red-500 to-rose-500 text-white";
+      default: return "bg-gradient-to-r from-gray-500 to-gray-600 text-white";
     }
   };
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
-      case "LOW": return "bg-green-50 text-green-700 border-green-200";
-      case "MEDIUM": return "bg-yellow-50 text-yellow-700 border-yellow-200";
-      case "HIGH": return "bg-orange-50 text-orange-700 border-orange-200";
-      case "CRITICAL": return "bg-red-50 text-red-700 border-red-200";
-      default: return "bg-gray-50 text-gray-700 border-gray-200";
+      case "LOW": return "bg-gradient-to-r from-green-500 to-emerald-500 text-white";
+      case "MEDIUM": return "bg-gradient-to-r from-yellow-500 to-amber-500 text-white";
+      case "HIGH": return "bg-gradient-to-r from-orange-500 to-red-500 text-white";
+      case "CRITICAL": return "bg-gradient-to-r from-red-500 to-rose-600 text-white";
+      default: return "bg-gradient-to-r from-gray-500 to-gray-600 text-white";
     }
   };
 
@@ -132,12 +102,11 @@ export function TaskCard({
   const isTaskOverdue = isOverdue(task.due_date, task.status);
 
   return (
-    <Card className={`group transition-all duration-500 ease-in-out hover:shadow-md border-l-4 ${
-      isTaskOverdue 
-        ? getOverdueColor()
-        : `${getStatusBorderColor(task.status)} hover:shadow-lg`
-    }`}>
-      <CardContent className={`transition-all duration-500 ease-in-out ${viewMode === 'list' ? 'p-4' : 'p-6'}`}>
+    <div className="group relative overflow-hidden rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+      {isTaskOverdue && (
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent"></div>
+      )}
+      <div className={`relative transition-all duration-500 ease-in-out ${viewMode === 'list' ? 'p-4' : 'p-5'}`}>
         {viewMode === 'list' ? (
           /* List View Layout */
           <div className="space-y-3 transition-all duration-500 ease-in-out">
@@ -145,96 +114,116 @@ export function TaskCard({
              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  {getStatusIcon(task.status)}
-                  <h3 className="font-semibold text-gray-900 line-clamp-1">{task.title}</h3>
+                  <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg">
+                    {getStatusIcon(task.status)}
+                  </div>
+                  <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{task.title}</h3>
                   {task.attachments && task.attachments.length > 0 && (
-                    <div className="flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
+                    <div className="flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-2.5 py-1 rounded-lg shadow-sm">
                       <Paperclip className="h-3 w-3" />
                       <span>{task.attachments.length}</span>
                     </div>
                   )}
                   {isTaskOverdue && (
-                    <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                    <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 animate-pulse" />
                   )}
                 </div>
                 {task.description && (
-                  <div className="text-sm text-gray-600 line-clamp-2 ml-6">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 ml-8">
                     {task.description}
                   </div>
                 )}
               </div>
 
                <div className="flex flex-wrap items-center gap-2 sm:ml-4">
-                <Badge className={`${getStatusColor(task.status)} border text-xs font-medium`}>
+                <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${getStatusColor(task.status)}`}>
                   {task.status.replace('_', ' ')}
-                </Badge>
-                <Badge className={`${getPriorityColor(task.priority)} border text-xs font-medium`}>
-                  <Flag className="h-3 w-3 mr-1" />
+                </span>
+                <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${getPriorityColor(task.priority)} flex items-center gap-1`}>
+                  <Flag className="h-3 w-3" />
                   {task.priority}
-                </Badge>
+                </span>
                 {isTaskOverdue && (
-                  <Badge className={`${getOverdueBadgeColor(task.status)} border text-xs font-medium`}>
+                  <span className="px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm bg-gradient-to-r from-red-500 to-rose-500 text-white animate-pulse">
                     Overdue
-                  </Badge>
+                  </span>
                 )}
               </div>
             </div>
 
             {/* Project and Team Row */}
-             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+             <div className="flex flex-wrap items-center gap-3 text-sm">
               {task.project?.name && (
                 <div className="flex items-center gap-2">
-                  <Briefcase className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Project:</span> {task.project.name}
+                  <div className="p-1.5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 rounded-lg">
+                    <Briefcase className="h-4 w-4 text-purple-600 dark:text-purple-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    <span className="font-semibold text-gray-900 dark:text-white">{task.project.name}</span>
                   </span>
                 </div>
               )}
               {task.team?.name && (
                 <div className="flex items-center gap-2">
-                  <Users className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Team:</span> {task.team.name}
+                  <div className="p-1.5 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-lg">
+                    <Users className="h-4 w-4 text-green-600 dark:text-green-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    <span className="font-semibold text-gray-900 dark:text-white">{task.team.name}</span>
                   </span>
                 </div>
               )}
             </div>
 
             {/* People Row */}
-             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+             <div className="flex flex-wrap items-center gap-3 text-sm">
               <div className="flex items-center gap-2">
-                <User className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-600">
-                  <span className="font-medium">Assignee:</span> {task.assignee?.name || 'Unassigned'}
-                </span>
+                <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg">
+                  <User className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+                </div>
+                <span className="text-gray-600 dark:text-gray-400">Assignee:</span>
+                <div className="flex items-center gap-2">
+                  <UserAvatar name={task.assignee?.name || 'Unassigned'} size="sm" />
+                  <span className="font-semibold text-gray-900 dark:text-white">{task.assignee?.name || 'Unassigned'}</span>
+                </div>
               </div>
               <div className="flex items-center gap-2">
-                <User className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-600">
-                  <span className="font-medium">Creator:</span> {task.creator?.name || 'Unknown'}
-                </span>
+                <div className="p-1.5 bg-gradient-to-br from-amber-500/20 to-orange-500/20 dark:from-amber-500/10 dark:to-orange-500/10 rounded-lg">
+                  <User className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                </div>
+                <span className="text-gray-600 dark:text-gray-400">Creator:</span>
+                <div className="flex items-center gap-2">
+                  <UserAvatar name={task.creator?.name || 'Unknown'} size="sm" />
+                  <span className="font-semibold text-gray-900 dark:text-white">{task.creator?.name || 'Unknown'}</span>
+                </div>
               </div>
             </div>
 
             {/* Dates Row */}
-             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+             <div className="flex flex-wrap items-center gap-3 text-sm">
               <div className="flex items-center gap-2">
-                <Calendar className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-600">
-                  <span className="font-medium">Start:</span> {formatDate(task.start_date)}
+                <div className="p-1.5 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 dark:from-teal-500/10 dark:to-cyan-500/10 rounded-lg">
+                  <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-500" />
+                </div>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Start: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(task.start_date)}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-600">
-                  <span className="font-medium">Due:</span> {formatDate(task.due_date)}
+                <div className="p-1.5 bg-gradient-to-br from-rose-500/20 to-red-500/20 dark:from-rose-500/10 dark:to-red-500/10 rounded-lg">
+                  <Calendar className="h-4 w-4 text-rose-600 dark:text-rose-500" />
+                </div>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Due: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(task.due_date)}</span>
                 </span>
               </div>
               {task.follow_up_date && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Follow-up:</span> {formatDate(task.follow_up_date)}
+                  <div className="p-1.5 bg-gradient-to-br from-violet-500/20 to-purple-500/20 dark:from-violet-500/10 dark:to-purple-500/10 rounded-lg">
+                    <Calendar className="h-4 w-4 text-violet-600 dark:text-violet-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Follow-up: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(task.follow_up_date)}</span>
                   </span>
                 </div>
               )}
@@ -245,29 +234,24 @@ export function TaskCard({
           /* Card View Layout */
            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4 transition-all duration-500 ease-in-out">
             <div className="flex-1 min-w-0">
-               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                <div className="flex items-center gap-2">
+               <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg">
                   {getStatusIcon(task.status)}
-                  <h3 className="font-semibold text-gray-900 line-clamp-1">{task.title}</h3>
-                  {task.attachments && task.attachments.length > 0 && (
-                    <div className="flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
-                      <Paperclip className="h-3 w-3" />
-                      <span>{task.attachments.length}</span>
-                    </div>
-                  )}
-                  {isTaskOverdue && (
-                    <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
-                  )}
                 </div>
+                <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">{task.title}</h3>
+                {task.attachments && task.attachments.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-2.5 py-1 rounded-lg shadow-sm">
+                    <Paperclip className="h-3 w-3" />
+                    <span>{task.attachments.length}</span>
+                  </div>
+                )}
                 {isTaskOverdue && (
-                   <Badge className={`${getOverdueBadgeColor(task.status)} border text-xs font-medium self-start`}>
-                    Overdue
-                  </Badge>
+                  <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0 animate-pulse" />
                 )}
               </div>
               
               {task.description && (
-                <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mb-3">
                   {task.description}
                 </p>
               )}
@@ -275,13 +259,18 @@ export function TaskCard({
 
             {/* Status and Priority Badges */}
              <div className="flex flex-row sm:flex-col gap-2 sm:ml-4">
-              <Badge className={`${getStatusColor(task.status)} border text-xs font-medium`}>
+              <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${getStatusColor(task.status)}`}>
                 {task.status.replace('_', ' ')}
-              </Badge>
-              <Badge className={`${getPriorityColor(task.priority)} border text-xs font-medium`}>
-                <Flag className="h-3 w-3 mr-1" />
+              </span>
+              <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${getPriorityColor(task.priority)} flex items-center gap-1`}>
+                <Flag className="h-3 w-3" />
                 {task.priority}
-              </Badge>
+              </span>
+              {isTaskOverdue && (
+                <span className="px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm bg-gradient-to-r from-red-500 to-rose-500 text-white animate-pulse">
+                  Overdue
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -291,60 +280,78 @@ export function TaskCard({
             {/* Key Information Grid */}
             <div className="space-y-3 mb-4">
               {/* First Row: Project and Team */}
-               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+               <div className="flex flex-wrap items-center gap-3 text-sm">
                 {task.project?.name && (
                   <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-600">
-                      <span className="font-medium">Project:</span> {task.project.name}
+                    <div className="p-1.5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 rounded-lg">
+                      <Briefcase className="h-4 w-4 text-purple-600 dark:text-purple-500" />
+                    </div>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      <span className="font-semibold text-gray-900 dark:text-white">{task.project.name}</span>
                     </span>
                   </div>
                 )}
                 {task.team?.name && (
                   <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-600">
-                      <span className="font-medium">Team:</span> {task.team.name}
+                    <div className="p-1.5 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-lg">
+                      <Users className="h-4 w-4 text-green-600 dark:text-green-500" />
+                    </div>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      <span className="font-semibold text-gray-900 dark:text-white">{task.team.name}</span>
                     </span>
                   </div>
                 )}
               </div>
 
               {/* Second Row: Assignee and Creator */}
-               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Assignee:</span> {task.assignee?.name || 'Unassigned'}
-                  </span>
+                  <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg">
+                    <User className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">Assignee:</span>
+                  <div className="flex items-center gap-2">
+                    <UserAvatar name={task.assignee?.name || 'Unassigned'} size="sm" />
+                    <span className="font-semibold text-gray-900 dark:text-white">{task.assignee?.name || 'Unassigned'}</span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Creator:</span> {task.creator?.name || 'Unknown'}
-                  </span>
+                  <div className="p-1.5 bg-gradient-to-br from-amber-500/20 to-orange-500/20 dark:from-amber-500/10 dark:to-orange-500/10 rounded-lg">
+                    <User className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">Creator:</span>
+                  <div className="flex items-center gap-2">
+                    <UserAvatar name={task.creator?.name || 'Unknown'} size="sm" />
+                    <span className="font-semibold text-gray-900 dark:text-white">{task.creator?.name || 'Unknown'}</span>
+                  </div>
                 </div>
               </div>
 
               {/* Third Row: Dates */}
-               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Start:</span> {formatDate(task.start_date)}
+                  <div className="p-1.5 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 dark:from-teal-500/10 dark:to-cyan-500/10 rounded-lg">
+                    <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Start: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(task.start_date)}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-600">
-                    <span className="font-medium">Due:</span> {formatDate(task.due_date)}
+                  <div className="p-1.5 bg-gradient-to-br from-rose-500/20 to-red-500/20 dark:from-rose-500/10 dark:to-red-500/10 rounded-lg">
+                    <Calendar className="h-4 w-4 text-rose-600 dark:text-rose-500" />
+                  </div>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Due: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(task.due_date)}</span>
                   </span>
                 </div>
                 {task.follow_up_date && (
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-gray-600">
-                      <span className="font-medium">Follow-up:</span> {formatDate(task.follow_up_date)}
+                    <div className="p-1.5 bg-gradient-to-br from-violet-500/20 to-purple-500/20 dark:from-violet-500/10 dark:to-purple-500/10 rounded-lg">
+                      <Calendar className="h-4 w-4 text-violet-600 dark:text-violet-500" />
+                    </div>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Follow-up: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(task.follow_up_date)}</span>
                     </span>
                   </div>
                 )}
@@ -352,7 +359,7 @@ export function TaskCard({
             </div>
 
             {/* Action Buttons */}
-             <div className="pt-4 border-t border-gray-500">
+             <div className="pt-4 border-t border-gray-200 dark:border-slate-700">
                {/* Primary Actions Row */}
                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                 <TaskDetailsModal task={task} />
@@ -362,10 +369,10 @@ export function TaskCard({
                     task={task} 
                     onTaskUpdated={onTaskUpdated}
                     trigger={
-                       <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
-                         <Edit className="h-4 w-4 mr-1" />
+                       <button className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                         <Edit className="h-4 w-4" />
                          <span className="hidden sm:inline">Edit</span>
-                      </Button>
+                      </button>
                     }
                   />
                 )}
@@ -375,10 +382,10 @@ export function TaskCard({
                     task={task} 
                     onStatusUpdated={onTaskUpdated}
                     trigger={
-                       <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
-                         <RefreshCw className="h-4 w-4 mr-1" />
+                       <button className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                         <RefreshCw className="h-4 w-4" />
                          <span className="hidden sm:inline">Update Status</span>
-                      </Button>
+                      </button>
                     }
                   />
                 )}
@@ -391,31 +398,29 @@ export function TaskCard({
                   taskTitle={task.title}
                   onLogCreated={onLogCreated}
                   trigger={
-                     <Button variant="outline" size="sm" className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0">
-                      <Plus className="h-4 w-4 mr-1" />
+                     <button className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                      <Plus className="h-4 w-4" />
                        <span className="hidden sm:inline">Add Log</span>
-                    </Button>
+                    </button>
                   }
                 />
                 
-                <Button 
-                  variant="outline" 
-                  size="sm"
+                <button 
                   onClick={() => onToggleLogs(task.id)}
-                   className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0"
+                   className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium"
                 >
                   {shownLogs.has(task.id) ? (
                     <>
-                      <EyeOff className="h-4 w-4 mr-1" />
+                      <EyeOff className="h-4 w-4" />
                        <span className="hidden sm:inline">Hide Logs</span>
                     </>
                   ) : (
                     <>
-                      <Eye className="h-4 w-4 mr-1" />
+                      <Eye className="h-4 w-4" />
                        <span className="hidden sm:inline">Show Logs</span>
                     </>
                   )}
-                </Button>
+                </button>
               </div>
             </div>
           </>
@@ -423,7 +428,7 @@ export function TaskCard({
 
          {/* List View Action Buttons */}
          {viewMode === 'list' && (
-           <div className="mt-3 pt-3 border-t border-gray-500">
+           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700">
              {/* Primary Actions Row */}
              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                <TaskDetailsModal task={task} />
@@ -433,10 +438,10 @@ export function TaskCard({
                    task={task} 
                    onTaskUpdated={onTaskUpdated}
                    trigger={
-                     <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
-                       <Edit className="h-4 w-4 mr-1" />
+                     <button className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                       <Edit className="h-4 w-4" />
                        Edit
-                     </Button>
+                     </button>
                    }
                  />
                )}
@@ -446,10 +451,10 @@ export function TaskCard({
                    task={task} 
                    onStatusUpdated={onTaskUpdated}
                    trigger={
-                     <Button variant="outline" size="sm" className="h-8 cursor-pointer flex-shrink-0">
-                       <RefreshCw className="h-4 w-4 mr-1" />
+                     <button className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                       <RefreshCw className="h-4 w-4" />
                        Update Status
-                     </Button>
+                     </button>
                    }
                  />
                )}
@@ -462,38 +467,36 @@ export function TaskCard({
                  taskTitle={task.title}
                  onLogCreated={onLogCreated}
                  trigger={
-                   <Button variant="outline" size="sm" className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0">
-                     <Plus className="h-4 w-4 mr-1" />
+                   <button className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                     <Plus className="h-4 w-4" />
                      Add Log
-                   </Button>
+                   </button>
                  }
                />
                
-               <Button 
-                 variant="outline" 
-                 size="sm"
+               <button 
                  onClick={() => onToggleLogs(task.id)}
-                 className="h-8 border-gray-300 hover:bg-gray-50 cursor-pointer flex-shrink-0"
+                 className="h-8 px-3 flex items-center gap-1 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer flex-shrink-0 text-gray-700 dark:text-gray-200 text-sm font-medium"
                >
                  {shownLogs.has(task.id) ? (
                    <>
-                     <EyeOff className="h-4 w-4 mr-1" />
+                     <EyeOff className="h-4 w-4" />
                      Hide Logs
                    </>
                  ) : (
                    <>
-                     <Eye className="h-4 w-4 mr-1" />
+                     <Eye className="h-4 w-4" />
                      Show Logs
                    </>
                  )}
-               </Button>
+               </button>
              </div>
            </div>
          )}
 
         {/* Task Progress Bar */}
         {shownLogs.has(task.id) && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
             <TaskProgressBar
               taskId={task.id}
               taskTitle={task.title}
@@ -504,7 +507,7 @@ export function TaskCard({
 
         {/* Task Logs Display */}
         {shownLogs.has(task.id) && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
             <div className="overflow-x-auto">
               <TaskLogDisplay
                 taskId={task.id}
@@ -514,7 +517,7 @@ export function TaskCard({
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

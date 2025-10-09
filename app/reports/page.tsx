@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
+import { UserAvatar } from "@/components/user-avatar";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -183,77 +182,93 @@ export default function ReportsPage() {
 
       {/* Error Display */}
       {data.error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2 text-red-800">
-              <AlertCircle className="h-4 w-4" />
-              <span className="text-sm font-medium">Error loading analytics data</span>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-red-200 dark:border-red-800 shadow-xl">
+          <div className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg">
+                <AlertCircle className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-red-900 dark:text-red-300">Error loading analytics data</p>
+                <p className="text-sm text-red-700 dark:text-red-400 mt-1">{data.error}</p>
+              </div>
             </div>
-            <p className="text-sm text-red-600 mt-1">{data.error}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="flex gap-2">
-          <Button 
-            onClick={() => handleExportReport('pdf')}
-            disabled={exportLoading.pdf || exportLoading.excel}
-          >
-            {exportLoading.pdf ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4 mr-2" />
-            )}
-            Export PDF
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={() => handleExportReport('excel')}
-            disabled={exportLoading.pdf || exportLoading.excel}
-          >
-            {exportLoading.excel ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <FileText className="h-4 w-4 mr-2" />
-            )}
-            Export Excel
-          </Button>
+      {/* Quick Actions - Modern Glass */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 to-gray-500/10 dark:from-slate-500/5 dark:to-gray-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+        <div className="relative p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Export Buttons */}
+            <button 
+              onClick={() => handleExportReport('pdf')}
+              disabled={exportLoading.pdf || exportLoading.excel}
+              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+            >
+              <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                {exportLoading.pdf ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+              </div>
+              <span>Export PDF</span>
+            </button>
+            
+            <button 
+              onClick={() => handleExportReport('excel')}
+              disabled={exportLoading.pdf || exportLoading.excel}
+              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-green-500/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+            >
+              <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                {exportLoading.excel ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+              </div>
+              <span>Export Excel</span>
+            </button>
+            
+            {/* Filters */}
+            <select 
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white text-sm font-medium transition-all cursor-pointer"
+            >
+              <option value="last_7_days">Last 7 days</option>
+              <option value="last_30_days">Last 30 days</option>
+              <option value="last_90_days">Last 90 days</option>
+              <option value="last_year">Last year</option>
+            </select>
+            
+            <select 
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              className="px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white text-sm font-medium transition-all cursor-pointer"
+            >
+              <option value="all">All Departments</option>
+              <option value="engineering">Engineering</option>
+              <option value="marketing">Marketing</option>
+              <option value="sales">Sales</option>
+              <option value="hr">HR</option>
+              <option value="finance">Finance</option>
+              <option value="operations">Operations</option>
+              <option value="it">IT</option>
+            </select>
+            
+            <button 
+              onClick={fetchAnalyticsData}
+              className="px-5 py-2.5 rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium text-gray-900 dark:text-white cursor-pointer"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
-        
-        <div className="flex gap-2">
-          <select 
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-          >
-            <option value="last_7_days">Last 7 days</option>
-            <option value="last_30_days">Last 30 days</option>
-            <option value="last_90_days">Last 90 days</option>
-            <option value="last_year">Last year</option>
-          </select>
-          
-          <select 
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-          >
-            <option value="all">All Departments</option>
-            <option value="engineering">Engineering</option>
-            <option value="marketing">Marketing</option>
-            <option value="sales">Sales</option>
-            <option value="hr">HR</option>
-            <option value="finance">Finance</option>
-            <option value="operations">Operations</option>
-            <option value="it">IT</option>
-          </select>
-        </div>
-        
-        <Button variant="outline" onClick={fetchAnalyticsData}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh Data
-        </Button>
       </div>
 
       {/* Role-based Reports */}
@@ -344,60 +359,66 @@ export default function ReportsPage() {
         loading={data.loading.charts}
       />
 
-      {/* Recent Activities Report */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent System Activities</CardTitle>
-          <p className="text-sm text-gray-600">Latest task updates and system activities</p>
-        </CardHeader>
-        <CardContent>
-          {data.loading.activities ? (
-            <div className="flex items-center justify-center h-48">
-              <div className="flex items-center space-x-2">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading activities...</span>
-              </div>
+      {/* Recent Activities Report - Modern Glass */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-500/5 dark:via-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+        <div className="relative">
+          {/* Header */}
+          <div className="flex items-center gap-4 p-4 border-b border-white/20 dark:border-white/10">
+            <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+              <Calendar className="h-6 w-6 text-white" />
             </div>
-          ) : (
-            <div className="space-y-4">
-              {data.recentActivities.length > 0 ? (
-                data.recentActivities.map((activity, index) => (
-                  <div key={activity.id || index} className="p-4 border rounded-lg bg-white">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span className="text-blue-600 text-sm font-medium">
-                              {activity.user?.name?.charAt(0) || 'U'}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent System Activities</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Latest task updates and system activities</p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-4">
+            {data.loading.activities ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading activities...</span>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {data.recentActivities.length > 0 ? (
+                  data.recentActivities.map((activity, index) => (
+                    <div key={activity.id || index} className="p-4 rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
+                      <div className="flex items-start gap-3">
+                        <UserAvatar name={activity.user?.name || 'Unknown User'} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 dark:text-white">
                             {activity.user?.name || 'Unknown User'}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                             {activity.action || activity.description}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
                             {new Date(activity.created_at).toLocaleString()}
                           </p>
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="p-4 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-full w-fit mx-auto mb-4">
+                      <Calendar className="h-12 w-12 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No recent activities found</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Activities will appear here as tasks are updated</p>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Calendar className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                  <p>No recent activities found</p>
-                  <p className="text-sm">Activities will appear here as tasks are updated</p>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

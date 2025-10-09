@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/user-avatar";
 import { 
   Clock, 
   CheckCircle, 
@@ -43,44 +41,21 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "CRITICAL":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-gradient-to-r from-red-500 to-rose-500 text-white";
       case "HIGH":
-        return "bg-orange-100 text-orange-800 border-orange-200";
+        return "bg-gradient-to-r from-orange-500 to-amber-500 text-white";
       case "MEDIUM":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-gradient-to-r from-yellow-500 to-amber-500 text-white";
       case "LOW":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-gradient-to-r from-blue-500 to-indigo-500 text-white";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gradient-to-r from-gray-500 to-gray-600 text-white";
     }
-  };
-
-  const getStatusColor = (isCompleted: boolean, dueDate: string) => {
-    if (isCompleted) {
-      return "bg-green-50 border-green-200";
-    }
-    
-    // Get current IST date
-    const now = new Date();
-    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
-    const due = new Date(dueDate);
-    const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
-    
-    if (dueDateOnly < today) {
-      return "bg-red-50 border-red-200";
-    }
-    
-    if (dueDateOnly.getTime() === today.getTime()) {
-      return "bg-blue-50 border-blue-200";
-    }
-    
-    return "bg-white border-gray-200";
   };
 
   const getStatusLabel = (isCompleted: boolean, dueDate: string) => {
     if (isCompleted) {
-      return { label: "Completed", color: "bg-green-100 text-green-800" };
+      return { label: "Completed", color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white" };
     }
     
     // Get current IST date
@@ -91,21 +66,21 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
     const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
     
     if (dueDateOnly < today) {
-      return { label: "Overdue", color: "bg-red-100 text-red-800" };
+      return { label: "Overdue", color: "bg-gradient-to-r from-red-500 to-rose-500 text-white" };
     }
     
     if (dueDateOnly.getTime() === today.getTime()) {
-      return { label: "Today", color: "bg-blue-100 text-blue-800" };
+      return { label: "Today", color: "bg-gradient-to-r from-blue-500 to-indigo-500 text-white" };
     }
     
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     if (dueDateOnly.getTime() === tomorrow.getTime()) {
-      return { label: "Tomorrow", color: "bg-green-100 text-green-800" };
+      return { label: "Tomorrow", color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white" };
     }
     
-    return { label: "Upcoming", color: "bg-gray-100 text-gray-800" };
+    return { label: "Upcoming", color: "bg-gradient-to-r from-gray-500 to-gray-600 text-white" };
   };
 
   const handleMarkCompleted = async () => {
@@ -157,71 +132,95 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
   const statusInfo = getStatusLabel(reminder.is_completed, reminder.due_date);
 
   return (
-    <Card className={`${getStatusColor(reminder.is_completed, reminder.due_date)} transition-all hover:shadow-sm`}>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
+    <div className="group relative overflow-hidden rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+      {reminder.is_completed && (
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-50"></div>
+      )}
+      {!reminder.is_completed && new Date(reminder.due_date) < new Date() && (
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-50"></div>
+      )}
+      <div className="relative p-4">
+        <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="font-medium text-gray-900 flex-1 pr-4">
-                {reminder.title}
-              </h3>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {!reminder.is_completed && (
-                    <DropdownMenuItem onClick={handleMarkCompleted} disabled={loading}>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Mark Completed
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem onClick={handleDelete} disabled={loading} className="text-red-600">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            
-            <p className="text-sm text-gray-600 mb-3">
+            <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 pr-4">
+              {reminder.title}
+            </h3>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
               {reminder.description}
             </p>
-            
-            <div className="flex flex-wrap gap-2 mb-3">
-              <Badge variant="outline" className={statusInfo.color}>
-                {statusInfo.label}
-              </Badge>
-              <Badge variant="outline" className={getPriorityColor(reminder.priority)}>
-                {reminder.priority}
-              </Badge>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                Due: {formatDateTime(reminder.due_date)}
-              </span>
-              <span className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                {reminder.user.name}
-              </span>
-              {reminder.task && (
-                <span className="flex items-center gap-1">
-                  <FileText className="h-3 w-3" />
-                  Task: {reminder.task.title}
-                </span>
+          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer">
+                <MoreVertical className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {!reminder.is_completed && (
+                <DropdownMenuItem onClick={handleMarkCompleted} disabled={loading} className="cursor-pointer">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Mark Completed
+                </DropdownMenuItem>
               )}
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                Created: {formatDateTime(reminder.created_at)}
-              </span>
+              <DropdownMenuItem onClick={handleDelete} disabled={loading} className="text-red-600 cursor-pointer">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        <div className="flex flex-wrap gap-2 mb-4">
+          <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${statusInfo.color}`}>
+            {statusInfo.label}
+          </span>
+          <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${getPriorityColor(reminder.priority)}`}>
+            {reminder.priority}
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg">
+              <Clock className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            </div>
+            <span className="text-gray-600 dark:text-gray-400">
+              Due: <span className="font-semibold text-gray-900 dark:text-white">{formatDateTime(reminder.due_date)}</span>
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 rounded-lg">
+              <User className="h-4 w-4 text-purple-600 dark:text-purple-500" />
+            </div>
+            <div className="flex items-center gap-2">
+              <UserAvatar name={reminder.user.name} size="sm" />
+              <span className="font-semibold text-gray-900 dark:text-white">{reminder.user.name}</span>
             </div>
           </div>
+          
+          {reminder.task && (
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-lg">
+                <FileText className="h-4 w-4 text-green-600 dark:text-green-500" />
+              </div>
+              <span className="text-gray-600 dark:text-gray-400">
+                Task: <span className="font-semibold text-gray-900 dark:text-white">{reminder.task.title}</span>
+              </span>
+            </div>
+          )}
+          
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-gradient-to-br from-amber-500/20 to-orange-500/20 dark:from-amber-500/10 dark:to-orange-500/10 rounded-lg">
+              <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+            </div>
+            <span className="text-gray-600 dark:text-gray-400">
+              Created: <span className="font-semibold text-gray-900 dark:text-white">{formatDateTime(reminder.created_at)}</span>
+            </span>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
