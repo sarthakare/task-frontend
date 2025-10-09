@@ -212,19 +212,19 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PageHeader 
         title={getRoleBasedTitle(overview?.user_role || '')} 
         description={getRoleBasedDescription(overview?.user_role || '', overview)}
       />
 
       {/* Key Metrics - Interactive Glass Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric Card 1 */}
         <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-blue-500/50 transition-all group-hover:scale-110">
                 <Users className="h-6 w-6 text-white" />
               </div>
@@ -265,8 +265,8 @@ export default function Dashboard() {
         {/* Metric Card 2 */}
         <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
           <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/50 transition-all group-hover:scale-110">
                 <FolderOpen className="h-6 w-6 text-white" />
               </div>
@@ -301,8 +301,8 @@ export default function Dashboard() {
         {/* Metric Card 3 */}
         <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-purple-500/50 transition-all group-hover:scale-110">
                 <CheckCircle2 className="h-6 w-6 text-white" />
               </div>
@@ -337,8 +337,8 @@ export default function Dashboard() {
         {/* Metric Card 4 */}
         <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-red-500/10 dark:from-orange-500/5 dark:to-red-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-lg group-hover:shadow-orange-500/50 transition-all group-hover:scale-110">
                 <Clock className="h-6 w-6 text-white" />
               </div>
@@ -375,8 +375,8 @@ export default function Dashboard() {
       {overview?.scope_description && (
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 via-gray-500/10 to-zinc-500/10 dark:from-slate-500/5 dark:via-gray-500/5 dark:to-zinc-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse shadow-lg"></div>
@@ -395,7 +395,7 @@ export default function Dashboard() {
                 {overview.scope_description.scope_description}
               </span>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {/* People in Scope */}
               <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
                 <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
@@ -472,13 +472,13 @@ export default function Dashboard() {
       )}
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
         {/* Recent Projects - Modern Glass */}
         <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="relative p-4">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
@@ -496,7 +496,7 @@ export default function Dashboard() {
                 <span className="text-sm font-medium text-gray-900 dark:text-white">View All</span>
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {isProjectsLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="flex items-center gap-3">
@@ -556,8 +556,8 @@ export default function Dashboard() {
         {/* Recent Activities - Modern Glass */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-6">
-            <div className="mb-6">
+          <div className="relative p-4">
+            <div className="mb-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg">
                   <Activity className="h-5 w-5 text-white" />
@@ -610,13 +610,13 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         
         {/* Task Summary - Modern Glass */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-6">
-            <div className="mb-6">
+          <div className="relative p-4">
+            <div className="mb-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-lg">
                   <Target className="h-5 w-5 text-white" />
@@ -678,8 +678,8 @@ export default function Dashboard() {
         {/* Upcoming Deadlines - Modern Glass */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-6">
-            <div className="mb-6">
+          <div className="relative p-4">
+            <div className="mb-4">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg shadow-lg">
                   <Bell className="h-5 w-5 text-white" />
