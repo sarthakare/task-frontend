@@ -2,7 +2,7 @@
 
 import { Button } from "./ui/button";
 import { useUser } from "./user-provider";
-import { UserCircle, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { NotificationBell } from "./notification-bell";
+import { UserAvatar } from "./user-avatar";
 
 interface PageHeaderProps {
   title: string;
@@ -33,14 +34,17 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
         <NotificationBell className="cursor-pointer"/>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="cursor-pointer">
-              <UserCircle className="h-4 w-4 mr-2" />
-              {currentUser?.name || "User"}
+            <Button variant="outline" className="cursor-pointer flex items-center gap-2">
+              <UserAvatar name={currentUser?.name || "User"} size="sm" />
+              <span>{currentUser?.name || "User"}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-64">
             <div className="px-2 py-1.5 text-sm text-gray-500 border-b">
-              <div className="font-medium text-gray-900">{currentUser?.name}</div>
+              <div className="flex items-center gap-2 mb-2">
+                <UserAvatar name={currentUser?.name || "User"} size="md" />
+                <div className="font-medium text-gray-900">{currentUser?.name}</div>
+              </div>
               <div>{currentUser?.email}</div>
               {currentUser?.mobile && <div>📱 {currentUser.mobile}</div>}
             </div>
