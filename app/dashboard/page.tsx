@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/page-header";
 import {
   Users,
@@ -17,24 +14,16 @@ import {
   Activity,
   Award,
   Target,
-  Zap,
   BarChart3,
   AlertCircle,
   CircleAlert,
   Loader2,
-  User,
-  Building,
-  Shield,
 } from "lucide-react";
 import { api } from "@/lib/api-service";
 import { toast } from "sonner";
 import type { DashboardOverview, Activity as ActivityType, Task, Project } from "@/types";
-import { useAuth } from "@/contexts/auth-context";
 
 export default function Dashboard() {
-  // Get current user from auth context
-  const { user } = useAuth();
-  
   // State for dashboard data
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [recentActivities, setRecentActivities] = useState<ActivityType[]>([]);
@@ -229,86 +218,40 @@ export default function Dashboard() {
         description={getRoleBasedDescription(overview?.user_role || '', overview)}
       />
 
-      {/* User Info Section */}
-      {user && (
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="pt-0">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* User Name */}
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <User className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Name</p>
-                  <p className="text-sm text-gray-600">{user.name}</p>
-                </div>
+      {/* Key Metrics - Interactive Glass Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Metric Card 1 */}
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-blue-500/50 transition-all group-hover:scale-110">
+                <Users className="h-6 w-6 text-white" />
               </div>
-
-              {/* Department */}
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Building className="h-4 w-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Department</p>
-                  <p className="text-sm text-gray-600">{user.department}</p>
-                </div>
-              </div>
-
-              {/* Role */}
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Shield className="h-4 w-4 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Role</p>
-                  <Badge 
-                    variant="secondary" 
-                    className={`text-xs mt-1 ${
-                      user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :
-                      user.role === 'CEO' ? 'bg-purple-100 text-purple-800' :
-                      user.role === 'MANAGER' ? 'bg-blue-100 text-blue-800' :
-                      user.role === 'TEAM_LEAD' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {user.role.replace('_', ' ')}
-                  </Badge>
-                </div>
+              <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">
+                {overview?.user_role === 'MEMBER' ? 'Tasks' : 'People'}
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-900">
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
               {overview?.user_role === 'MEMBER' ? 'My Tasks' : 
                overview?.user_role === 'TEAM_LEAD' ? 'Team Members' :
                overview?.user_role === 'MANAGER' ? 'Direct Reports' : 'Total Users'}
-            </CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
+            </h3>
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
+                <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                <span className="text-sm text-gray-500">Loading...</span>
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-blue-900">
+                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-2">
                   {overview?.user_role === 'MEMBER' ? overview?.total_tasks || 0 :
                    overview?.user_role === 'TEAM_LEAD' ? overview?.team_info?.member_count || 0 :
                    overview?.user_role === 'MANAGER' ? overview?.direct_subordinates_count || 0 :
                    overview?.total_users || 0}
                 </div>
-                <div className="flex items-center text-xs text-blue-700 mt-1">
-                  <Users className="h-3 w-3 mr-1" />
+                <div className="flex items-center text-xs font-medium text-blue-600 dark:text-blue-400">
+                  <TrendingUp className="h-3 w-3 mr-1" />
                   {overview?.user_role === 'MEMBER' ? `${overview?.completed_tasks || 0} completed` :
                    overview?.user_role === 'TEAM_LEAD' ? `${overview?.active_users || 0} active` :
                    overview?.user_role === 'MANAGER' ? `${overview?.active_users || 0} active` :
@@ -316,28 +259,35 @@ export default function Dashboard() {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-900">
+        {/* Metric Card 2 */}
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/50 transition-all group-hover:scale-110">
+                <FolderOpen className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
+                {overview?.user_role === 'MEMBER' ? 'Done' : 'Projects'}
+              </div>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
               {overview?.user_role === 'MEMBER' ? 'Completed Tasks' : 'Total Projects'}
-            </CardTitle>
-            <FolderOpen className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
+            </h3>
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
+                <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+                <span className="text-sm text-gray-500">Loading...</span>
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-green-900">
+                <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent mb-2">
                   {overview?.user_role === 'MEMBER' ? overview?.completed_tasks || 0 : overview?.total_projects || 0}
                 </div>
-                <div className="flex items-center text-xs text-green-700 mt-1">
+                <div className="flex items-center text-xs font-medium text-green-600 dark:text-green-400">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   {overview?.user_role === 'MEMBER' ? 
                     `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate` :
@@ -345,28 +295,35 @@ export default function Dashboard() {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-900">
+        {/* Metric Card 3 */}
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-purple-500/50 transition-all group-hover:scale-110">
+                <CheckCircle2 className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full">
+                {overview?.user_role === 'MEMBER' ? 'Pending' : 'Completed'}
+              </div>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
               {overview?.user_role === 'MEMBER' ? 'Pending Tasks' : 'Completed Tasks'}
-            </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
+            </h3>
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
+                <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
+                <span className="text-sm text-gray-500">Loading...</span>
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-purple-900">
+                <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-2">
                   {overview?.user_role === 'MEMBER' ? overview?.pending_tasks || 0 : overview?.completed_tasks || 0}
                 </div>
-                <div className="flex items-center text-xs text-purple-700 mt-1">
+                <div className="flex items-center text-xs font-medium text-purple-600 dark:text-purple-400">
                   <Target className="h-3 w-3 mr-1" />
                   {overview?.user_role === 'MEMBER' ? 
                     `${overview?.overdue_tasks || 0} overdue` :
@@ -374,28 +331,35 @@ export default function Dashboard() {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-900">
+        {/* Metric Card 4 */}
+        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-red-500/10 dark:from-orange-500/5 dark:to-red-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-lg group-hover:shadow-orange-500/50 transition-all group-hover:scale-110">
+                <Clock className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full">
+                {overview?.user_role === 'MEMBER' ? 'Overdue' : 'Pending'}
+              </div>
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
               {overview?.user_role === 'MEMBER' ? 'Overdue Tasks' : 'Pending Tasks'}
-            </CardTitle>
-            <Clock className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
+            </h3>
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
+                <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+                <span className="text-sm text-gray-500">Loading...</span>
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-orange-900">
+                <div className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 dark:from-orange-400 dark:to-red-400 bg-clip-text text-transparent mb-2">
                   {overview?.user_role === 'MEMBER' ? overview?.overdue_tasks || 0 : overview?.pending_tasks || 0}
                 </div>
-                <div className="flex items-center text-xs text-orange-700 mt-1">
+                <div className="flex items-center text-xs font-medium text-orange-600 dark:text-orange-400">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   {overview?.user_role === 'MEMBER' ? 
                     'Need attention' :
@@ -403,308 +367,360 @@ export default function Dashboard() {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Comprehensive Access Scope Info */}
+      {/* Comprehensive Access Scope Info - Modern Glass */}
       {overview?.scope_description && (
-        <Card className="bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 via-gray-500/10 to-zinc-500/10 dark:from-slate-500/5 dark:via-gray-500/5 dark:to-zinc-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-gray-700">Your Access Scope</span>
+                  <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse shadow-lg"></div>
+                  <span className="text-lg font-bold text-gray-900 dark:text-white">Your Access Scope</span>
                 </div>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
                   {overview.scope_description.user_role}
                 </Badge>
                 {overview.team_info && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                     {overview.team_info.team_name} • {overview.team_info.department}
                   </span>
                 )}
               </div>
-              <span className="text-xs text-gray-400">
+              <span className="text-sm text-gray-500 dark:text-gray-400 italic">
                 {overview.scope_description.scope_description}
               </span>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {/* People in Scope */}
-              <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                <Users className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-gray-900">{overview.scope_description.viewable_user_count}</div>
-                <div className="text-xs text-gray-500">People in Scope</div>
+              <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{overview.scope_description.viewable_user_count}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">People in Scope</div>
               </div>
 
               {/* Projects */}
-              <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                <FolderOpen className="h-5 w-5 text-green-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-gray-900">{overview.total_projects}</div>
-                <div className="text-xs text-gray-500">Projects</div>
+              <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <FolderOpen className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{overview.total_projects}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Projects</div>
               </div>
 
               {/* Tasks */}
-              <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                <CheckCircle2 className="h-5 w-5 text-purple-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-gray-900">{overview.total_tasks}</div>
-                <div className="text-xs text-gray-500">Tasks</div>
+              <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 className="h-5 w-5 text-white" />
+                </div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{overview.total_tasks}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Tasks</div>
               </div>
 
               {/* Direct Reports */}
               {overview.scope_details && overview.scope_details.total_direct_reports > 0 && (
-                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                  <Users className="h-5 w-5 text-orange-600 mx-auto mb-1" />
-                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.total_direct_reports}</div>
-                  <div className="text-xs text-gray-500">Direct Reports</div>
+                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 dark:from-orange-400 dark:to-red-400 bg-clip-text text-transparent">{overview.scope_details.total_direct_reports}</div>
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Direct Reports</div>
                 </div>
               )}
 
               {/* Teams Leading */}
               {overview.scope_details && overview.scope_details.total_teams_leading > 0 && (
-                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                  <Users className="h-5 w-5 text-indigo-600 mx-auto mb-1" />
-                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.total_teams_leading}</div>
-                  <div className="text-xs text-gray-500">Teams Leading</div>
+                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">{overview.scope_details.total_teams_leading}</div>
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Teams Leading</div>
                 </div>
               )}
 
               {/* Department Members */}
               {overview.scope_details?.department_info && (
-                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                  <Users className="h-5 w-5 text-teal-600 mx-auto mb-1" />
-                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.department_info.total_members}</div>
-                  <div className="text-xs text-gray-500">Dept. Members</div>
+                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="p-2 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 dark:from-teal-400 dark:to-cyan-400 bg-clip-text text-transparent">{overview.scope_details.department_info.total_members}</div>
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Dept. Members</div>
                 </div>
               )}
 
               {/* Total Subordinates */}
               {overview.scope_details && overview.scope_details.total_subordinates > 0 && (
-                <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                  <Users className="h-5 w-5 text-red-600 mx-auto mb-1" />
-                  <div className="text-lg font-semibold text-gray-900">{overview.scope_details.total_subordinates}</div>
-                  <div className="text-xs text-gray-500">Total Subordinates</div>
+                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="p-2 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 dark:from-red-400 dark:to-pink-400 bg-clip-text text-transparent">{overview.scope_details.total_subordinates}</div>
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Total Subordinates</div>
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Recent Projects */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
-                Recent Projects
-              </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">Track progress of ongoing projects</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => window.location.href = '/projects'}>
-              <FolderOpen className="h-4 w-4 mr-1" />
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {isProjectsLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  <span className="text-sm text-muted-foreground">Loading projects...</span>
-                </div>
-              </div>
-            ) : recentProjects.length === 0 ? (
-              <div className="text-center py-8">
-                <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">No active projects</p>
-                <p className="text-sm text-gray-400">Create your first project to get started</p>
-              </div>
-            ) : (
-              recentProjects.map((project) => {
-                const progress = calculateProjectProgress(project);
-                return (
-                  <div key={project.id} className="p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-gray-900">{project.name}</h4>
-                      <Badge className={getStatusColor(project.status)}>
-                        {project.status.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>Progress: {progress}%</span>
-                        <span>{project.assigned_teams.length} team{project.assigned_teams.length !== 1 ? 's' : ''}</span>
-                      </div>
-                      <Progress value={progress} className="h-2" />
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          Due: {new Date(project.end_date).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          Manager: {project.manager.name}
-                        </span>
-                      </div>
-                    </div>
+        {/* Recent Projects - Modern Glass */}
+        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                    <BarChart3 className="h-5 w-5 text-white" />
                   </div>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activities */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-green-600" />
-              Recent Activities
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Latest team activities</p>
-          </CardHeader>
-          <CardContent>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent Projects</h3>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Track progress of ongoing projects</p>
+              </div>
+              <button 
+                onClick={() => window.location.href = '/projects'}
+                className="px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
+              >
+                <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">View All</span>
+              </button>
+            </div>
             <div className="space-y-4">
+              {isProjectsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading projects...</span>
+                  </div>
+                </div>
+              ) : recentProjects.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-full w-fit mx-auto mb-4">
+                    <FolderOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">No active projects</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first project to get started</p>
+                </div>
+              ) : (
+                recentProjects.map((project) => {
+                  const progress = calculateProjectProgress(project);
+                  return (
+                    <div key={project.id} className="group p-5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg">{project.name}</h4>
+                        <Badge className={`${getStatusColor(project.status)} font-semibold px-3 py-1`}>
+                          {project.status.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm font-medium">
+                          <span className="text-gray-700 dark:text-gray-300">Progress: {progress}%</span>
+                          <span className="text-gray-600 dark:text-gray-400">{project.assigned_teams.length} team{project.assigned_teams.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            className="absolute h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 group-hover:shadow-lg"
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs font-medium">
+                          <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                            <Calendar className="h-3.5 w-3.5" />
+                            Due: {new Date(project.end_date).toLocaleDateString()}
+                          </span>
+                          <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                            <Users className="h-3.5 w-3.5" />
+                            Manager: {project.manager.name}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activities - Modern Glass */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+          <div className="relative p-6">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg">
+                  <Activity className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent Activities</h3>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Latest team activities</p>
+            </div>
+            <div className="space-y-3">
               {isActivitiesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                    <span className="text-sm text-muted-foreground">Loading activities...</span>
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading activities...</span>
                   </div>
                 </div>
               ) : recentActivities.length === 0 ? (
-                <div className="text-center py-8">
-                  <Activity className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">No recent activities</p>
-                  <p className="text-sm text-gray-400">Activity will appear here as your team works</p>
+                <div className="text-center py-12">
+                  <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-full w-fit mx-auto mb-4">
+                    <Activity className="h-12 w-12 text-green-600 dark:text-green-400" />
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">No recent activities</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Activity will appear here as your team works</p>
                 </div>
               ) : (
                 recentActivities.map((activity, index) => (
-                  <div key={activity.id || index} className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div className="flex-shrink-0 mt-0.5">
+                  <div key={activity.id || index} className="group flex items-start space-x-3 p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
+                    <div className="flex-shrink-0 mt-0.5 p-2 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-lg group-hover:scale-110 transition-transform">
                       {getActivityIcon(activity.description)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{activity.user.name}</p>
-                      <p className="text-xs text-gray-600 mt-1">{activity.description}</p>
-                      <p className="text-xs text-gray-400 mt-1">{formatTimeAgo(activity.created_at)}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{activity.user.name}</p>
+                      <p className="text-xs text-gray-700 dark:text-gray-300 mt-1 font-medium">{activity.description}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{formatTimeAgo(activity.created_at)}</p>
                     </div>
                   </div>
                 ))
               )}
             </div>
             {!isActivitiesLoading && recentActivities.length > 0 && (
-              <Button variant="ghost" className="w-full mt-4 text-sm" onClick={() => window.location.href = '/reports'}>
+              <button 
+                onClick={() => window.location.href = '/reports'}
+                className="w-full mt-4 px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 text-sm font-medium text-gray-900 dark:text-white"
+              >
                 View All Activities
-              </Button>
+              </button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Task Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-purple-600" />
-              Task Summary
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Overview of task distribution</p>
-          </CardHeader>
-          <CardContent>
+        {/* Task Summary - Modern Glass */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+          <div className="relative p-6">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-lg">
+                  <Target className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Task Summary</h3>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Overview of task distribution</p>
+            </div>
             {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                  <span className="text-sm text-muted-foreground">Loading...</span>
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading...</span>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-900">Total Tasks</span>
+              <div className="space-y-3">
+                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 rounded-xl border border-blue-200/50 dark:border-blue-700/30 hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg group-hover:scale-110 transition-transform">
+                      <Clock className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Total Tasks</span>
                   </div>
-                  <span className="text-lg font-bold text-blue-900">{overview?.total_tasks || 0}</span>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{overview?.total_tasks || 0}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-green-50">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-900">Completed</span>
+                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 rounded-xl border border-green-200/50 dark:border-green-700/30 hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform">
+                      <CheckCircle2 className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Completed</span>
                   </div>
-                  <span className="text-lg font-bold text-green-900">{overview?.completed_tasks || 0}</span>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{overview?.completed_tasks || 0}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-orange-50">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-orange-600" />
-                    <span className="text-sm font-medium text-orange-900">Pending</span>
+                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5 rounded-xl border border-orange-200/50 dark:border-orange-700/30 hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg group-hover:scale-110 transition-transform">
+                      <Clock className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Pending</span>
                   </div>
-                  <span className="text-lg font-bold text-orange-900">{overview?.pending_tasks || 0}</span>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 dark:from-orange-400 dark:to-amber-400 bg-clip-text text-transparent">{overview?.pending_tasks || 0}</span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-red-50">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                    <span className="text-sm font-medium text-red-900">Overdue</span>
+                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 rounded-xl border border-red-200/50 dark:border-red-700/30 hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg group-hover:scale-110 transition-transform">
+                      <AlertCircle className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Overdue</span>
                   </div>
-                  <span className="text-lg font-bold text-red-900">{overview?.overdue_tasks || 0}</span>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-400 dark:to-rose-400 bg-clip-text text-transparent">{overview?.overdue_tasks || 0}</span>
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Upcoming Deadlines */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-red-600" />
-              Upcoming Deadlines
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Tasks due soon</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+        {/* Upcoming Deadlines - Modern Glass */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
+          <div className="relative p-6">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg shadow-lg">
+                  <Bell className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Upcoming Deadlines</h3>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Tasks due soon</p>
+            </div>
+            <div className="space-y-3">
               {isDeadlinesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                    <span className="text-sm text-muted-foreground">Loading deadlines...</span>
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading deadlines...</span>
                   </div>
                 </div>
               ) : upcomingDeadlines.length === 0 ? (
-                <div className="text-center py-8">
-                  <Bell className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">No upcoming deadlines</p>
-                  <p className="text-sm text-gray-400">All tasks are on track</p>
+                <div className="text-center py-12">
+                  <div className="p-4 bg-gradient-to-br from-red-500/20 to-rose-500/20 dark:from-red-500/10 dark:to-rose-500/10 rounded-full w-fit mx-auto mb-4">
+                    <Bell className="h-12 w-12 text-red-600 dark:text-red-400" />
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">No upcoming deadlines</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">All tasks are on track</p>
                 </div>
               ) : (
                 upcomingDeadlines.map((task, index) => (
-                  <div key={task.id || index} className="p-3 border-l-4 border-l-blue-500 bg-blue-50 rounded-r-lg">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
-                      <Badge className={getPriorityColor(task.priority)}>
+                  <div key={task.id || index} className="group relative p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border-l-4 border-l-blue-500 border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{task.title}</h4>
+                      <Badge className={`${getPriorityColor(task.priority)} font-semibold px-2 py-0.5`}>
                         {task.priority}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-600 mb-2">{task.project?.name || 'No project'}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 font-medium">{task.project?.name || 'No project'}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
+                      <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5 font-medium">
+                        <Calendar className="h-3.5 w-3.5" />
                         Due: {new Date(task.due_date).toLocaleDateString()}
                       </span>
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
-                        <Users className="h-3 w-3" />
+                      <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5 font-medium">
+                        <Users className="h-3.5 w-3.5" />
                         {task.assignee.name}
                       </span>
                     </div>
@@ -713,175 +729,17 @@ export default function Dashboard() {
               )}
             </div>
             {!isDeadlinesLoading && upcomingDeadlines.length > 0 && (
-              <Button variant="ghost" className="w-full mt-4 text-sm" onClick={() => window.location.href = '/tasks'}>
+              <button 
+                onClick={() => window.location.href = '/tasks'}
+                className="w-full mt-4 px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 text-sm font-medium text-gray-900 dark:text-white"
+              >
                 View All Tasks
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Role-based Quick Actions */}
-      <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-indigo-600" />
-            {overview?.user_role === 'MEMBER' ? 'My Quick Actions' : 'Quick Actions'}
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            {overview?.user_role === 'MEMBER' ? 'Common tasks and shortcuts for your work' : 'Common tasks and shortcuts'}
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {overview?.user_role === 'MEMBER' ? (
-              // Member-specific actions
-              <>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/tasks'}
-                >
-                  <CheckCircle2 className="h-6 w-6 mb-2 text-blue-600" />
-                  <span className="text-sm">My Tasks</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/reminders'}
-                >
-                  <Bell className="h-6 w-6 mb-2 text-green-600" />
-                  <span className="text-sm">Reminders</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/reports'}
-                >
-                  <BarChart3 className="h-6 w-6 mb-2 text-purple-600" />
-                  <span className="text-sm">My Reports</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/projects'}
-                >
-                  <FolderOpen className="h-6 w-6 mb-2 text-orange-600" />
-                  <span className="text-sm">Projects</span>
-                </Button>
-              </>
-            ) : overview?.user_role === 'TEAM_LEAD' ? (
-              // Team Lead actions
-              <>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/teams'}
-                >
-                  <Users className="h-6 w-6 mb-2 text-blue-600" />
-                  <span className="text-sm">My Team</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/tasks'}
-                >
-                  <CheckCircle2 className="h-6 w-6 mb-2 text-green-600" />
-                  <span className="text-sm">Team Tasks</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/users'}
-                >
-                  <Users className="h-6 w-6 mb-2 text-purple-600" />
-                  <span className="text-sm">Team Members</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/reports'}
-                >
-                  <BarChart3 className="h-6 w-6 mb-2 text-orange-600" />
-                  <span className="text-sm">Team Reports</span>
-                </Button>
-              </>
-            ) : overview?.user_role === 'MANAGER' ? (
-              // Manager actions
-              <>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/users'}
-                >
-                  <Users className="h-6 w-6 mb-2 text-blue-600" />
-                  <span className="text-sm">Manage Users</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/teams'}
-                >
-                  <Users className="h-6 w-6 mb-2 text-green-600" />
-                  <span className="text-sm">Manage Teams</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/projects'}
-                >
-                  <FolderOpen className="h-6 w-6 mb-2 text-purple-600" />
-                  <span className="text-sm">Projects</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/reports'}
-                >
-                  <BarChart3 className="h-6 w-6 mb-2 text-orange-600" />
-                  <span className="text-sm">Reports</span>
-                </Button>
-              </>
-            ) : (
-              // Admin/CEO actions
-              <>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/users'}
-                >
-                  <Users className="h-6 w-6 mb-2 text-blue-600" />
-                  <span className="text-sm">Manage Users</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/projects'}
-                >
-                  <FolderOpen className="h-6 w-6 mb-2 text-green-600" />
-                  <span className="text-sm">Projects</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/teams'}
-                >
-                  <Users className="h-6 w-6 mb-2 text-purple-600" />
-                  <span className="text-sm">Teams</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-20 flex-col bg-white hover:bg-gray-50"
-                  onClick={() => window.location.href = '/tasks'}
-                >
-                  <CheckCircle2 className="h-6 w-6 mb-2 text-orange-600" />
-                  <span className="text-sm">Tasks</span>
-                </Button>
-              </>
+              </button>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
     </div>
   );
 }
