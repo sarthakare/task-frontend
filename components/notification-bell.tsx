@@ -192,31 +192,34 @@ export function NotificationBell({ className }: NotificationBellProps) {
   // Don't render until mounted to prevent hydration mismatch
   if (!isMounted) {
     return (
-      <Button variant="ghost" size="sm" className={`relative ${className}`}>
-        <Bell className="h-5 w-5" />
-      </Button>
+      <button 
+        className={`relative inline-flex items-center justify-center h-10 w-10 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm ${className}`}
+        aria-label="Notifications"
+      >
+        <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+      </button>
     );
   }
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className={`relative ${className}`}>
-          <Bell className="h-5 w-5" />
+        <button 
+          className={`relative inline-flex items-center justify-center h-10 w-10 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${className}`}
+          aria-label="Notifications"
+        >
+          <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300" />
           {stats && stats.unread_count > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-            >
+            <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-semibold shadow-lg animate-pulse">
               {stats.unread_count > 99 ? '99+' : stats.unread_count}
-            </Badge>
+            </span>
           )}
-        </Button>
+        </button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between p-4 border-b">
+      <PopoverContent className="w-80 p-0 shadow-xl border-gray-200 dark:border-slate-700" align="end">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900">
           <div className="flex items-center gap-3">
-            <h3 className="font-semibold">Notifications</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
             <Badge 
               variant="outline" 
               className={`flex items-center gap-1 ${getWebSocketStatusColor()}`}

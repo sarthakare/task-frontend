@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { LayoutWrapper } from "@/components/layout-wrapper";
 import { AuthProvider } from "@/contexts/auth-context";
 import { WebSocketProvider } from "@/contexts/websocket-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,18 +21,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <AuthProvider>
-          <WebSocketProvider>
-            <UserProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-              <Toaster />
-            </UserProvider>
-          </WebSocketProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <WebSocketProvider>
+              <UserProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+                <Toaster />
+              </UserProvider>
+            </WebSocketProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

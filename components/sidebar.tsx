@@ -144,15 +144,15 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div
       className={cn(
-        "flex flex-col border-r bg-white transition-all duration-300",
+        "flex flex-col border-r border-border bg-white dark:bg-sidebar transition-all duration-300",
         isCollapsed ? "w-16" : "w-64",
         className
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b border-border px-4">
         {!isCollapsed && (
-          <h2 className="text-lg font-semibold text-gray-900">Task Manager</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-sidebar-foreground">Task Manager</h2>
         )}
         <Button
           variant="ghost"
@@ -178,8 +178,8 @@ export function Sidebar({ className }: SidebarProps) {
               "w-full justify-start gap-3",
               isCollapsed ? "px-2" : "px-3",
               activeMenu === item.id
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                ? "bg-gray-100 dark:bg-sidebar-accent text-gray-900 dark:text-sidebar-accent-foreground"
+                : "text-gray-600 dark:text-sidebar-foreground hover:bg-gray-50 dark:hover:bg-sidebar-accent hover:text-gray-900 dark:hover:text-sidebar-accent-foreground"
             )}
             onClick={() => handleMenuClick(item.id)}
           >
@@ -192,29 +192,29 @@ export function Sidebar({ className }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t p-4">
+      <div className="border-t border-border p-4">
         {!isCollapsed && (
           <div className="space-y-3">
             {isLoading ? (
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
-                <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-sidebar-accent">
+                <div className="w-8 h-8 bg-gray-200 dark:bg-muted rounded-full animate-pulse"></div>
                 <div className="flex-1 min-w-0">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-muted rounded animate-pulse mb-1"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-muted rounded animate-pulse w-2/3"></div>
                 </div>
               </div>
             ) : currentUser ? (
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-medium text-sm">
+              <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-sidebar-accent">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 dark:text-blue-400 font-medium text-sm">
                     {currentUser.name?.charAt(0) || "U"}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-gray-900 dark:text-sidebar-foreground truncate">
                     {currentUser.name}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="text-xs text-gray-500 dark:text-muted-foreground truncate">
                     {currentUser.role}
                   </p>
                 </div>
@@ -228,14 +228,14 @@ export function Sidebar({ className }: SidebarProps) {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={logout}>
                       <LogOut className="h-4 w-4 mr-2" />
-                      <span className="text-red-600">Logout</span>
+                      <span className="text-red-600 dark:text-red-400">Logout</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </div>
             ) : (
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 dark:text-muted-foreground">
                 <p>Task Manager v1.0</p>
                 <p className="mt-1">© 2024 All rights reserved</p>
               </div>
