@@ -209,7 +209,7 @@ export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFo
   };
 
   const defaultTrigger = (
-    <Button 
+    <button 
       onClick={() => {
         if (!canCreateProjects()) {
           toast.error('Access Denied', {
@@ -221,11 +221,13 @@ export function ProjectCreateForm({ trigger, onProjectCreated }: ProjectCreateFo
         }
         setIsCreateDialogOpen(true);
       }}
-      className="cursor-pointer"
+      className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:ring-offset-2 cursor-pointer"
     >
-      <Plus className="h-4 w-4 mr-2" />
-      Create Project
-    </Button>
+      <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+        <Plus className="h-4 w-4" />
+      </div>
+      <span>Create Project</span>
+    </button>
   );
 
   // Get today's date for min date validation

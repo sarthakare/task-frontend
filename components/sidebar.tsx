@@ -143,7 +143,7 @@ export function Sidebar({ className }: SidebarProps) {
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between border-b border-gray-200 dark:border-slate-700 px-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900">
+      <div className="flex h-20 items-center justify-between border-b border-gray-200 dark:border-slate-700 px-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900">
         {!isCollapsed && (
           <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
             Task Manager
