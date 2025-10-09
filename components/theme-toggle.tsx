@@ -15,7 +15,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="relative inline-flex items-center h-10 w-[4.5rem] rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+      className="relative inline-flex items-center h-10 w-[4.5rem] rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 cursor-pointer"
       style={{
         backgroundColor: isDark ? '#1e293b' : '#e2e8f0',
       }}
