@@ -100,177 +100,159 @@ export default function RemindersPage() {
         action={<ReminderCreateForm onReminderCreated={handleReminderCreated} />}
       />
 
-      {/* Search and Refresh - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 to-gray-500/10 dark:from-slate-500/5 dark:to-gray-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative p-4">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Search reminders..."
-                  className="pl-12 pr-4 py-3 w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+      {/* Search and Refresh */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-3">
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search reminders..."
+                className="pl-10 pr-3 py-2 w-full text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="px-5 py-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {refreshing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              <span>Refresh</span>
-            </button>
           </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="px-4 py-2 h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors flex items-center gap-2 font-medium text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {refreshing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
-      {/* Reminder Stats - Modern Glass */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Reminder Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Active Reminders */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-blue-500/50 transition-all group-hover:scale-110">
-                <Bell className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Bell className="h-5 w-5 text-blue-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Active Reminders</h3>
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{stats.active_reminders}</div>
-                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mt-1">Currently active</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Active Reminders</h3>
+          {loading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.active_reminders}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Currently active</p>
+            </>
+          )}
         </div>
 
         {/* Overdue */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg group-hover:shadow-red-500/50 transition-all group-hover:scale-110">
-                <AlertTriangle className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Overdue</h3>
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-red-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-400 dark:to-rose-400 bg-clip-text text-transparent">{stats.overdue_reminders}</div>
-                <p className="text-xs font-medium text-red-600 dark:text-red-400 mt-1">Requires attention</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Overdue</h3>
+          {loading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-red-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue_reminders}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Requires attention</p>
+            </>
+          )}
         </div>
 
         {/* Today */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/50 transition-all group-hover:scale-110">
-                <Clock className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <Clock className="h-5 w-5 text-green-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Today</h3>
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{stats.today_reminders}</div>
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 mt-1">Due today</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Today</h3>
+          {loading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.today_reminders}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Due today</p>
+            </>
+          )}
         </div>
 
         {/* Completed */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-purple-500/50 transition-all group-hover:scale-110">
-                <CheckCircle className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-purple-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Completed</h3>
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{stats.completed_reminders}</div>
-                <p className="text-xs font-medium text-purple-600 dark:text-purple-400 mt-1">Total completed</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Completed</h3>
+          {loading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completed_reminders}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Total completed</p>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Reminders List - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-500/10 dark:from-amber-500/5 dark:via-orange-500/5 dark:to-red-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          {/* Header */}
-          <div className="flex items-center gap-4 p-4 border-b border-white/20 dark:border-white/10">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg">
-              <Bell className="h-6 w-6 text-white" />
+      {/* Reminders List */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <div className="flex items-center gap-4 p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+            <Bell className="h-6 w-6 text-amber-500" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">All Reminders</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {filteredReminders.length} {filteredReminders.length === 1 ? 'reminder' : 'reminders'}
+            </p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading reminders...</span>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">All Reminders</h3>
+          ) : sortedReminders.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-full w-fit mx-auto mb-4">
+                <Bell className="h-12 w-12 text-amber-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                {searchTerm ? 'No reminders found' : 'No reminders yet'}
+              </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {filteredReminders.length} {filteredReminders.length === 1 ? 'reminder' : 'reminders'}
+                {searchTerm ? `No reminders found matching "${searchTerm}"` : 'Create your first reminder to get started!'}
               </p>
             </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-4">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex items-center gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading reminders...</span>
-                </div>
-              </div>
-            ) : sortedReminders.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="p-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 dark:from-amber-500/10 dark:to-orange-500/10 rounded-full w-fit mx-auto mb-4">
-                  <Bell className="h-12 w-12 text-amber-600 dark:text-amber-400" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                  {searchTerm ? 'No reminders found' : 'No reminders yet'}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {searchTerm ? `No reminders found matching "${searchTerm}"` : 'Create your first reminder to get started!'}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {sortedReminders.map((reminder) => (
-                  <ReminderDisplay
-                    key={reminder.id}
-                    reminder={reminder}
-                    onReminderUpdated={handleReminderUpdated}
-                    onReminderDeleted={handleReminderDeleted}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          ) : (
+            <div className="space-y-3">
+              {sortedReminders.map((reminder) => (
+                <ReminderDisplay
+                  key={reminder.id}
+                  reminder={reminder}
+                  onReminderUpdated={handleReminderUpdated}
+                  onReminderDeleted={handleReminderDeleted}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

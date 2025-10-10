@@ -229,11 +229,9 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
   const defaultTrigger = (
     <button 
       onClick={() => setIsDialogOpen(true)} 
-      className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 focus:ring-offset-2 cursor-pointer"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
     >
-      <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-        <Plus className="h-4 w-4" />
-      </div>
+      <Plus className="h-4 w-4" />
       <span>Create Reminder</span>
     </button>
   );
@@ -243,15 +241,15 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
       <DialogTrigger asChild>
         {defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
-        <DialogHeader className="pb-6 border-b border-gray-100">
-          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-            <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg">
-              <Plus className="h-5 w-5 text-white" />
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden bg-white dark:bg-gray-900">
+        <DialogHeader className="pb-6 border-b border-gray-200 dark:border-gray-800">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Plus className="h-5 w-5 text-blue-500" />
             </div>
             Create New Reminder
           </DialogTitle>
-          <DialogDescription className="text-gray-600 mt-2">
+          <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2">
             Fill out the form below to create a new reminder with all necessary details and assignments.
           </DialogDescription>
         </DialogHeader>
@@ -261,14 +259,14 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
             
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
                 Basic Information
               </h3>
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Reminder Title *</Label>
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300">Reminder Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -283,7 +281,7 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description *</Label>
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
@@ -302,19 +300,19 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
 
             {/* Assignment & Context */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
                 <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
                 Assignment & Context
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="user_id" className="text-sm font-medium text-gray-700">Assign To *</Label>
+                  <Label htmlFor="user_id" className="text-sm font-medium text-gray-700 dark:text-gray-300">Assign To *</Label>
                   <Select
                     value={formData.user_id === 0 ? "" : formData.user_id.toString()}
                     onValueChange={(value) => handleInputChange('user_id', parseInt(value))}
                   >
-                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.user_id ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                    <SelectTrigger className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.user_id ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                       <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select user"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -339,14 +337,14 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="task_id" className="text-sm font-medium text-gray-700">Related Task (Optional)</Label>
+                  <Label htmlFor="task_id" className="text-sm font-medium text-gray-700 dark:text-gray-300">Related Task (Optional)</Label>
                   <Select
                     value={formData.task_id?.toString() || "none"}
                     onValueChange={(value) => 
                       handleInputChange('task_id', value === "none" ? undefined : parseInt(value))
                     }
                   >
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue placeholder={isLoadingTasks ? "Loading..." : "Select task (optional)"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -371,19 +369,19 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
 
             {/* Priority & Due Date */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-green-500 rounded-full"></div>
                 Priority & Due Date
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="priority" className="text-sm font-medium text-gray-700">Priority</Label>
+                  <Label htmlFor="priority" className="text-sm font-medium text-gray-700 dark:text-gray-300">Priority</Label>
                   <Select
                     value={formData.priority}
                     onValueChange={(value) => handleInputChange('priority', value)}
                   >
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-green-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -396,14 +394,14 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="due_date" className="text-sm font-medium text-gray-700">Due Date *</Label>
+                  <Label htmlFor="due_date" className="text-sm font-medium text-gray-700 dark:text-gray-300">Due Date *</Label>
                   <Input
                     id="due_date"
                     type="date"
                     value={formData.due_date}
                     onChange={(e) => handleInputChange('due_date', e.target.value)}
                     min={getCurrentDate()}
-                    className={`h-10 bg-white border-gray-200 hover:border-green-300 transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}
+                    className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}
                   />
                   {errors.due_date && <p className="text-sm text-red-500 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
@@ -422,7 +420,7 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
               </div>
             )}
 
-            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-800">
               <Button
                 type="button"
                 variant="outline"
@@ -431,14 +429,14 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
                   setIsDialogOpen(false);
                 }}
                 disabled={isSubmitting}
-                className="px-6 h-10 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                className="px-6 h-10 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 h-10 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 h-10 bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
               >
                 {isSubmitting ? (
                   <>
