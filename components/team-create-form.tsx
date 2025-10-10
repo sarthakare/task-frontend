@@ -12,7 +12,6 @@ import { Plus, XCircle, Users, CheckCircle2, CircleAlert, Loader2 } from "lucide
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import { canCreateTeams } from "@/utils/auth";
-import { useUser } from "@/components/user-provider";
 import type { User, TeamCreate } from "@/types";
 
 interface TeamCreateFormProps {
@@ -21,7 +20,6 @@ interface TeamCreateFormProps {
 }
 
 export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) {
-  const { currentUser } = useUser();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -217,11 +215,9 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
         }
         setIsCreateDialogOpen(true);
       }}
-      className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 cursor-pointer"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
     >
-      <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-        <Plus className="h-4 w-4" />
-      </div>
+      <Plus className="h-4 w-4" />
       <span>Create Team</span>
     </button>
   );
@@ -236,15 +232,15 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
-        <DialogHeader className="pb-6 border-b border-gray-100">
-          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-              <Plus className="h-5 w-5 text-white" />
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden bg-white dark:bg-gray-900">
+        <DialogHeader className="pb-6 border-b border-gray-200 dark:border-gray-800">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Plus className="h-5 w-5 text-blue-500" />
             </div>
             Create New Team
           </DialogTitle>
-          <DialogDescription className="text-gray-600 mt-2">
+          <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2">
             Fill out the form below to create a new team with all necessary details and member assignments.
           </DialogDescription>
         </DialogHeader>
@@ -254,38 +250,38 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
             
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-indigo-500 to-blue-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
                 Basic Information
               </h3>
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">Team Name *</Label>
+                  <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Team Name *</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     placeholder="Enter team name"
-                    className={`h-10 bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
+                    className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.name ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
-                  {errors.name && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.name && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.name}
                   </p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description *</Label>
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Enter team description and purpose"
                     rows={3}
-                    className={`bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
+                    className={`bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
-                  {errors.description && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.description && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.description}
                   </p>}
@@ -295,16 +291,16 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
 
             {/* Department & Status */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
                 Department & Status
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="department" className="text-sm font-medium text-gray-700">Department *</Label>
+                  <Label htmlFor="department" className="text-sm font-medium text-gray-700 dark:text-gray-300">Department *</Label>
                   <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
-                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                    <SelectTrigger className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.department ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                       <SelectValue placeholder={isLoadingDepartments ? "Loading..." : "Select department"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -315,16 +311,16 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.department && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.department && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.department}
                   </p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="status" className="text-sm font-medium text-gray-700">Status</Label>
+                  <Label htmlFor="status" className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</Label>
                   <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -338,15 +334,15 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
 
             {/* Team Leadership */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-green-500 rounded-full"></div>
                 Team Leadership
               </h3>
               
               <div className="space-y-2">
-                <Label htmlFor="leader_id" className="text-sm font-medium text-gray-700">Team Lead *</Label>
+                <Label htmlFor="leader_id" className="text-sm font-medium text-gray-700 dark:text-gray-300">Team Lead *</Label>
                 <Select value={formData.leader_id} onValueChange={(value) => handleInputChange('leader_id', value)}>
-                  <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-green-300 transition-colors ${errors.leader_id ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}>
+                  <SelectTrigger className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.leader_id ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                     <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select team lead"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -364,12 +360,12 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.leader_id && <p className="text-sm text-red-500 flex items-center gap-1">
+                {errors.leader_id && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.leader_id}
                 </p>}
                 {filteredUsers.length === 0 && !isLoadingUsers && formData.department && (
-                  <p className="text-sm text-yellow-600 bg-yellow-50 p-3 rounded-md border border-yellow-200">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md border border-yellow-200 dark:border-yellow-800">
                     No users available in the selected department.
                   </p>
                 )}
@@ -378,25 +374,25 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
 
             {/* Team Members */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-orange-500 rounded-full"></div>
                 Team Members
               </h3>
               
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-gray-700">Select Team Members *</Label>
-                <div className="border rounded-lg p-4 max-h-48 overflow-y-auto bg-gray-50">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Select Team Members *</Label>
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 max-h-48 overflow-y-auto bg-gray-50 dark:bg-gray-800">
                   {isLoadingUsers ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <span className="text-sm text-gray-600">Loading team members...</span>
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Loading team members...</span>
                       </div>
                     </div>
                   ) : filteredUsers.length > 0 ? (
                     <div className="space-y-0">
                       {filteredUsers.map((user) => (
-                        <div key={user.id} className="flex items-center space-x-3 p-2 hover:bg-white rounded-md transition-colors">
+                        <div key={user.id} className="flex items-center space-x-3 p-2 hover:bg-white dark:hover:bg-gray-700 rounded-md transition-colors">
                           <Checkbox
                             id={`member-${user.id}`}
                             checked={formData.member_ids.includes(user.id)}
@@ -404,29 +400,29 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
                           />
                           <label htmlFor={`member-${user.id}`} className="flex-1 cursor-pointer">
                             <div className="flex items-center justify-between">
-                              <span className="font-medium text-gray-900">{user.name}</span>
-                              <span className="text-sm text-gray-500">{user.role}</span>
+                              <span className="font-medium text-gray-900 dark:text-white">{user.name}</span>
+                              <span className="text-sm text-gray-500 dark:text-gray-400">{user.role}</span>
                             </div>
-                            <div className="text-sm text-gray-600">{user.email}</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">{user.email}</div>
                           </label>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="text-center py-4">
-                      <Users className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">
+                      <Users className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {formData.department ? 'No users available in selected department' : 'Select a department to see available users'}
                       </p>
                     </div>
                   )}
                 </div>
-                {errors.member_ids && <p className="text-sm text-red-500 flex items-center gap-1">
+                {errors.member_ids && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                   <XCircle className="h-4 w-4" />
                   {errors.member_ids}
                 </p>}
                 {formData.member_ids.length > 0 && (
-                  <p className="text-sm text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
+                  <p className="text-sm text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded border border-blue-200 dark:border-blue-800">
                     {formData.member_ids.length} member(s) selected
                   </p>
                 )}
@@ -434,15 +430,15 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
             </div>
 
             {errors.submit && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 flex items-center gap-2">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                   <XCircle className="h-5 w-5" />
                   {errors.submit}
                 </p>
               </div>
             )}
 
-            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-800">
               <Button
                 type="button"
                 variant="outline"
@@ -451,14 +447,14 @@ export function TeamCreateForm({ trigger, onTeamCreated }: TeamCreateFormProps) 
                   setIsCreateDialogOpen(false);
                 }}
                 disabled={isSubmitting}
-                className="px-6 h-10 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                className="px-6 h-10 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 h-10 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 h-10 bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
               >
                 {isSubmitting ? (
                   <>

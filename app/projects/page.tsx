@@ -162,191 +162,174 @@ export default function ProjectsPage() {
         }
       />
 
-      {/* Project Stats - Modern Glass Cards */}
+      {/* Project Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Projects */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-blue-500/50 transition-all group-hover:scale-110">
-                <FolderOpen className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <FolderOpen className="h-5 w-5 text-blue-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Total Projects</h3>
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{stats.totalProjects}</div>
-                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mt-1">All projects</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Projects</h3>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalProjects}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">All projects</p>
+            </>
+          )}
         </div>
 
         {/* Active Projects */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/50 transition-all group-hover:scale-110">
-                <Clock className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <Clock className="h-5 w-5 text-green-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Active</h3>
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{stats.activeProjects}</div>
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 mt-1">Currently active</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Active</h3>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.activeProjects}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Currently active</p>
+            </>
+          )}
         </div>
 
         {/* Completed Projects */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-purple-500/50 transition-all group-hover:scale-110">
-                <CheckCircle className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-purple-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Completed</h3>
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{stats.completedProjects}</div>
-                <p className="text-xs font-medium text-purple-600 dark:text-purple-400 mt-1">Finished projects</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Completed</h3>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.completedProjects}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Finished projects</p>
+            </>
+          )}
         </div>
 
         {/* On Hold Projects */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg group-hover:shadow-orange-500/50 transition-all group-hover:scale-110">
-                <Pause className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <Pause className="h-5 w-5 text-orange-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">On Hold</h3>
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 dark:from-orange-400 dark:to-amber-400 bg-clip-text text-transparent">{stats.onHoldProjects}</div>
-                <p className="text-xs font-medium text-orange-600 dark:text-orange-400 mt-1">Paused projects</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">On Hold</h3>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats.onHoldProjects}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Paused projects</p>
+            </>
+          )}
         </div>
       </div>
       
-      {/* Search and Filters - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 to-gray-500/10 dark:from-slate-500/5 dark:to-gray-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative p-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search Bar */}
-            <div className="relative flex-1">   
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="Search projects, descriptions, managers, or teams..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-4 py-3 w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
-              />
-            </div>
+      {/* Search and Filters */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-3">
+        <div className="flex flex-col lg:flex-row gap-3">
+          {/* Search Bar */}
+          <div className="relative flex-1">   
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-3 py-2 w-full text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
+            />
+          </div>
 
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-11 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                  <SelectValue placeholder="All Statuses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="on_hold">On Hold</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors cursor-pointer">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="on_hold">On Hold</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
 
-              <Select value={managerFilter} onValueChange={setManagerFilter}>
-                <SelectTrigger className="h-11 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                  <SelectValue placeholder="All Managers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Managers</SelectItem>
-                  {uniqueManagers.map((manager) => (
-                    <SelectItem key={manager} value={manager}>
-                      {manager}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={managerFilter} onValueChange={setManagerFilter}>
+              <SelectTrigger className="h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors cursor-pointer">
+                <SelectValue placeholder="All Managers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Managers</SelectItem>
+                {uniqueManagers.map((manager) => (
+                  <SelectItem key={manager} value={manager}>
+                    {manager}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
-      {/* Projects List - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-teal-500/10 dark:from-green-500/5 dark:via-emerald-500/5 dark:to-teal-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/20 dark:border-white/10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
-                <FolderOpen className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Projects</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {filteredProjects.length !== projects.length
-                    ? `Showing ${filteredProjects.length} of ${projects.length} projects`
-                    : `${filteredProjects.length} projects total`
-                  }
-                </p>
-              </div>
+      {/* Projects List */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <FolderOpen className="h-6 w-6 text-green-500" />
             </div>
-
-            {/* View Toggle Buttons */}
-            <div className="flex bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg p-1">
-              <button
-                onClick={() => setViewMode('card')}
-                className={`h-9 px-4 rounded-lg flex items-center gap-2 transition-all duration-200 cursor-pointer ${viewMode === 'card'
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
-                  }`}
-              >
-                <Grid3X3 className="h-4 w-4" />
-                <span className="text-sm font-medium">Card</span>
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`h-9 px-4 rounded-lg flex items-center gap-2 transition-all duration-200 cursor-pointer ${viewMode === 'list'
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
-                  }`}
-              >
-                <List className="h-4 w-4" />
-                <span className="text-sm font-medium">List</span>
-              </button>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Projects</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {filteredProjects.length !== projects.length
+                  ? `Showing ${filteredProjects.length} of ${projects.length} projects`
+                  : `${filteredProjects.length} projects total`
+                }
+              </p>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-4">
+          {/* View Toggle Buttons */}
+          <div className="flex bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+            <button
+              onClick={() => setViewMode('card')}
+              className={`h-9 px-4 rounded flex items-center gap-2 transition-colors cursor-pointer ${viewMode === 'card'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+            >
+              <Grid3X3 className="h-4 w-4" />
+              <span className="text-sm font-medium">Card</span>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`h-9 px-4 rounded flex items-center gap-2 transition-colors cursor-pointer ${viewMode === 'list'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+            >
+              <List className="h-4 w-4" />
+              <span className="text-sm font-medium">List</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center gap-3">
@@ -357,16 +340,16 @@ export default function ProjectsPage() {
           ) : filteredProjects.length > 0 ? (
             <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'space-y-2.5'}>
               {filteredProjects.map((project) => (
-                <div key={project.id} className={`group relative overflow-hidden rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 ${viewMode === 'list' ? 'p-3.5' : 'p-4'
+                <div key={project.id} className={`bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${viewMode === 'list' ? 'p-3.5' : 'p-4'
                   }`}>
                   {viewMode === 'card' ? (
-                    /* Card View Layout - Modern */
+                    /* Card View Layout */
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:bg-gradient-to-r group-hover:from-green-600 group-hover:to-emerald-600 dark:group-hover:from-green-400 dark:group-hover:to-emerald-400 group-hover:bg-clip-text group-hover:text-transparent transition-all line-clamp-1">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
                           {project.name}
                         </h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 leading-relaxed">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
                           {project.description}
                         </p>
                       </div>
@@ -376,7 +359,7 @@ export default function ProjectsPage() {
                         {isAdminOrCEO ? (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer">
+                              <button className="h-9 w-9 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                               </button>
                             </DropdownMenuTrigger>
@@ -449,7 +432,7 @@ export default function ProjectsPage() {
                           </DropdownMenu>
                         ) : (
                           <button
-                            className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer"
+                            className="h-9 w-9 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center cursor-pointer"
                             onClick={() => handleViewProjectDetails(project)}
                           >
                             <Eye className="h-4 w-4 text-gray-700 dark:text-gray-300" />
@@ -458,11 +441,11 @@ export default function ProjectsPage() {
                       </div>
                     </div>
                   ) : (
-                    /* List View Layout - Modern */
+                    /* List View Layout */
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-gray-900 dark:text-white mb-1 line-clamp-1">{project.name}</h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                           {project.description}
                         </p>
                       </div>
@@ -472,7 +455,7 @@ export default function ProjectsPage() {
                         {isAdminOrCEO ? (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer">
+                              <button className="h-9 w-9 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                               </button>
                             </DropdownMenuTrigger>
@@ -558,16 +541,16 @@ export default function ProjectsPage() {
                   {viewMode === 'card' && (
                     <>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${project.status === 'active' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' :
-                            project.status === 'completed' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' :
-                              project.status === 'on_hold' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' :
-                                'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                        <span className={`px-3 py-1.5 text-xs font-medium rounded-lg ${project.status === 'active' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                            project.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                              project.status === 'on_hold' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }`}>
                           {project.status === 'active' ? 'Active' :
                             project.status === 'completed' ? 'Completed' :
                               project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
                         </span>
-                        <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm">
+                        <span className="px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
                           {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
                         </span>
                       </div>
@@ -575,25 +558,25 @@ export default function ProjectsPage() {
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg">
+                            <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                               <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-500" />
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300 font-medium">{new Date(project.start_date).toLocaleDateString()} - {new Date(project.end_date).toLocaleDateString()}</span>
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">{new Date(project.start_date).toLocaleDateString()} - {new Date(project.end_date).toLocaleDateString()}</span>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 rounded-lg">
+                            <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                               <Users className="h-4 w-4 text-purple-600 dark:text-purple-500" />
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300 font-semibold">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)} Members</span>
+                            <span className="text-gray-600 dark:text-gray-400 font-semibold">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)} Members</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-lg">
+                            <div className="p-1.5 bg-green-50 dark:bg-green-900/20 rounded-lg">
                               <User className="h-4 w-4 text-green-600 dark:text-green-500" />
                             </div>
-                            <span className="text-gray-700 dark:text-gray-300 font-semibold">{project.manager.name}</span>
+                            <span className="text-gray-600 dark:text-gray-400 font-semibold">{project.manager.name}</span>
                           </div>
                         </div>
                       </div>
@@ -603,31 +586,31 @@ export default function ProjectsPage() {
                   {viewMode === 'list' && (
                     <>
                       <div className="flex flex-wrap gap-2 mb-3">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg shadow-sm ${project.status === 'active' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' :
-                            project.status === 'completed' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' :
-                              project.status === 'on_hold' ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' :
-                                'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                        <span className={`px-2.5 py-1 text-xs font-medium rounded-lg ${project.status === 'active' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                            project.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                              project.status === 'on_hold' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }`}>
                           {project.status === 'active' ? 'Active' :
                             project.status === 'completed' ? 'Completed' :
                               project.status === 'on_hold' ? 'On Hold' : 'Cancelled'}
                         </span>
-                        <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm">
+                        <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
                           {project.assigned_teams.length} {project.assigned_teams.length === 1 ? 'Team' : 'Teams'}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-3.5 w-3.5 text-blue-600 dark:text-blue-500" />
+                          <Calendar className="h-3.5 w-3.5 text-blue-500" />
                           <span className="text-gray-600 dark:text-gray-400 font-medium">{new Date(project.start_date).toLocaleDateString()} - {new Date(project.end_date).toLocaleDateString()}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Users className="h-3.5 w-3.5 text-purple-600 dark:text-purple-500" />
+                          <Users className="h-3.5 w-3.5 text-purple-500" />
                           <span className="text-gray-600 dark:text-gray-400 font-medium">{project.assigned_teams.reduce((total, team) => total + team.members.length, 0)} Members</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <User className="h-3.5 w-3.5 text-green-600 dark:text-green-500" />
+                          <User className="h-3.5 w-3.5 text-green-500" />
                           <span className="text-gray-600 dark:text-gray-400 font-medium">{project.manager.name}</span>
                         </div>
                       </div>
@@ -638,8 +621,8 @@ export default function ProjectsPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-full w-fit mx-auto mb-4">
-                <FolderOpen className="h-12 w-12 text-green-600 dark:text-green-400" />
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-full w-fit mx-auto mb-4">
+                <FolderOpen className="h-12 w-12 text-green-500" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 {projects.length === 0 ? "No projects yet" : "No projects found"}
@@ -654,7 +637,7 @@ export default function ProjectsPage() {
                 <ProjectCreateForm
                   onProjectCreated={handleProjectCreated}
                   trigger={
-                    <button className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:ring-offset-2 cursor-pointer">
+                    <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer">
                       <FolderOpen className="h-4 w-4" />
                       Create Your First Project
                     </button>
@@ -663,7 +646,6 @@ export default function ProjectsPage() {
               )}
             </div>
           )}
-          </div>
         </div>
       </div>
 
