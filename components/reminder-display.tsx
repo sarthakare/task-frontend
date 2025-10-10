@@ -41,21 +41,21 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "CRITICAL":
-        return "bg-gradient-to-r from-red-500 to-rose-500 text-white";
+        return "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800";
       case "HIGH":
-        return "bg-gradient-to-r from-orange-500 to-amber-500 text-white";
+        return "bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800";
       case "MEDIUM":
-        return "bg-gradient-to-r from-yellow-500 to-amber-500 text-white";
+        return "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800";
       case "LOW":
-        return "bg-gradient-to-r from-blue-500 to-indigo-500 text-white";
+        return "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800";
       default:
-        return "bg-gradient-to-r from-gray-500 to-gray-600 text-white";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700";
     }
   };
 
   const getStatusLabel = (isCompleted: boolean, dueDate: string) => {
     if (isCompleted) {
-      return { label: "Completed", color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white" };
+      return { label: "Completed", color: "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800" };
     }
     
     // Get current IST date
@@ -66,21 +66,21 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
     const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
     
     if (dueDateOnly < today) {
-      return { label: "Overdue", color: "bg-gradient-to-r from-red-500 to-rose-500 text-white" };
+      return { label: "Overdue", color: "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800" };
     }
     
     if (dueDateOnly.getTime() === today.getTime()) {
-      return { label: "Today", color: "bg-gradient-to-r from-blue-500 to-indigo-500 text-white" };
+      return { label: "Today", color: "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800" };
     }
     
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     if (dueDateOnly.getTime() === tomorrow.getTime()) {
-      return { label: "Tomorrow", color: "bg-gradient-to-r from-green-500 to-emerald-500 text-white" };
+      return { label: "Tomorrow", color: "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800" };
     }
     
-    return { label: "Upcoming", color: "bg-gradient-to-r from-gray-500 to-gray-600 text-white" };
+    return { label: "Upcoming", color: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700" };
   };
 
   const handleMarkCompleted = async () => {
@@ -132,14 +132,8 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
   const statusInfo = getStatusLabel(reminder.is_completed, reminder.due_date);
 
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
-      {reminder.is_completed && (
-        <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-50"></div>
-      )}
-      {!reminder.is_completed && new Date(reminder.due_date) < new Date() && (
-        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-50"></div>
-      )}
-      <div className="relative p-4">
+    <div className={`bg-white dark:bg-gray-900 rounded-lg border transition-colors ${reminder.is_completed ? 'border-green-300 dark:border-green-800 bg-green-50/30 dark:bg-green-900/10' : !reminder.is_completed && new Date(reminder.due_date) < new Date() ? 'border-red-300 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'}`}>
+      <div className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
             <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2 pr-4">

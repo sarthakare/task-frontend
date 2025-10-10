@@ -38,24 +38,24 @@ export function RoleBasedReports({ userRole, data, loading }: RoleBasedReportsPr
   const getRoleColor = (role: string) => {
     const colors = {
       'ADMIN': {
-        gradient: "from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5",
-        iconBg: "from-red-500 to-rose-600",
+        iconBg: "bg-red-50 dark:bg-red-900/20",
+        iconColor: "text-red-500",
       },
       'CEO': {
-        gradient: "from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5",
-        iconBg: "from-purple-500 to-pink-600",
+        iconBg: "bg-purple-50 dark:bg-purple-900/20",
+        iconColor: "text-purple-500",
       },
       'MANAGER': {
-        gradient: "from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5",
-        iconBg: "from-blue-500 to-indigo-600",
+        iconBg: "bg-blue-50 dark:bg-blue-900/20",
+        iconColor: "text-blue-500",
       },
       'TEAM_LEAD': {
-        gradient: "from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5",
-        iconBg: "from-green-500 to-emerald-600",
+        iconBg: "bg-green-50 dark:bg-green-900/20",
+        iconColor: "text-green-500",
       },
       'MEMBER': {
-        gradient: "from-gray-500/10 to-slate-500/10 dark:from-gray-500/5 dark:to-slate-500/5",
-        iconBg: "from-gray-500 to-slate-600",
+        iconBg: "bg-gray-50 dark:bg-gray-800",
+        iconColor: "text-gray-500",
       }
     };
     return colors[role as keyof typeof colors] || colors['MEMBER'];
@@ -66,47 +66,41 @@ export function RoleBasedReports({ userRole, data, loading }: RoleBasedReportsPr
 
   return (
     <div className="space-y-4">
-      {/* Role Header - Glass Morphism */}
-      <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${roleColors.gradient} backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative p-4">
-          <div className="flex items-center gap-4">
-            <div className={`p-3 bg-gradient-to-br ${roleColors.iconBg} rounded-xl shadow-lg`}>
-              <RoleIcon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {userRole.charAt(0) + userRole.slice(1).toLowerCase()} Reports & Analytics
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{scopeDescription}</p>
-            </div>
+      {/* Role Header */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 ${roleColors.iconBg} rounded-lg`}>
+            <RoleIcon className={`h-6 w-6 ${roleColors.iconColor}`} />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {userRole.charAt(0) + userRole.slice(1).toLowerCase()} Reports & Analytics
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{scopeDescription}</p>
           </div>
         </div>
       </div>
 
-      {/* Role-specific Metrics - Glass Morphism */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/5 dark:to-purple-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          <div className="p-4 border-b border-white/20 dark:border-white/10">
-            <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-gray-900 dark:text-white" />
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Key Metrics for {userRole.charAt(0) + userRole.slice(1).toLowerCase()}
-              </h3>
-            </div>
+      {/* Role-specific Metrics */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-gray-900 dark:text-white" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Key Metrics for {userRole.charAt(0) + userRole.slice(1).toLowerCase()}
+            </h3>
           </div>
-          <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {roleMetrics.map((metric, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg">
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-md">
-                    <BarChart3 className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{metric}</span>
+        </div>
+        <div className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {roleMetrics.map((metric, index) => (
+              <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <BarChart3 className="h-4 w-4 text-blue-500" />
                 </div>
-              ))}
-            </div>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{metric}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -124,18 +118,16 @@ export function RoleBasedReports({ userRole, data, loading }: RoleBasedReportsPr
 // Admin Reports Component
 function AdminReports({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-      <div className="relative">
-        <div className="p-4 border-b border-white/20 dark:border-white/10">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-gray-900 dark:text-white" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">System Administration Dashboard</h3>
-          </div>
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-gray-900 dark:text-white" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">System Administration Dashboard</h3>
         </div>
+      </div>
         <div className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-red-500/20 to-rose-500/20 dark:from-red-500/10 dark:to-rose-500/10 border border-red-200 dark:border-red-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
               <div className="flex items-center gap-2 mb-2">
                 <Users className="h-5 w-5 text-red-600 dark:text-red-400" />
                 <span className="text-sm font-semibold text-red-800 dark:text-red-300">Total Users</span>
@@ -144,7 +136,7 @@ function AdminReports({ data, loading }: { data: AnalyticsData | null; loading: 
                 {loading ? "..." : (data?.overview?.total_users || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <UserCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <span className="text-sm font-semibold text-green-800 dark:text-green-300">Active Users</span>
@@ -153,7 +145,7 @@ function AdminReports({ data, loading }: { data: AnalyticsData | null; loading: 
                 {loading ? "..." : (data?.overview?.active_users || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Total Projects</span>
@@ -162,7 +154,7 @@ function AdminReports({ data, loading }: { data: AnalyticsData | null; loading: 
                 {loading ? "..." : (data?.overview?.total_projects || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 border border-purple-200 dark:border-purple-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 <span className="text-sm font-semibold text-purple-800 dark:text-purple-300">System Health</span>
@@ -173,7 +165,6 @@ function AdminReports({ data, loading }: { data: AnalyticsData | null; loading: 
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
@@ -181,18 +172,16 @@ function AdminReports({ data, loading }: { data: AnalyticsData | null; loading: 
 // CEO Reports Component
 function CEOReports({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-      <div className="relative">
-        <div className="p-4 border-b border-white/20 dark:border-white/10">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <Crown className="h-5 w-5 text-gray-900 dark:text-white" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Executive Dashboard</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Executive Dashboard</h3>
           </div>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 border border-purple-200 dark:border-purple-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 <span className="text-sm font-semibold text-purple-800 dark:text-purple-300">Organization Performance</span>
@@ -201,7 +190,7 @@ function CEOReports({ data, loading }: { data: AnalyticsData | null; loading: bo
                 {loading ? "..." : "87%"}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Department Metrics</span>
@@ -210,7 +199,7 @@ function CEOReports({ data, loading }: { data: AnalyticsData | null; loading: bo
                 {loading ? "..." : (data?.overview?.total_projects || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <span className="text-sm font-semibold text-green-800 dark:text-green-300">Strategic KPIs</span>
@@ -221,7 +210,6 @@ function CEOReports({ data, loading }: { data: AnalyticsData | null; loading: bo
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
@@ -229,18 +217,16 @@ function CEOReports({ data, loading }: { data: AnalyticsData | null; loading: bo
 // Manager Reports Component
 function ManagerReports({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-      <div className="relative">
-        <div className="p-4 border-b border-white/20 dark:border-white/10">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-gray-900 dark:text-white" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Department Management Dashboard</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Department Management Dashboard</h3>
           </div>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Department Members</span>
@@ -249,7 +235,7 @@ function ManagerReports({ data, loading }: { data: AnalyticsData | null; loading
                 {loading ? "..." : (data?.overview?.total_users || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <span className="text-sm font-semibold text-green-800 dark:text-green-300">Team Productivity</span>
@@ -258,7 +244,7 @@ function ManagerReports({ data, loading }: { data: AnalyticsData | null; loading
                 {loading ? "..." : "85%"}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 border border-purple-200 dark:border-purple-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 <span className="text-sm font-semibold text-purple-800 dark:text-purple-300">Department KPIs</span>
@@ -269,7 +255,6 @@ function ManagerReports({ data, loading }: { data: AnalyticsData | null; loading
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
@@ -277,18 +262,16 @@ function ManagerReports({ data, loading }: { data: AnalyticsData | null; loading
 // Team Lead Reports Component
 function TeamLeadReports({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-      <div className="relative">
-        <div className="p-4 border-b border-white/20 dark:border-white/10">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <Users2 className="h-5 w-5 text-gray-900 dark:text-white" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Team Leadership Dashboard</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Team Leadership Dashboard</h3>
           </div>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <Users2 className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <span className="text-sm font-semibold text-green-800 dark:text-green-300">Team Members</span>
@@ -297,7 +280,7 @@ function TeamLeadReports({ data, loading }: { data: AnalyticsData | null; loadin
                 {loading ? "..." : (data?.overview?.total_users || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Team Performance</span>
@@ -306,7 +289,7 @@ function TeamLeadReports({ data, loading }: { data: AnalyticsData | null; loadin
                 {loading ? "..." : "82%"}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 border border-purple-200 dark:border-purple-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 <span className="text-sm font-semibold text-purple-800 dark:text-purple-300">Team Efficiency</span>
@@ -317,7 +300,6 @@ function TeamLeadReports({ data, loading }: { data: AnalyticsData | null; loadin
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
@@ -325,18 +307,16 @@ function TeamLeadReports({ data, loading }: { data: AnalyticsData | null; loadin
 // Member Reports Component
 function MemberReports({ data, loading }: { data: AnalyticsData | null; loading: boolean }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-500/10 to-slate-500/10 dark:from-gray-500/5 dark:to-slate-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-      <div className="relative">
-        <div className="p-4 border-b border-white/20 dark:border-white/10">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <User className="h-5 w-5 text-gray-900 dark:text-white" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Personal Performance Dashboard</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Personal Performance Dashboard</h3>
           </div>
         </div>
         <div className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-gray-500/20 to-slate-500/20 dark:from-gray-500/10 dark:to-slate-500/10 border border-gray-200 dark:border-gray-700 shadow-lg">
+            <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 <span className="text-sm font-semibold text-gray-800 dark:text-gray-300">My Tasks</span>
@@ -345,7 +325,7 @@ function MemberReports({ data, loading }: { data: AnalyticsData | null; loading:
                 {loading ? "..." : (data?.overview?.total_tasks || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 border border-green-200 dark:border-green-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <UserCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <span className="text-sm font-semibold text-green-800 dark:text-green-300">Completed Tasks</span>
@@ -354,7 +334,7 @@ function MemberReports({ data, loading }: { data: AnalyticsData | null; loading:
                 {loading ? "..." : (data?.overview?.completed_tasks || 0)}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-800 shadow-lg">
+            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">Productivity</span>
@@ -365,7 +345,6 @@ function MemberReports({ data, loading }: { data: AnalyticsData | null; loading:
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
