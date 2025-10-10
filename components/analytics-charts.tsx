@@ -138,7 +138,7 @@ export function ProjectProgressChart({ data, loading }: { data: ProjectProgressD
         <XAxis type="number" domain={[0, 100]} />
         <YAxis dataKey="name" type="category" width={100} />
         <Tooltip 
-          formatter={(value: number, _name: string) => [`${value}%`, 'Progress']}
+          formatter={(value: number) => [`${value}%`, 'Progress']}
           labelFormatter={(label: string) => `Project: ${label}`}
         />
         <Bar dataKey="percentage" fill="#8884d8" />
@@ -220,59 +220,51 @@ export function MetricCard({
 }) {
   const colorClasses = {
     blue: {
-      gradient: "from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5",
-      iconBg: "from-blue-500 to-indigo-600",
-      iconShadow: "group-hover:shadow-blue-500/50"
+      iconBg: "bg-blue-50 dark:bg-blue-900/20",
+      iconColor: "text-blue-500"
     },
     green: {
-      gradient: "from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5",
-      iconBg: "from-green-500 to-emerald-600",
-      iconShadow: "group-hover:shadow-green-500/50"
+      iconBg: "bg-green-50 dark:bg-green-900/20",
+      iconColor: "text-green-500"
     },
     purple: {
-      gradient: "from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5",
-      iconBg: "from-purple-500 to-pink-600",
-      iconShadow: "group-hover:shadow-purple-500/50"
+      iconBg: "bg-purple-50 dark:bg-purple-900/20",
+      iconColor: "text-purple-500"
     },
     orange: {
-      gradient: "from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5",
-      iconBg: "from-orange-500 to-amber-600",
-      iconShadow: "group-hover:shadow-orange-500/50"
+      iconBg: "bg-orange-50 dark:bg-orange-900/20",
+      iconColor: "text-orange-500"
     },
     red: {
-      gradient: "from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5",
-      iconBg: "from-red-500 to-rose-600",
-      iconShadow: "group-hover:shadow-red-500/50"
+      iconBg: "bg-red-50 dark:bg-red-900/20",
+      iconColor: "text-red-500"
     }
   };
 
   const colors = colorClasses[color as keyof typeof colorClasses];
 
   return (
-    <div className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${colors.gradient} backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer`}>
-      <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient.replace('/10', '/5').replace('/5', '/2')} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-      <div className="relative p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className={`p-2.5 bg-gradient-to-br ${colors.iconBg} rounded-xl shadow-lg ${colors.iconShadow} transition-all group-hover:scale-110`}>
-            <Icon className="h-5 w-5 text-white" />
-          </div>
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+      <div className="flex items-center justify-between mb-3">
+        <div className={`p-2 ${colors.iconBg} rounded-lg`}>
+          <Icon className={`h-5 w-5 ${colors.iconColor}`} />
         </div>
-        <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">{title}</h3>
-        <div className="text-3xl font-bold text-gray-900 dark:text-white">{value}</div>
-        {change !== undefined && changeLabel && (
-          <div className="flex items-center gap-1 mt-2">
-            {change >= 0 ? (
-              <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
-            ) : (
-              <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />
-            )}
-            <span className={`text-xs font-medium ${change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {change >= 0 ? '+' : ''}{change}%
-            </span>
-            <span className="text-xs text-gray-600 dark:text-gray-400">{changeLabel}</span>
-          </div>
-        )}
       </div>
+      <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{title}</h3>
+      <div className="text-3xl font-bold text-gray-900 dark:text-white">{value}</div>
+      {change !== undefined && changeLabel && (
+        <div className="flex items-center gap-1 mt-2">
+          {change >= 0 ? (
+            <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
+          ) : (
+            <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />
+          )}
+          <span className={`text-xs font-medium ${change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {change >= 0 ? '+' : ''}{change}%
+          </span>
+          <span className="text-xs text-gray-600 dark:text-gray-400">{changeLabel}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -287,54 +279,42 @@ export function AnalyticsOverview({
   return (
     <div className="space-y-4">
       {/* Task Status Overview */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          <div className="p-4 border-b border-white/20 dark:border-white/10">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Task Status Distribution</h3>
-          </div>
-          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
-            <TaskStatusChart data={taskStatusData} loading={loading} />
-          </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Task Status Distribution</h3>
+        </div>
+        <div className="p-4">
+          <TaskStatusChart data={taskStatusData} loading={loading} />
         </div>
       </div>
 
       {/* User Activity Trends */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          <div className="p-4 border-b border-white/20 dark:border-white/10">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">User Activity Trends</h3>
-          </div>
-          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
-            <UserActivityChart data={userActivityData} loading={loading} />
-          </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">User Activity Trends</h3>
+        </div>
+        <div className="p-4">
+          <UserActivityChart data={userActivityData} loading={loading} />
         </div>
       </div>
 
       {/* Project Progress */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          <div className="p-4 border-b border-white/20 dark:border-white/10">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Project Progress Overview</h3>
-          </div>
-          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
-            <ProjectProgressChart data={projectProgressData} loading={loading} />
-          </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Project Progress Overview</h3>
+        </div>
+        <div className="p-4">
+          <ProjectProgressChart data={projectProgressData} loading={loading} />
         </div>
       </div>
 
       {/* Team Performance */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          <div className="p-4 border-b border-white/20 dark:border-white/10">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Team Performance Metrics</h3>
-          </div>
-          <div className="p-4 bg-white/40 dark:bg-slate-900/40">
-            <TeamPerformanceChart data={teamPerformanceData} loading={loading} />
-          </div>
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Team Performance Metrics</h3>
+        </div>
+        <div className="p-4">
+          <TeamPerformanceChart data={teamPerformanceData} loading={loading} />
         </div>
       </div>
     </div>

@@ -182,92 +182,83 @@ export default function ReportsPage() {
 
       {/* Error Display */}
       {data.error && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-red-200 dark:border-red-800 shadow-xl">
-          <div className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg">
-                <AlertCircle className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="font-semibold text-red-900 dark:text-red-300">Error loading analytics data</p>
-                <p className="text-sm text-red-700 dark:text-red-400 mt-1">{data.error}</p>
-              </div>
+        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+            </div>
+            <div>
+              <p className="font-semibold text-red-900 dark:text-red-300">Error loading analytics data</p>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-1">{data.error}</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Quick Actions - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 to-gray-500/10 dark:from-slate-500/5 dark:to-gray-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative p-4">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Export Buttons */}
-            <button 
-              onClick={() => handleExportReport('pdf')}
-              disabled={exportLoading.pdf || exportLoading.excel}
-              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-red-500/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
-            >
-              <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-                {exportLoading.pdf ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <FileText className="h-4 w-4" />
-                )}
-              </div>
-              <span>Export PDF</span>
-            </button>
-            
-            <button 
-              onClick={() => handleExportReport('excel')}
-              disabled={exportLoading.pdf || exportLoading.excel}
-              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-green-500/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
-            >
-              <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-                {exportLoading.excel ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <FileText className="h-4 w-4" />
-                )}
-              </div>
-              <span>Export Excel</span>
-            </button>
-            
-            {/* Filters */}
-            <select 
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white text-sm font-medium transition-all cursor-pointer"
-            >
-              <option value="last_7_days">Last 7 days</option>
-              <option value="last_30_days">Last 30 days</option>
-              <option value="last_90_days">Last 90 days</option>
-              <option value="last_year">Last year</option>
-            </select>
-            
-            <select 
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white text-sm font-medium transition-all cursor-pointer"
-            >
-              <option value="all">All Departments</option>
-              <option value="engineering">Engineering</option>
-              <option value="marketing">Marketing</option>
-              <option value="sales">Sales</option>
-              <option value="hr">HR</option>
-              <option value="finance">Finance</option>
-              <option value="operations">Operations</option>
-              <option value="it">IT</option>
-            </select>
-            
-            <button 
-              onClick={fetchAnalyticsData}
-              className="px-5 py-2.5 rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium text-gray-900 dark:text-white cursor-pointer"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </button>
-          </div>
+      {/* Quick Actions */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Export Buttons */}
+          <button 
+            onClick={() => handleExportReport('pdf')}
+            disabled={exportLoading.pdf || exportLoading.excel}
+            className="px-4 py-2 text-sm rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+          >
+            {exportLoading.pdf ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
+            <span>Export PDF</span>
+          </button>
+          
+          <button 
+            onClick={() => handleExportReport('excel')}
+            disabled={exportLoading.pdf || exportLoading.excel}
+            className="px-4 py-2 text-sm rounded-lg bg-green-500 hover:bg-green-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+          >
+            {exportLoading.excel ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
+            <span>Export Excel</span>
+          </button>
+          
+          {/* Filters */}
+          <select 
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-4 py-2 h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white transition-colors cursor-pointer"
+          >
+            <option value="last_7_days">Last 7 days</option>
+            <option value="last_30_days">Last 30 days</option>
+            <option value="last_90_days">Last 90 days</option>
+            <option value="last_year">Last year</option>
+          </select>
+          
+          <select 
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            className="px-4 py-2 h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white transition-colors cursor-pointer"
+          >
+            <option value="all">All Departments</option>
+            <option value="engineering">Engineering</option>
+            <option value="marketing">Marketing</option>
+            <option value="sales">Sales</option>
+            <option value="hr">HR</option>
+            <option value="finance">Finance</option>
+            <option value="operations">Operations</option>
+            <option value="it">IT</option>
+          </select>
+          
+          <button 
+            onClick={fetchAnalyticsData}
+            className="px-4 py-2 h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors flex items-center gap-2 font-medium text-gray-900 dark:text-white cursor-pointer"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
