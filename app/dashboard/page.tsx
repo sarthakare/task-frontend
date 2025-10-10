@@ -218,255 +218,237 @@ export default function Dashboard() {
         description={getRoleBasedDescription(overview?.user_role || '', overview)}
       />
 
-      {/* Key Metrics - Interactive Glass Cards */}
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric Card 1 */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-blue-500/50 transition-all group-hover:scale-110">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full">
-                {overview?.user_role === 'MEMBER' ? 'Tasks' : 'People'}
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Users className="h-5 w-5 text-blue-500" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              {overview?.user_role === 'MEMBER' ? 'My Tasks' : 
-               overview?.user_role === 'TEAM_LEAD' ? 'Team Members' :
-               overview?.user_role === 'MANAGER' ? 'Direct Reports' : 'Total Users'}
-            </h3>
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                <span className="text-sm text-gray-500">Loading...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-2">
-                  {overview?.user_role === 'MEMBER' ? overview?.total_tasks || 0 :
-                   overview?.user_role === 'TEAM_LEAD' ? overview?.team_info?.member_count || 0 :
-                   overview?.user_role === 'MANAGER' ? overview?.direct_subordinates_count || 0 :
-                   overview?.total_users || 0}
-                </div>
-                <div className="flex items-center text-xs font-medium text-blue-600 dark:text-blue-400">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  {overview?.user_role === 'MEMBER' ? `${overview?.completed_tasks || 0} completed` :
-                   overview?.user_role === 'TEAM_LEAD' ? `${overview?.active_users || 0} active` :
-                   overview?.user_role === 'MANAGER' ? `${overview?.active_users || 0} active` :
-                   `${overview?.active_users || 0} active`}
-                </div>
-              </>
-            )}
+            <div className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
+              {overview?.user_role === 'MEMBER' ? 'Tasks' : 'People'}
+            </div>
           </div>
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+            {overview?.user_role === 'MEMBER' ? 'My Tasks' : 
+             overview?.user_role === 'TEAM_LEAD' ? 'Team Members' :
+             overview?.user_role === 'MANAGER' ? 'Direct Reports' : 'Total Users'}
+          </h3>
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+              <span className="text-sm text-gray-500">Loading...</span>
+            </div>
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                {overview?.user_role === 'MEMBER' ? overview?.total_tasks || 0 :
+                 overview?.user_role === 'TEAM_LEAD' ? overview?.team_info?.member_count || 0 :
+                 overview?.user_role === 'MANAGER' ? overview?.direct_subordinates_count || 0 :
+                 overview?.total_users || 0}
+              </div>
+              <div className="flex items-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                {overview?.user_role === 'MEMBER' ? `${overview?.completed_tasks || 0} completed` :
+                 overview?.user_role === 'TEAM_LEAD' ? `${overview?.active_users || 0} active` :
+                 overview?.user_role === 'MANAGER' ? `${overview?.active_users || 0} active` :
+                 `${overview?.active_users || 0} active`}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Metric Card 2 */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/50 transition-all group-hover:scale-110">
-                <FolderOpen className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
-                {overview?.user_role === 'MEMBER' ? 'Done' : 'Projects'}
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <FolderOpen className="h-5 w-5 text-green-500" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              {overview?.user_role === 'MEMBER' ? 'Completed Tasks' : 'Total Projects'}
-            </h3>
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-                <span className="text-sm text-gray-500">Loading...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent mb-2">
-                  {overview?.user_role === 'MEMBER' ? overview?.completed_tasks || 0 : overview?.total_projects || 0}
-                </div>
-                <div className="flex items-center text-xs font-medium text-green-600 dark:text-green-400">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  {overview?.user_role === 'MEMBER' ? 
-                    `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate` :
-                    `${overview?.active_projects || 0} active`}
-                </div>
-              </>
-            )}
+            <div className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">
+              {overview?.user_role === 'MEMBER' ? 'Done' : 'Projects'}
+            </div>
           </div>
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+            {overview?.user_role === 'MEMBER' ? 'Completed Tasks' : 'Total Projects'}
+          </h3>
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+              <span className="text-sm text-gray-500">Loading...</span>
+            </div>
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                {overview?.user_role === 'MEMBER' ? overview?.completed_tasks || 0 : overview?.total_projects || 0}
+              </div>
+              <div className="flex items-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                {overview?.user_role === 'MEMBER' ? 
+                  `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate` :
+                  `${overview?.active_projects || 0} active`}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Metric Card 3 */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-purple-500/50 transition-all group-hover:scale-110">
-                <CheckCircle2 className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full">
-                {overview?.user_role === 'MEMBER' ? 'Pending' : 'Completed'}
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <CheckCircle2 className="h-5 w-5 text-purple-500" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              {overview?.user_role === 'MEMBER' ? 'Pending Tasks' : 'Completed Tasks'}
-            </h3>
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-                <span className="text-sm text-gray-500">Loading...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-2">
-                  {overview?.user_role === 'MEMBER' ? overview?.pending_tasks || 0 : overview?.completed_tasks || 0}
-                </div>
-                <div className="flex items-center text-xs font-medium text-purple-600 dark:text-purple-400">
-                  <Target className="h-3 w-3 mr-1" />
-                  {overview?.user_role === 'MEMBER' ? 
-                    `${overview?.overdue_tasks || 0} overdue` :
-                    `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate`}
-                </div>
-              </>
-            )}
+            <div className="text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded">
+              {overview?.user_role === 'MEMBER' ? 'Pending' : 'Completed'}
+            </div>
           </div>
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+            {overview?.user_role === 'MEMBER' ? 'Pending Tasks' : 'Completed Tasks'}
+          </h3>
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
+              <span className="text-sm text-gray-500">Loading...</span>
+            </div>
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                {overview?.user_role === 'MEMBER' ? overview?.pending_tasks || 0 : overview?.completed_tasks || 0}
+              </div>
+              <div className="flex items-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                <Target className="h-3 w-3 mr-1" />
+                {overview?.user_role === 'MEMBER' ? 
+                  `${overview?.overdue_tasks || 0} overdue` :
+                  `${((overview?.completed_tasks || 0) / Math.max(overview?.total_tasks || 1, 1) * 100).toFixed(1)}% completion rate`}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Metric Card 4 */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-red-500/10 dark:from-orange-500/5 dark:to-red-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-lg group-hover:shadow-orange-500/50 transition-all group-hover:scale-110">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-xs font-semibold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full">
-                {overview?.user_role === 'MEMBER' ? 'Overdue' : 'Pending'}
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <Clock className="h-5 w-5 text-orange-500" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              {overview?.user_role === 'MEMBER' ? 'Overdue Tasks' : 'Pending Tasks'}
-            </h3>
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
-                <span className="text-sm text-gray-500">Loading...</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 dark:from-orange-400 dark:to-red-400 bg-clip-text text-transparent mb-2">
-                  {overview?.user_role === 'MEMBER' ? overview?.overdue_tasks || 0 : overview?.pending_tasks || 0}
-                </div>
-                <div className="flex items-center text-xs font-medium text-orange-600 dark:text-orange-400">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  {overview?.user_role === 'MEMBER' ? 
-                    'Need attention' :
-                    `${overview?.overdue_tasks || 0} overdue`}
-                </div>
-              </>
-            )}
+            <div className="text-xs font-medium text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded">
+              {overview?.user_role === 'MEMBER' ? 'Overdue' : 'Pending'}
+            </div>
           </div>
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+            {overview?.user_role === 'MEMBER' ? 'Overdue Tasks' : 'Pending Tasks'}
+          </h3>
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+              <span className="text-sm text-gray-500">Loading...</span>
+            </div>
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                {overview?.user_role === 'MEMBER' ? overview?.overdue_tasks || 0 : overview?.pending_tasks || 0}
+              </div>
+              <div className="flex items-center text-xs font-medium text-gray-600 dark:text-gray-400">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {overview?.user_role === 'MEMBER' ? 
+                  'Need attention' :
+                  `${overview?.overdue_tasks || 0} overdue`}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Comprehensive Access Scope Info - Modern Glass */}
+      {/* Access Scope Info */}
       {overview?.scope_description && (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 via-gray-500/10 to-zinc-500/10 dark:from-slate-500/5 dark:via-gray-500/5 dark:to-zinc-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse shadow-lg"></div>
-                  <span className="text-lg font-bold text-gray-900 dark:text-white">Your Access Scope</span>
-                </div>
-                <Badge variant="secondary" className="text-xs font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
-                  {overview.scope_description.user_role}
-                </Badge>
-                {overview.team_info && (
-                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                    {overview.team_info.team_name} • {overview.team_info.department}
-                  </span>
-                )}
-              </div>
-              <span className="text-sm text-gray-500 dark:text-gray-400 italic">
-                {overview.scope_description.scope_description}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {/* People in Scope */}
-              <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <Users className="h-5 w-5 text-white" />
-                </div>
-                <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{overview.scope_description.viewable_user_count}</div>
-                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">People in Scope</div>
-              </div>
-
-              {/* Projects */}
-              <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <FolderOpen className="h-5 w-5 text-white" />
-                </div>
-                <div className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{overview.total_projects}</div>
-                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Projects</div>
-              </div>
-
-              {/* Tasks */}
-              <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <CheckCircle2 className="h-5 w-5 text-white" />
-                </div>
-                <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{overview.total_tasks}</div>
-                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Tasks</div>
-              </div>
-
-              {/* Direct Reports */}
-              {overview.scope_details && overview.scope_details.total_direct_reports > 0 && (
-                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                    <Users className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 dark:from-orange-400 dark:to-red-400 bg-clip-text text-transparent">{overview.scope_details.total_direct_reports}</div>
-                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Direct Reports</div>
-                </div>
-              )}
-
-              {/* Teams Leading */}
-              {overview.scope_details && overview.scope_details.total_teams_leading > 0 && (
-                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                    <Users className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">{overview.scope_details.total_teams_leading}</div>
-                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Teams Leading</div>
-                </div>
-              )}
-
-              {/* Department Members */}
-              {overview.scope_details?.department_info && (
-                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="p-2 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                    <Users className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 dark:from-teal-400 dark:to-cyan-400 bg-clip-text text-transparent">{overview.scope_details.department_info.total_members}</div>
-                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Dept. Members</div>
-                </div>
-              )}
-
-              {/* Total Subordinates */}
-              {overview.scope_details && overview.scope_details.total_subordinates > 0 && (
-                <div className="group text-center p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                  <div className="p-2 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform">
-                    <Users className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 dark:from-red-400 dark:to-pink-400 bg-clip-text text-transparent">{overview.scope_details.total_subordinates}</div>
-                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Total Subordinates</div>
-                </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <span className="text-lg font-semibold text-gray-900 dark:text-white">Your Access Scope</span>
+              <Badge variant="secondary" className="text-xs font-medium">
+                {overview.scope_description.user_role}
+              </Badge>
+              {overview.team_info && (
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {overview.team_info.team_name} • {overview.team_info.department}
+                </span>
               )}
             </div>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {overview.scope_description.scope_description}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {/* People in Scope */}
+            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded w-fit mx-auto mb-2">
+                <Users className="h-4 w-4 text-blue-500" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.scope_description.viewable_user_count}</div>
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">People in Scope</div>
+            </div>
+
+            {/* Projects */}
+            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded w-fit mx-auto mb-2">
+                <FolderOpen className="h-4 w-4 text-green-500" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.total_projects}</div>
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Projects</div>
+            </div>
+
+            {/* Tasks */}
+            <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded w-fit mx-auto mb-2">
+                <CheckCircle2 className="h-4 w-4 text-purple-500" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.total_tasks}</div>
+              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Tasks</div>
+            </div>
+
+            {/* Direct Reports */}
+            {overview.scope_details && overview.scope_details.total_direct_reports > 0 && (
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded w-fit mx-auto mb-2">
+                  <Users className="h-4 w-4 text-orange-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.scope_details.total_direct_reports}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Direct Reports</div>
+              </div>
+            )}
+
+            {/* Teams Leading */}
+            {overview.scope_details && overview.scope_details.total_teams_leading > 0 && (
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded w-fit mx-auto mb-2">
+                  <Users className="h-4 w-4 text-indigo-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.scope_details.total_teams_leading}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Teams Leading</div>
+              </div>
+            )}
+
+            {/* Department Members */}
+            {overview.scope_details?.department_info && (
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="p-2 bg-teal-50 dark:bg-teal-900/20 rounded w-fit mx-auto mb-2">
+                  <Users className="h-4 w-4 text-teal-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.scope_details.department_info.total_members}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Dept. Members</div>
+              </div>
+            )}
+
+            {/* Total Subordinates */}
+            {overview.scope_details && overview.scope_details.total_subordinates > 0 && (
+              <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded w-fit mx-auto mb-2">
+                  <Users className="h-4 w-4 text-red-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">{overview.scope_details.total_subordinates}</div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Total Subordinates</div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -474,269 +456,257 @@ export default function Dashboard() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
-        {/* Recent Projects - Modern Glass */}
-        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-                    <BarChart3 className="h-5 w-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent Projects</h3>
+        {/* Recent Projects */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <BarChart3 className="h-5 w-5 text-blue-500" />
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Track progress of ongoing projects</p>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Projects</h3>
               </div>
-              <button 
-                onClick={() => window.location.href = '/projects'}
-                className="px-4 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
-              >
-                <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">View All</span>
-              </button>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Track progress of ongoing projects</p>
             </div>
-            <div className="space-y-3">
-              {isProjectsLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading projects...</span>
-                  </div>
+            <button 
+              onClick={() => window.location.href = '/projects'}
+              className="px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors flex items-center gap-2"
+            >
+              <FolderOpen className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">View All</span>
+            </button>
+          </div>
+          <div className="space-y-3">
+            {isProjectsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading projects...</span>
                 </div>
-              ) : recentProjects.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-full w-fit mx-auto mb-4">
-                    <FolderOpen className="h-12 w-12 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium">No active projects</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first project to get started</p>
+              </div>
+            ) : recentProjects.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-full w-fit mx-auto mb-4">
+                  <FolderOpen className="h-12 w-12 text-blue-500" />
                 </div>
-              ) : (
-                recentProjects.map((project) => {
-                  const progress = calculateProjectProgress(project);
-                  return (
-                    <div key={project.id} className="group p-5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold text-gray-900 dark:text-white text-lg">{project.name}</h4>
-                        <Badge className={`${getStatusColor(project.status)} font-semibold px-3 py-1`}>
-                          {project.status.replace('_', ' ')}
-                        </Badge>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">No active projects</p>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Create your first project to get started</p>
+              </div>
+            ) : (
+              recentProjects.map((project) => {
+                const progress = calculateProjectProgress(project);
+                return (
+                  <div key={project.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{project.name}</h4>
+                      <Badge className={`${getStatusColor(project.status)} font-medium px-2 py-1`}>
+                        {project.status.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Progress: {progress}%</span>
+                        <span className="text-gray-600 dark:text-gray-400">{project.assigned_teams.length} team{project.assigned_teams.length !== 1 ? 's' : ''}</span>
                       </div>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between text-sm font-medium">
-                          <span className="text-gray-700 dark:text-gray-300">Progress: {progress}%</span>
-                          <span className="text-gray-600 dark:text-gray-400">{project.assigned_teams.length} team{project.assigned_teams.length !== 1 ? 's' : ''}</span>
-                        </div>
-                        <div className="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div 
-                            className="absolute h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 group-hover:shadow-lg"
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
-                        <div className="flex items-center justify-between text-xs font-medium">
-                          <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                            <Calendar className="h-3.5 w-3.5" />
-                            Due: {new Date(project.end_date).toLocaleDateString()}
-                          </span>
-                          <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                            <Users className="h-3.5 w-3.5" />
-                            Manager: {project.manager.name}
-                          </span>
-                        </div>
+                      <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          className="absolute h-full bg-blue-500 rounded-full transition-all duration-500"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Due: {new Date(project.end_date).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                          <Users className="h-3.5 w-3.5" />
+                          Manager: {project.manager.name}
+                        </span>
                       </div>
                     </div>
-                  );
-                })
-              )}
-            </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* Recent Activities - Modern Glass */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-4">
-            <div className="mb-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg shadow-lg">
-                  <Activity className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent Activities</h3>
+        {/* Recent Activities */}
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <Activity className="h-5 w-5 text-green-500" />
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Latest team activities</p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Activities</h3>
             </div>
-            <div className="space-y-3">
-              {isActivitiesLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-green-500" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading activities...</span>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Latest team activities</p>
+          </div>
+          <div className="space-y-3">
+            {isActivitiesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading activities...</span>
+                </div>
+              </div>
+            ) : recentActivities.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-full w-fit mx-auto mb-4">
+                  <Activity className="h-12 w-12 text-green-500" />
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">No recent activities</p>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Activity will appear here as your team works</p>
+              </div>
+            ) : (
+              recentActivities.map((activity, index) => (
+                <div key={activity.id || index} className="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="flex-shrink-0 mt-0.5 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    {getActivityIcon(activity.description)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{activity.user.name}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{activity.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{formatTimeAgo(activity.created_at)}</p>
                   </div>
                 </div>
-              ) : recentActivities.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-full w-fit mx-auto mb-4">
-                    <Activity className="h-12 w-12 text-green-600 dark:text-green-400" />
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium">No recent activities</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Activity will appear here as your team works</p>
-                </div>
-              ) : (
-                recentActivities.map((activity, index) => (
-                  <div key={activity.id || index} className="group flex items-start space-x-3 p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-                    <div className="flex-shrink-0 mt-0.5 p-2 bg-gradient-to-br from-green-500/20 to-emerald-500/20 dark:from-green-500/10 dark:to-emerald-500/10 rounded-lg group-hover:scale-110 transition-transform">
-                      {getActivityIcon(activity.description)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{activity.user.name}</p>
-                      <p className="text-xs text-gray-700 dark:text-gray-300 mt-1 font-medium">{activity.description}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{formatTimeAgo(activity.created_at)}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            {!isActivitiesLoading && recentActivities.length > 0 && (
-              <button 
-                onClick={() => window.location.href = '/reports'}
-                className="w-full mt-4 px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                View All Activities
-              </button>
+              ))
             )}
           </div>
+          {!isActivitiesLoading && recentActivities.length > 0 && (
+            <button 
+              onClick={() => window.location.href = '/reports'}
+              className="w-full mt-4 px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors text-sm font-medium text-gray-900 dark:text-white"
+            >
+              View All Activities
+            </button>
+          )}
         </div>
       </div>
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         
-        {/* Task Summary - Modern Glass */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-4">
-            <div className="mb-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-lg">
-                  <Target className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Task Summary</h3>
+        {/* Task Summary */}
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <Target className="h-5 w-5 text-purple-500" />
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Overview of task distribution</p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Task Summary</h3>
             </div>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex items-center gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading...</span>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 rounded-xl border border-blue-200/50 dark:border-blue-700/30 hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg group-hover:scale-110 transition-transform">
-                      <Clock className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Total Tasks</span>
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{overview?.total_tasks || 0}</span>
-                </div>
-                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 rounded-xl border border-green-200/50 dark:border-green-700/30 hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform">
-                      <CheckCircle2 className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Completed</span>
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{overview?.completed_tasks || 0}</span>
-                </div>
-                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5 rounded-xl border border-orange-200/50 dark:border-orange-700/30 hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg group-hover:scale-110 transition-transform">
-                      <Clock className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Pending</span>
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 dark:from-orange-400 dark:to-amber-400 bg-clip-text text-transparent">{overview?.pending_tasks || 0}</span>
-                </div>
-                <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 rounded-xl border border-red-200/50 dark:border-red-700/30 hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg group-hover:scale-110 transition-transform">
-                      <AlertCircle className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Overdue</span>
-                  </div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-400 dark:to-rose-400 bg-clip-text text-transparent">{overview?.overdue_tasks || 0}</span>
-                </div>
-              </div>
-            )}
+            <p className="text-sm text-gray-600 dark:text-gray-400">Overview of task distribution</p>
           </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <Clock className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Total Tasks</span>
+                </div>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{overview?.total_tasks || 0}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Completed</span>
+                </div>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{overview?.completed_tasks || 0}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <Clock className="h-4 w-4 text-orange-500" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Pending</span>
+                </div>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{overview?.pending_tasks || 0}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">Overdue</span>
+                </div>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{overview?.overdue_tasks || 0}</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Upcoming Deadlines - Modern Glass */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500/10 to-rose-500/10 dark:from-red-500/5 dark:to-rose-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-          <div className="relative p-4">
-            <div className="mb-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg shadow-lg">
-                  <Bell className="h-5 w-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Upcoming Deadlines</h3>
+        {/* Upcoming Deadlines */}
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4">
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <Bell className="h-5 w-5 text-red-500" />
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Tasks due soon</p>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Upcoming Deadlines</h3>
             </div>
-            <div className="space-y-3">
-              {isDeadlinesLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-red-500" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading deadlines...</span>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Tasks due soon</p>
+          </div>
+          <div className="space-y-3">
+            {isDeadlinesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-red-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading deadlines...</span>
+                </div>
+              </div>
+            ) : upcomingDeadlines.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-full w-fit mx-auto mb-4">
+                  <Bell className="h-12 w-12 text-red-500" />
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">No upcoming deadlines</p>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">All tasks are on track</p>
+              </div>
+            ) : (
+              upcomingDeadlines.map((task, index) => (
+                <div key={task.id || index} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border-l-4 border-l-blue-500 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{task.title}</h4>
+                    <Badge className={`${getPriorityColor(task.priority)} font-medium px-2 py-0.5`}>
+                      {task.priority}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">{task.project?.name || 'No project'}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5" />
+                      Due: {new Date(task.due_date).toLocaleDateString()}
+                    </span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5" />
+                      {task.assignee.name}
+                    </span>
                   </div>
                 </div>
-              ) : upcomingDeadlines.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="p-4 bg-gradient-to-br from-red-500/20 to-rose-500/20 dark:from-red-500/10 dark:to-rose-500/10 rounded-full w-fit mx-auto mb-4">
-                    <Bell className="h-12 w-12 text-red-600 dark:text-red-400" />
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-400 font-medium">No upcoming deadlines</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">All tasks are on track</p>
-                </div>
-              ) : (
-                upcomingDeadlines.map((task, index) => (
-                  <div key={task.id || index} className="group relative p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border-l-4 border-l-blue-500 border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{task.title}</h4>
-                      <Badge className={`${getPriorityColor(task.priority)} font-semibold px-2 py-0.5`}>
-                        {task.priority}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 font-medium">{task.project?.name || 'No project'}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5 font-medium">
-                        <Calendar className="h-3.5 w-3.5" />
-                        Due: {new Date(task.due_date).toLocaleDateString()}
-                      </span>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1.5 font-medium">
-                        <Users className="h-3.5 w-3.5" />
-                        {task.assignee.name}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            {!isDeadlinesLoading && upcomingDeadlines.length > 0 && (
-              <button 
-                onClick={() => window.location.href = '/tasks'}
-                className="w-full mt-4 px-4 py-2.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                View All Tasks
-              </button>
+              ))
             )}
           </div>
+          {!isDeadlinesLoading && upcomingDeadlines.length > 0 && (
+            <button 
+              onClick={() => window.location.href = '/tasks'}
+              className="w-full mt-4 px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors text-sm font-medium text-gray-900 dark:text-white"
+            >
+              View All Tasks
+            </button>
+          )}
         </div>
       </div>
 

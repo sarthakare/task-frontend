@@ -186,223 +186,203 @@ export default function UsersPage() {
         action={canCreate ? <UserCreateForm onUserCreated={handleUserCreated} /> : null}
       />
 
-      {/* User Stats - Modern Glass Cards */}
+      {/* User Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
         {/* Total Users */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-blue-500/50 transition-all group-hover:scale-110">
-                <Users className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Users className="h-5 w-5 text-blue-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Total Users</h3>
-            {isLoadingStats ? (
-              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{stats?.total_users || 0}</div>
-                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mt-1">Total members</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Users</h3>
+          {isLoadingStats ? (
+            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.total_users || 0}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Total members</p>
+            </>
+          )}
         </div>
 
         {/* Active Users */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-green-500/50 transition-all group-hover:scale-110">
-                <CheckCircle2 className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Active Users</h3>
-            {isLoadingStats ? (
-              <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{stats?.active_users || 0}</div>
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 mt-1">Active members</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Active Users</h3>
+          {isLoadingStats ? (
+            <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.active_users || 0}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Active members</p>
+            </>
+          )}
         </div>
 
         {/* Managers */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg group-hover:shadow-purple-500/50 transition-all group-hover:scale-110">
-                <Users className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <Users className="h-5 w-5 text-purple-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Managers</h3>
-            {isLoadingStats ? (
-              <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">{stats?.users_by_role?.manager || 0}</div>
-                <p className="text-xs font-medium text-purple-600 dark:text-purple-400 mt-1">Team managers</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Managers</h3>
+          {isLoadingStats ? (
+            <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.users_by_role?.manager || 0}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Team managers</p>
+            </>
+          )}
         </div>
 
         {/* Team Leads */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-amber-500/10 dark:from-orange-500/5 dark:to-amber-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl shadow-lg group-hover:shadow-orange-500/50 transition-all group-hover:scale-110">
-                <Users className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <Users className="h-5 w-5 text-orange-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Team Leads</h3>
-            {isLoadingStats ? (
-              <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 dark:from-orange-400 dark:to-amber-400 bg-clip-text text-transparent">{stats?.users_by_role?.team_lead || 0}</div>
-                <p className="text-xs font-medium text-orange-600 dark:text-orange-400 mt-1">Team leaders</p>
-              </>
-            )}
           </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Team Leads</h3>
+          {isLoadingStats ? (
+            <Loader2 className="h-5 w-5 animate-spin text-orange-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.users_by_role?.team_lead || 0}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Team leaders</p>
+            </>
+          )}
         </div>
 
         {/* Members */}
-        <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/5 dark:to-purple-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg group-hover:shadow-indigo-500/50 transition-all group-hover:scale-110">
-                <Users className="h-5 w-5 text-white" />
-              </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+              <Users className="h-5 w-5 text-indigo-500" />
             </div>
-            <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Members</h3>
-            {isLoadingStats ? (
-              <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
-            ) : (
-              <>
-                <div className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">{stats?.users_by_role?.member || 0}</div>
-                <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mt-1">Team members</p>
-              </>
-            )}
+          </div>
+          <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Members</h3>
+          {isLoadingStats ? (
+            <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.users_by_role?.member || 0}</div>
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">Team members</p>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-3">
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search users..."
+                className="pl-10 pr-3 py-2 w-full text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
+              <SelectTrigger className="h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors cursor-pointer">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active Only</SelectItem>
+                <SelectItem value="inactive">Inactive Only</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors cursor-pointer">
+                <SelectValue placeholder="Department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {stats?.users_by_department && Object.keys(stats.users_by_department).map((dept) => (
+                  <SelectItem key={dept} value={dept}>
+                    {dept.charAt(0).toUpperCase() + dept.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="h-9 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors cursor-pointer">
+                <SelectValue placeholder="Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                {stats?.users_by_role && Object.keys(stats.users_by_role).map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' ')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
-      {/* Search and Filters - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-500/10 to-gray-500/10 dark:from-slate-500/5 dark:to-gray-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative p-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Search users by name, email, department, or role..."
-                  className="pl-12 pr-4 py-3 w-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+      {/* Users List */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Users className="h-6 w-6 text-blue-500" />
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
-                <SelectTrigger className="h-11 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active Only</SelectItem>
-                  <SelectItem value="inactive">Inactive Only</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger className="h-11 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                  <SelectValue placeholder="Department" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {stats?.users_by_department && Object.keys(stats.users_by_department).map((dept) => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept.charAt(0).toUpperCase() + dept.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="h-11 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-xl transition-all cursor-pointer">
-                  <SelectValue placeholder="Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Roles</SelectItem>
-                  {stats?.users_by_role && Object.keys(stats.users_by_role).map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {role.charAt(0).toUpperCase() + role.slice(1).replace('_', ' ')}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">All Users</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {filteredUsers.length !== users.length
+                  ? `Showing ${filteredUsers.length} of ${users.length} users`
+                  : `${filteredUsers.length} users total`
+                }
+              </p>
             </div>
           </div>
+
+          {/* View Toggle Buttons */}
+          <div className="flex bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+            <button
+              onClick={() => setViewMode('card')}
+              className={`h-9 px-4 rounded flex items-center gap-2 transition-colors cursor-pointer ${viewMode === 'card'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+            >
+              <Grid3X3 className="h-4 w-4" />
+              <span className="text-sm font-medium">Card</span>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`h-9 px-4 rounded flex items-center gap-2 transition-colors cursor-pointer ${viewMode === 'list'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+            >
+              <List className="h-4 w-4" />
+              <span className="text-sm font-medium">List</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Users List - Modern Glass */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-purple-500/10 dark:from-blue-500/5 dark:via-indigo-500/5 dark:to-purple-500/5 backdrop-blur-sm border border-white/20 dark:border-white/10 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 dark:from-white/5 dark:to-transparent"></div>
-        <div className="relative">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/20 dark:border-white/10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">All Users</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {filteredUsers.length !== users.length
-                    ? `Showing ${filteredUsers.length} of ${users.length} users`
-                    : `${filteredUsers.length} users total`
-                  }
-                </p>
-              </div>
-            </div>
-
-            {/* View Toggle Buttons */}
-            <div className="flex bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-xl border border-white/40 dark:border-slate-700/40 shadow-lg p-1">
-              <button
-                  onClick={() => setViewMode('card')}
-                className={`h-9 px-4 rounded-lg flex items-center gap-2 transition-all duration-200 cursor-pointer ${viewMode === 'card'
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
-                  }`}
-              >
-                <Grid3X3 className="h-4 w-4" />
-                <span className="text-sm font-medium">Card</span>
-              </button>
-              <button
-                  onClick={() => setViewMode('list')}
-                className={`h-9 px-4 rounded-lg flex items-center gap-2 transition-all duration-200 cursor-pointer ${viewMode === 'list'
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-slate-700/50'
-                  }`}
-              >
-                <List className="h-4 w-4" />
-                <span className="text-sm font-medium">List</span>
-              </button>
-              </div>
-            </div>
-
-          {/* Content */}
-          <div className="p-4">
+        {/* Content */}
+        <div className="p-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center gap-3">
@@ -412,8 +392,8 @@ export default function UsersPage() {
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="text-center py-12">
-              <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-full w-fit mx-auto mb-4">
-                <Users className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-full w-fit mx-auto mb-4">
+                <Users className="h-12 w-12 text-blue-500" />
               </div>
               <p className="text-gray-600 dark:text-gray-400 font-medium">
                 {searchTerm ? 'No users found matching your search.' : 'No users found.'}
@@ -422,7 +402,7 @@ export default function UsersPage() {
           ) : (
             <div className={viewMode === 'card' ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'space-y-2.5'}>
               {filteredUsers.map((user) => (
-                <div key={user.id} className={`group relative overflow-hidden rounded-xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/40 dark:border-slate-700/40 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 ${viewMode === 'list' ? 'p-3.5' : 'p-4'
+                <div key={user.id} className={`bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${viewMode === 'list' ? 'p-3.5' : 'p-4'
                   } ${!user.is_active ? 'opacity-75' : ''}`}>
                   {viewMode === 'card' ? (
                     /* Card View Layout - Modern */
@@ -434,7 +414,7 @@ export default function UsersPage() {
                             <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-800 ${user.is_active ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                           </div>
                           <div>
-                            <h3 className="font-bold text-gray-900 dark:text-white text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            <h3 className="font-bold text-gray-900 dark:text-white text-lg">
                               {user.name}
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
@@ -446,22 +426,22 @@ export default function UsersPage() {
                         
                         <div className="flex flex-wrap gap-2">
                           {user.role.toUpperCase() !== 'CEO' && (
-                            <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${
-                              user.role === 'team_lead' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' :
-                              user.role === 'manager' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
-                              user.role === 'member' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' :
-                              'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                            <span className={`px-3 py-1.5 text-xs font-medium rounded-lg ${
+                              user.role === 'team_lead' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                              user.role === 'manager' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                              user.role === 'member' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                              'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                             }`}>
                               {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
                             </span>
                           )}
-                          <span className={`px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${
-                            user.is_active ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' : 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                          <span className={`px-3 py-1.5 text-xs font-medium rounded-lg ${
+                            user.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }`}>
                             {user.is_active ? 'Active' : 'Inactive'}
                           </span>
                           {user.role.toUpperCase() !== 'CEO' && (
-                            <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/80 dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-600 shadow-sm">
+                            <span className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
                               {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
                             </span>
                           )}
@@ -473,7 +453,7 @@ export default function UsersPage() {
                         {(currentUser?.role.toUpperCase() === 'ADMIN' || currentUser?.role.toUpperCase() === 'CEO') && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer">
+                              <button className="h-9 w-9 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                               </button>
                             </DropdownMenuTrigger>
@@ -519,22 +499,22 @@ export default function UsersPage() {
                         )}
                           <div className="flex gap-2 mt-2">
                           {user.role.toUpperCase() !== 'CEO' && (
-                              <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg shadow-sm ${
-                                user.role === 'team_lead' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' :
-                                user.role === 'manager' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
-                                user.role === 'member' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' :
-                                'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                              <span className={`px-2.5 py-1 text-xs font-medium rounded-lg ${
+                                user.role === 'team_lead' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                user.role === 'manager' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' :
+                                user.role === 'member' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                             }`}>
                               {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ')}
                             </span>
                           )}
-                            <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg shadow-sm ${
-                              user.is_active ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' : 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                            <span className={`px-2.5 py-1 text-xs font-medium rounded-lg ${
+                              user.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }`}>
                             {user.is_active ? 'Active' : 'Inactive'}
                           </span>
                           {user.role.toUpperCase() !== 'CEO' && (
-                              <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white/80 dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-600 shadow-sm">
+                              <span className="px-2.5 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
                               {user.department.charAt(0).toUpperCase() + user.department.slice(1)}
                             </span>
                           )}
@@ -545,7 +525,7 @@ export default function UsersPage() {
                         {(currentUser?.role.toUpperCase() === 'ADMIN' || currentUser?.role.toUpperCase() === 'CEO') && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                              <button className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-700/80 border border-gray-200 dark:border-slate-600 shadow-sm hover:shadow-md hover:scale-105 transition-all flex items-center justify-center cursor-pointer">
+                              <button className="h-9 w-9 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                               </button>
                           </DropdownMenuTrigger>
@@ -580,7 +560,6 @@ export default function UsersPage() {
               ))}
             </div>
           )}
-          </div>
         </div>
       </div>
 
