@@ -102,30 +102,30 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden">
-        <DialogHeader className="pb-6 pr-10 border-b border-gray-500">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden bg-white dark:bg-gray-900">
+        <DialogHeader className="pb-6 pr-10 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
                 {getStatusIcon(task.status)}
-                <DialogTitle className="text-2xl font-bold text-gray-900 pr-4">
+                <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white pr-4">
                   {task.title}
                 </DialogTitle>
                 {isOverdue(task.due_date, task.status) && (
-                  <Badge className="bg-red-100 text-red-800 border-red-200 animate-pulse">
+                  <Badge className="bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800 animate-pulse">
                     Overdue
                   </Badge>
                 )}
               </div>
-              <DialogDescription className="text-gray-600 text-base">
+              <DialogDescription className="text-gray-600 dark:text-gray-400 text-base">
                 Complete task details and progress information
               </DialogDescription>
             </div>
             <div className="flex flex-col gap-2">
-              <Badge className={`${getStatusColor(task.status)} border text-sm font-medium px-3 py-1`}>
+              <Badge className={`${getStatusColor(task.status)} dark:bg-opacity-20 border text-sm font-medium px-3 py-1`}>
                 {task.status.replace('_', ' ')}
               </Badge>
-              <Badge className={`${getPriorityColor(task.priority)} border text-sm font-medium px-3 py-1`}>
+              <Badge className={`${getPriorityColor(task.priority)} dark:bg-opacity-20 border text-sm font-medium px-3 py-1`}>
                 <Flag className="h-3 w-3 mr-1" />
                 {task.priority}
               </Badge>
@@ -138,44 +138,44 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
             
             {/* Task Description */}
             <div className="space-y-4">
-              <h3 className="text-md font-semibold text-gray-900 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600" />
+              <h3 className="text-md font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-500" />
                 Description
               </h3>
               
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-200">
-                <p className="text-gray-800 leading-relaxed text-sm">{task.description}</p>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                <p className="text-gray-800 dark:text-gray-300 leading-relaxed text-sm">{task.description}</p>
               </div>
             </div>
 
             {/* People & Assignment */}
             <div className="space-y-4">
-              <h3 className="text-md font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-md font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Users className="h-5 w-5 text-green-600" />
                 People & Assignment
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-green-100 rounded-md">
                       <User className="h-4 w-4 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-green-800">Assigned To</p>
-                      <p className="text-sm font-semibold text-green-900">{task.assignee?.name || 'Unassigned'}</p>
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Assigned To</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{task.assignee?.name || 'Unassigned'}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-200">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-purple-100 rounded-md">
                       <User className="h-4 w-4 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-purple-800">Created By</p>
-                      <p className="text-sm font-semibold text-purple-900">{task.creator?.name}</p>
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Created By</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{task.creator?.name}</p>
                     </div>
                   </div>
                 </div>
@@ -185,21 +185,21 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
             {/* Project & Team */}
             {(task.project?.name || task.team?.name) && (
               <div className="space-y-4">
-                <h3 className="text-md font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-md font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <FolderOpen className="h-5 w-5 text-orange-600" />
                   Project & Team
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {task.project?.name && (
-                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-3 border border-orange-200">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 bg-orange-100 rounded-md">
                           <FolderOpen className="h-4 w-4 text-orange-600" />
                         </div>
                         <div>
-                          <p className="text-xs font-medium text-orange-800">Project</p>
-                          <p className="text-sm font-semibold text-orange-900">{task.project.name}</p>
+                          <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Project</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{task.project.name}</p>
                         </div>
                       </div>
                     </div>
@@ -226,7 +226,7 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
 
             {/* Timeline */}
             <div className="space-y-4">
-              <h3 className="text-md font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-md font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-blue-600" />
                 Timeline & Dates
               </h3>
@@ -238,8 +238,8 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
                       <Clock className="h-4 w-4 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-blue-800">Start Date</p>
-                      <p className="text-sm font-semibold text-blue-900">{formatDate(task.start_date)}</p>
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Start Date</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(task.start_date)}</p>
                     </div>
                   </div>
                 </div>
@@ -261,14 +261,14 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-green-100 rounded-md">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-green-800">Follow-up Date</p>
-                      <p className="text-sm font-semibold text-green-900">{formatDate(task.follow_up_date)}</p>
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Follow-up Date</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(task.follow_up_date)}</p>
                     </div>
                   </div>
                 </div>
@@ -281,21 +281,21 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
             {(task.project || task.team) && (
               <>
                 <div className="space-y-4">
-                  <h3 className="text-md font-semibold text-gray-900 flex items-center gap-2">
+                  <h3 className="text-md font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <FolderOpen className="h-5 w-5 text-green-600" />
                     Project & Team Context
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {task.project && (
-                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center gap-2">
                           <div className="p-1.5 bg-green-100 rounded-md">
                             <FolderOpen className="h-4 w-4 text-green-600" />
                           </div>
                           <div>
-                            <p className="text-xs font-medium text-green-800">Project</p>
-                            <p className="text-sm font-semibold text-green-900">{task.project.name}</p>
+                            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Project</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">{task.project.name}</p>
                             <p className="text-xs text-green-600 mt-1">Status: {task.project.status}</p>
                           </div>
                         </div>
@@ -325,7 +325,7 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
 
             {/* System Information */}
             <div className="space-y-4">
-              <h3 className="text-md font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-md font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Clock className="h-5 w-5 text-gray-500" />
                 System Information
               </h3>
@@ -351,22 +351,22 @@ export function TaskDetailsModal({ task, trigger }: TaskDetailsModalProps) {
                         <Clock className="h-4 w-4 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-blue-800">Last Updated</p>
-                        <p className="text-sm font-semibold text-blue-900">{formatDateTime(task.updated_at)}</p>
+                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Last Updated</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDateTime(task.updated_at)}</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {task.completedAt && (
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2">
                       <div className="p-1.5 bg-green-100 rounded-md">
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-green-800">Completed</p>
-                        <p className="text-sm font-semibold text-green-900">{formatDateTime(task.completedAt)}</p>
+                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Completed</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDateTime(task.completedAt)}</p>
                       </div>
                     </div>
                   </div>

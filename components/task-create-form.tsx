@@ -307,11 +307,9 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
   const defaultTrigger = (
     <button 
       onClick={() => setIsDialogOpen(true)} 
-      className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:ring-offset-2 cursor-pointer"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
     >
-      <div className="p-1 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-        <Plus className="h-4 w-4" />
-      </div>
+      <Plus className="h-4 w-4" />
       <span>Create Task</span>
     </button>
   );
@@ -321,15 +319,15 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden">
-        <DialogHeader className="pb-6 border-b border-gray-100">
-          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-              <Plus className="h-5 w-5 text-white" />
+      <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden bg-white dark:bg-gray-900">
+        <DialogHeader className="pb-6 border-b border-gray-200 dark:border-gray-800">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <Plus className="h-5 w-5 text-blue-500" />
             </div>
             Create New Task
           </DialogTitle>
-          <DialogDescription className="text-gray-600 mt-2">
+          <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2">
             Fill out the form below to create a new task with all necessary details and assignments.
           </DialogDescription>
         </DialogHeader>
@@ -339,38 +337,38 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
             
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-indigo-500 to-blue-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
                 Basic Information
               </h3>
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Task Name *</Label>
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300">Task Name *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="Enter task name"
-                    className={`h-10 bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.title ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
+                    className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.title ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
-                  {errors.title && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.title && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.title}
                   </p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description *</Label>
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Enter task description and requirements"
                     rows={3}
-                    className={`bg-white border-gray-200 hover:border-indigo-300 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-indigo-500'}`}
+                    className={`bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.description ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
-                  {errors.description && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.description && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.description}
                   </p>}
@@ -380,16 +378,16 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
 
             {/* Assignment & Context */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
                 Assignment & Context
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="project_id" className="text-sm font-medium text-gray-700">Project</Label>
+                  <Label htmlFor="project_id" className="text-sm font-medium text-gray-700 dark:text-gray-300">Project</Label>
                   <Select value={formData.project_id} onValueChange={(value) => handleInputChange('project_id', value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue placeholder={isLoadingProjects ? "Loading..." : "Select project"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -410,9 +408,9 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="team_id" className="text-sm font-medium text-gray-700">Team</Label>
+                  <Label htmlFor="team_id" className="text-sm font-medium text-gray-700 dark:text-gray-300">Team</Label>
                   <Select value={formData.team_id} onValueChange={(value) => handleInputChange('team_id', value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue placeholder={isLoadingTeams ? "Loading..." : "Select team"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -433,9 +431,9 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="assigned_to" className="text-sm font-medium text-gray-700">Assignee *</Label>
+                  <Label htmlFor="assigned_to" className="text-sm font-medium text-gray-700 dark:text-gray-300">Assignee *</Label>
                   <Select value={formData.assigned_to} onValueChange={(value) => handleInputChange('assigned_to', value)}>
-                    <SelectTrigger className={`h-10 bg-white border-gray-200 hover:border-blue-300 transition-colors ${errors.assigned_to ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
+                    <SelectTrigger className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.assigned_to ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}>
                       <SelectValue placeholder={isLoadingUsers ? "Loading..." : "Select assignee"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -453,7 +451,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.assigned_to && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.assigned_to && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.assigned_to}
                   </p>}
@@ -463,16 +461,16 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
 
             {/* Status & Priority */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-green-500 rounded-full"></div>
                 Status & Priority
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="status" className="text-sm font-medium text-gray-700">Status</Label>
+                  <Label htmlFor="status" className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</Label>
                   <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-green-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -487,9 +485,9 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="priority" className="text-sm font-medium text-gray-700">Priority</Label>
+                  <Label htmlFor="priority" className="text-sm font-medium text-gray-700 dark:text-gray-300">Priority</Label>
                   <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 hover:border-green-300 transition-colors">
+                    <SelectTrigger className="h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -505,14 +503,14 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
 
             {/* Dates */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-orange-500 rounded-full"></div>
                 Dates
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="start_date" className="text-sm font-medium text-gray-700">Start Date *</Label>
+                  <Label htmlFor="start_date" className="text-sm font-medium text-gray-700 dark:text-gray-300">Start Date *</Label>
                   <Input
                     id="start_date"
                     type="date"
@@ -520,14 +518,14 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                     onChange={(e) => handleInputChange('start_date', e.target.value)}
                     className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.start_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
-                  {errors.start_date && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.start_date && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.start_date}
                   </p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="due_date" className="text-sm font-medium text-gray-700">Due Date *</Label>
+                  <Label htmlFor="due_date" className="text-sm font-medium text-gray-700 dark:text-gray-300">Due Date *</Label>
                   <Input
                     id="due_date"
                     type="date"
@@ -536,14 +534,14 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                     min={formData.start_date}
                     className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
-                  {errors.due_date && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.due_date && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.due_date}
                   </p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="follow_up_date" className="text-sm font-medium text-gray-700">Follow-up Date *</Label>
+                  <Label htmlFor="follow_up_date" className="text-sm font-medium text-gray-700 dark:text-gray-300">Follow-up Date *</Label>
                   <Input
                     id="follow_up_date"
                     type="date"
@@ -552,7 +550,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                     min={formData.start_date}
                     className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.follow_up_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
-                  {errors.follow_up_date && <p className="text-sm text-red-500 flex items-center gap-1">
+                  {errors.follow_up_date && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
                     <XCircle className="h-4 w-4" />
                     {errors.follow_up_date}
                   </p>}
@@ -562,13 +560,13 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
 
             {/* Attachments */}
             <div className="space-y-4">
-              <h3 className="text-base sm:text-lg font-medium text-gray-900 border-b pb-2 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-600 rounded-full"></div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2 flex items-center gap-2">
+                <div className="w-1 h-6 bg-pink-500 rounded-full"></div>
                 Attachments
               </h3>
               
               <div className="space-y-3">
-                <Label htmlFor="attachments" className="text-sm font-medium text-gray-700">Upload Files</Label>
+                <Label htmlFor="attachments" className="text-sm font-medium text-gray-700 dark:text-gray-300">Upload Files</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     id="attachments"
@@ -600,7 +598,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                               <FileText className="h-4 w-4 text-purple-600" />
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-sm font-medium text-gray-700">{file.name}</span>
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{file.name}</span>
                               <span className="text-xs text-gray-500">
                                 {file.size > 1024 * 1024 
                                   ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
@@ -627,15 +625,15 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
             </div>
 
             {errors.submit && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 flex items-center gap-2">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                   <XCircle className="h-5 w-5" />
                   {errors.submit}
                 </p>
               </div>
             )}
 
-            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-800">
               <Button
                 type="button"
                 variant="outline"
@@ -644,14 +642,14 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                   setIsDialogOpen(false);
                 }}
                 disabled={isSubmitting}
-                className="px-6 h-10 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                className="px-6 h-10 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 h-10 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 h-10 bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
               >
                 {isSubmitting ? (
                   <>
