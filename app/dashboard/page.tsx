@@ -145,20 +145,6 @@ export default function Dashboard() {
     }
   };
 
-  const calculateProjectProgress = (project: Project) => {
-    // Since we don't have progress data, we'll estimate based on dates
-    const start = new Date(project.start_date);
-    const end = new Date(project.end_date);
-    const now = new Date();
-    
-    if (now < start) return 0;
-    if (now > end) return 100;
-    
-    const totalDuration = end.getTime() - start.getTime();
-    const elapsed = now.getTime() - start.getTime();
-    return Math.floor((elapsed / totalDuration) * 100);
-  };
-
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -466,7 +452,7 @@ export default function Dashboard() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Projects</h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Track progress of ongoing projects</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Overview of active projects</p>
             </div>
             <button 
               onClick={() => window.location.href = '/projects'}
@@ -494,7 +480,6 @@ export default function Dashboard() {
               </div>
             ) : (
               recentProjects.map((project) => {
-                const progress = calculateProjectProgress(project);
                 return (
                   <div key={project.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
                     <div className="flex items-center justify-between mb-3">
@@ -503,25 +488,23 @@ export default function Dashboard() {
                         {project.status.replace('_', ' ')}
                       </Badge>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">Progress: {progress}%</span>
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{project.description}</p>
+                      <div className="flex items-center justify-between text-sm pt-2">
                         <span className="text-gray-600 dark:text-gray-400">{project.assigned_teams.length} team{project.assigned_teams.length !== 1 ? 's' : ''}</span>
+                        <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                          <Users className="h-3.5 w-3.5" />
+                          {project.manager.name}
+                        </span>
                       </div>
-                      <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div 
-                          className="absolute h-full bg-blue-500 rounded-full transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-200 dark:border-gray-700">
+                        <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Started: {new Date(project.start_date).toLocaleDateString()}
+                        </span>
                         <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
                           <Calendar className="h-3.5 w-3.5" />
                           Due: {new Date(project.end_date).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                          <Users className="h-3.5 w-3.5" />
-                          Manager: {project.manager.name}
                         </span>
                       </div>
                     </div>
