@@ -42,6 +42,7 @@ export function TaskAttachmentUpload({ taskId, onAttachmentUploaded }: TaskAttac
       toast.warning('File validation warnings', {
         description: validationResult.warnings.join(', '),
         icon: <CircleAlert className="text-yellow-600" />,
+        style: { color: "orange" },
       });
     }
     
@@ -52,6 +53,7 @@ export function TaskAttachmentUpload({ taskId, onAttachmentUploaded }: TaskAttac
         toast.success('Files added successfully', {
           description: `${files.length} file(s) ready for upload`,
           icon: <CheckCircle2 className="text-green-600" />,
+          style: { color: "green" },
         });
       }
     }
@@ -68,6 +70,8 @@ export function TaskAttachmentUpload({ taskId, onAttachmentUploaded }: TaskAttac
     if (selectedFiles.length === 0) {
       toast.error('No files selected', {
         description: 'Please select at least one file to upload.',
+        icon: <CircleAlert className="text-red-600" />,
+        style: { color: "red" },
       });
       return;
     }

@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   CircleAlert,
   Grid3X3,
-  List
+  List,
+  Phone
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -312,7 +313,7 @@ export default function UsersPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Departments</SelectItem>
-                {stats?.users_by_department && Object.keys(stats.users_by_department).map((dept) => (
+                {stats?.users_by_department && Object.keys(stats.users_by_department).filter(dept => dept.toLowerCase() !== 'all').map((dept) => (
                   <SelectItem key={dept} value={dept}>
                     {dept.charAt(0).toUpperCase() + dept.slice(1)}
                   </SelectItem>
@@ -419,7 +420,7 @@ export default function UsersPage() {
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
                             {user.mobile && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">📱 {user.mobile}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1"> <Phone className="h-4 w-4" /> {user.mobile}</p>
                             )}
                           </div>
                         </div>

@@ -82,10 +82,22 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
   };
 
   const handleInputChange = (field: string, value: string | number | string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+
+      // If team leader is selected, automatically add them to members
+      if (field === 'leader_id' && value) {
+        const leaderId = parseInt(value as string);
+        if (!newData.member_ids.includes(leaderId)) {
+          newData.member_ids = [...newData.member_ids, leaderId];
+        }
+      }
+
+      return newData;
+    });
 
     // Clear error when user starts typing
     if (errors[field]) {
@@ -97,6 +109,17 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
   };
 
   const handleMemberToggle = (userId: number, checked: boolean) => {
+    // Prevent unchecking the team leader
+    const leaderId = formData.leader_id ? parseInt(formData.leader_id) : null;
+    if (!checked && leaderId === userId) {
+      toast.warning('Team leader cannot be removed', {
+        description: 'The team leader must be a member of the team.',
+        icon: <CircleAlert className="text-yellow-600" />,
+        style: { color: "orange" },
+      });
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       member_ids: checked
@@ -229,8 +252,11 @@ export function TeamEditForm({ team, trigger, onTeamUpdated }: TeamEditFormProps
   );
 
   // Filter users by department if a department is selected
+  // If department is "All", show all active users
   const filteredUsers = formData.department
-    ? users.filter(user => user.department === formData.department)
+    ? formData.department === 'All' 
+      ? users 
+      : users.filter(user => user.department === formData.department)
     : users;
 
   return (

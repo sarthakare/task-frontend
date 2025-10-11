@@ -345,7 +345,7 @@ export function UserEditForm({ user, trigger, onUserUpdated }: UserEditFormProps
               </h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {user.role.toUpperCase() !== 'CEO' && (
+                {user.role.toUpperCase() !== 'CEO' && user.role.toUpperCase() !== 'ADMIN' && (
                   <div className="space-y-2">
                     <Label htmlFor="edit-role" className="text-sm font-medium text-gray-700">Role/Designation *</Label>
                     {isLoadingRoles ? (
@@ -374,7 +374,7 @@ export function UserEditForm({ user, trigger, onUserUpdated }: UserEditFormProps
                   </div>
                 )}
 
-                {user.role.toUpperCase() !== 'CEO' && (
+                {user.role.toUpperCase() !== 'CEO' && user.role.toUpperCase() !== 'ADMIN' && (
                   <div className="space-y-2">
                     <Label htmlFor="edit-department" className="text-sm font-medium text-gray-700">Department *</Label>
                     {isLoadingDepartments ? (
@@ -405,7 +405,7 @@ export function UserEditForm({ user, trigger, onUserUpdated }: UserEditFormProps
               </div>
 
               {/* Role change warning */}
-              {formData.role !== user.role && user.role.toUpperCase() !== 'CEO' && (
+              {formData.role !== user.role && user.role.toUpperCase() !== 'CEO' && user.role.toUpperCase() !== 'ADMIN' && (
                 <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
                   <p className="text-sm text-blue-800">
                     <strong>Role Change Warning:</strong> Changing a user&apos;s role will affect their permissions and access levels.
@@ -416,6 +416,7 @@ export function UserEditForm({ user, trigger, onUserUpdated }: UserEditFormProps
                 </div>
               )}
 
+              {/* CEO Badge */}
               {user.role.toUpperCase() === 'CEO' && (
                 <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 p-4 rounded-md">
                   <div className="flex items-center gap-2">
@@ -426,6 +427,31 @@ export function UserEditForm({ user, trigger, onUserUpdated }: UserEditFormProps
                       <p className="text-sm font-medium text-green-900">Chief Executive Officer</p>
                       <p className="text-xs text-green-700">All Departments • Full System Access</p>
                     </div>
+                  </div>
+                  <div className="mt-3 bg-yellow-50 border border-yellow-200 p-3 rounded-md">
+                    <p className="text-xs text-yellow-800">
+                      <strong>Protected Role:</strong> Role and department cannot be modified for CEO accounts.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Badge */}
+              {user.role.toUpperCase() === 'ADMIN' && (
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 p-4 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">ADMIN</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">System Administrator</p>
+                      <p className="text-xs text-blue-700">All Departments • Full System Access</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 bg-yellow-50 border border-yellow-200 p-3 rounded-md">
+                    <p className="text-xs text-yellow-800">
+                      <strong>Protected Role:</strong> Role and department cannot be modified for admin accounts.
+                    </p>
                   </div>
                 </div>
               )}

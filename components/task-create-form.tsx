@@ -130,6 +130,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       toast.warning('File validation warnings', {
         description: validationResult.warnings.join(', '),
         icon: <CircleAlert className="text-yellow-600" />,
+        style: { color: "orange" },
       });
     }
     
@@ -140,6 +141,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
         toast.success('Files added successfully', {
           description: `${files.length} file(s) ready for upload`,
           icon: <CheckCircle2 className="text-green-600" />,
+          style: { color: "green" },
         });
       }
     }
@@ -189,12 +191,15 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
       }
     }
 
-    if (formData.start_date && formData.follow_up_date) {
+    if (formData.start_date && formData.follow_up_date && formData.due_date) {
       const startDate = new Date(formData.start_date);
       const followUpDate = new Date(formData.follow_up_date);
+      const dueDate = new Date(formData.due_date);
       
       if (followUpDate < startDate) {
         newErrors.follow_up_date = 'Follow-up date cannot be before start date';
+      } else if (followUpDate > dueDate) {
+        newErrors.follow_up_date = 'Follow-up date cannot be after due date';
       }
     }
 
@@ -344,7 +349,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300">Task Name *</Label>
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300">Task Name *</Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -359,7 +364,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300">Description *</Label>
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">Description *</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
@@ -548,6 +553,7 @@ export function TaskCreateForm({ trigger, onTaskCreated }: TaskCreateFormProps) 
                     value={formData.follow_up_date}
                     onChange={(e) => handleInputChange('follow_up_date', e.target.value)}
                     min={formData.start_date}
+                    max={formData.due_date}
                     className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.follow_up_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
                   {errors.follow_up_date && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">

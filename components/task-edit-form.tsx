@@ -173,12 +173,15 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
       }
     }
 
-    if (formData.start_date && formData.follow_up_date) {
+    if (formData.start_date && formData.follow_up_date && formData.due_date) {
       const startDate = new Date(formData.start_date);
       const followUpDate = new Date(formData.follow_up_date);
+      const dueDate = new Date(formData.due_date);
       
       if (followUpDate < startDate) {
         newErrors.follow_up_date = 'Follow-up date cannot be before start date';
+      } else if (followUpDate > dueDate) {
+        newErrors.follow_up_date = 'Follow-up date cannot be after due date';
       }
     }
 
@@ -557,6 +560,7 @@ export function TaskEditForm({ task, trigger, onTaskUpdated }: TaskEditFormProps
                     value={formData.follow_up_date}
                     onChange={(e) => handleInputChange('follow_up_date', e.target.value)}
                     min={formData.start_date}
+                    max={formData.due_date}
                     className={`h-10 bg-white border-gray-200 hover:border-orange-300 transition-colors ${errors.follow_up_date ? 'border-red-500 focus:border-red-500' : 'focus:border-orange-500'}`}
                   />
                   {errors.follow_up_date && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">

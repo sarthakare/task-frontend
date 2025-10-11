@@ -459,7 +459,7 @@ export default function Dashboard() {
               className="px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors flex items-center gap-2"
             >
               <FolderOpen className="h-4 w-4 text-blue-500" />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">View All</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">View All</span>
             </button>
           </div>
           <div className="space-y-3">
