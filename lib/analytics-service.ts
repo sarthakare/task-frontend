@@ -11,6 +11,7 @@ export interface OverviewData {
   completed_tasks: number;
   pending_tasks: number;
   overdue_tasks: number;
+  avg_task_duration_days?: number;
 }
 
 export interface UserStats {

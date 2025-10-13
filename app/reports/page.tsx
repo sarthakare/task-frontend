@@ -7,7 +7,6 @@ import {
   BarChart3, 
   TrendingUp, 
   Calendar, 
-  Download,
   RefreshCw,
   Loader2,
   FileText,
@@ -23,40 +22,6 @@ import {
 } from "@/components/analytics-charts";
 import { RoleBasedReports } from "@/components/role-based-reports";
 import { useAuth } from "@/contexts/auth-context";
-import type { DashboardOverview } from "@/types";
-
-interface UserStats {
-  total_users: number;
-  active_users: number;
-  inactive_users: number;
-  users_by_department: Record<string, number>;
-  users_by_role: Record<string, number>;
-}
-
-interface ProjectStats {
-  total: number;
-  active: number;
-  completed: number;
-}
-
-interface TeamStats {
-  total_teams: number;
-  active_teams: number;
-  inactive_teams: number;
-  department_counts: Record<string, number>;
-}
-
-interface RecentActivity {
-  id: string | number;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  action: string;
-  description: string;
-  created_at: string;
-}
 
 
 export default function ReportsPage() {
