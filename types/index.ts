@@ -297,6 +297,7 @@ export interface DashboardOverview {
   completed_tasks: number;
   pending_tasks: number;
   overdue_tasks: number;
+  avg_task_duration_days: number;
   total_projects: number;
   active_projects: number;
   total_users: number;

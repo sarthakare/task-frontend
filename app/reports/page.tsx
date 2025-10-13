@@ -158,9 +158,9 @@ export default function ReportsPage() {
   };
 
   const calculateAvgTaskDuration = () => {
-    // This would need additional backend endpoint for actual calculation
-    // For now, using a mock calculation
-    return 3.2;
+    // Use real data from backend - calculated from start_date to completed_at
+    if (!data.overview) return 0;
+    return data.overview.avg_task_duration_days || 0;
   };
 
   const calculateTeamEfficiency = () => {
