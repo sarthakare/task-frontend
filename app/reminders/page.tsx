@@ -82,14 +82,15 @@ export default function RemindersPage() {
 
   // Sort reminders: overdue first, then by due date
   const sortedReminders = filteredReminders.sort((a, b) => {
-    const now = new Date();
-    const aOverdue = new Date(a.due_date) < now && !a.is_completed;
-    const bOverdue = new Date(b.due_date) < now && !b.is_completed;
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD
+    const aOverdue = a.due_date < today && !a.is_completed;
+    const bOverdue = b.due_date < today && !b.is_completed;
     
     if (aOverdue && !bOverdue) return -1;
     if (!aOverdue && bOverdue) return 1;
     
-    return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+    // Compare dates as strings (YYYY-MM-DD format works for string comparison)
+    return a.due_date.localeCompare(b.due_date);
   });
 
   return (

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { UserAvatar } from "@/components/user-avatar";
+import { ReminderEditForm } from "@/components/reminder-edit-form";
+import { useUser } from "@/components/user-provider";
 import { 
   Clock, 
   CheckCircle, 
@@ -11,9 +13,13 @@ import {
   MoreVertical,
   Trash2,
   CheckCircle2,
-  CircleAlert
+  CircleAlert,
+  AlertTriangle,
+  Edit
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
 import { Reminder } from "@/types";
@@ -25,16 +31,32 @@ interface ReminderDisplayProps {
 }
 
 export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted }: ReminderDisplayProps) {
+  const { currentUser } = useUser();
   const [loading, setLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // Check if current user is the creator
+  const isCreator = currentUser?.id === reminder.created_by;
 
-  const formatDateTime = (dateTime: string) => {
-    // Convert to IST (Indian Standard Time) and show date only
-    const date = new Date(dateTime);
-    return date.toLocaleDateString('en-IN', {
-      timeZone: 'Asia/Kolkata',
+  const formatDate = (dateString: string) => {
+    // Format date string (YYYY-MM-DD) to readable format
+    const date = new Date(dateString + 'T00:00:00'); // Add time to avoid timezone issues
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatDateTime = (dateTimeString: string) => {
+    // Format datetime string (ISO format) to readable format
+    const date = new Date(dateTimeString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -58,25 +80,19 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
       return { label: "Completed", color: "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800" };
     }
     
-    // Get current IST date
-    const now = new Date();
-    const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-    const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
-    const due = new Date(dueDate);
-    const dueDateOnly = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+    // Compare dates as strings (YYYY-MM-DD format)
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]; // Add 1 day in milliseconds
     
-    if (dueDateOnly < today) {
+    if (dueDate < today) {
       return { label: "Overdue", color: "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800" };
     }
     
-    if (dueDateOnly.getTime() === today.getTime()) {
+    if (dueDate === today) {
       return { label: "Today", color: "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800" };
     }
     
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (dueDateOnly.getTime() === tomorrow.getTime()) {
+    if (dueDate === tomorrow) {
       return { label: "Tomorrow", color: "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800" };
     }
     
@@ -106,10 +122,14 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this reminder?")) return;
-    
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     setLoading(true);
+    setShowDeleteDialog(false);
+    
     try {
       await api.reminders.deleteReminder(reminder.id);
       toast.success("Reminder deleted successfully!", {
@@ -129,10 +149,16 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
     }
   };
 
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false);
+  };
+
   const statusInfo = getStatusLabel(reminder.is_completed, reminder.due_date);
+  const today = new Date().toISOString().split('T')[0];
+  const isOverdue = !reminder.is_completed && reminder.due_date < today;
 
   return (
-    <div className={`bg-white dark:bg-gray-900 rounded-lg border transition-colors ${reminder.is_completed ? 'border-green-300 dark:border-green-800 bg-green-50/30 dark:bg-green-900/10' : !reminder.is_completed && new Date(reminder.due_date) < new Date() ? 'border-red-300 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'}`}>
+    <div className={`bg-white dark:bg-gray-900 rounded-lg border transition-colors ${reminder.is_completed ? 'border-green-300 dark:border-green-800 bg-green-50/30 dark:bg-green-900/10' : isOverdue ? 'border-red-300 dark:border-red-800 bg-red-50/30 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'}`}>
       <div className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
@@ -151,16 +177,30 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {isCreator && (
+                <ReminderEditForm 
+                  reminder={reminder} 
+                  onReminderUpdated={onReminderUpdated}
+                  trigger={
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} disabled={loading} className="cursor-pointer">
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                  }
+                />
+              )}
               {!reminder.is_completed && (
                 <DropdownMenuItem onClick={handleMarkCompleted} disabled={loading} className="cursor-pointer">
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Mark Completed
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={handleDelete} disabled={loading} className="text-red-600 cursor-pointer">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
+              {isCreator && (
+                <DropdownMenuItem onClick={handleDeleteClick} disabled={loading} className="text-red-600 cursor-pointer">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -180,7 +220,7 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
               <Clock className="h-4 w-4 text-blue-600 dark:text-blue-500" />
             </div>
             <span className="text-gray-600 dark:text-gray-400">
-              Due: <span className="font-semibold text-gray-900 dark:text-white">{formatDateTime(reminder.due_date)}</span>
+              Due: <span className="font-semibold text-gray-900 dark:text-white">{formatDate(reminder.due_date)}</span>
             </span>
           </div>
           
@@ -188,9 +228,25 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
             <div className="p-1.5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 dark:from-purple-500/10 dark:to-pink-500/10 rounded-lg">
               <User className="h-4 w-4 text-purple-600 dark:text-purple-500" />
             </div>
+            <span className="text-gray-600 dark:text-gray-400">
+              Assigned to:
+            </span>
             <div className="flex items-center gap-2">
               <UserAvatar name={reminder.user.name} size="sm" />
               <span className="font-semibold text-gray-900 dark:text-white">{reminder.user.name}</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-gradient-to-br from-amber-500/20 to-orange-500/20 dark:from-amber-500/10 dark:to-orange-500/10 rounded-lg">
+              <User className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+            </div>
+            <span className="text-gray-600 dark:text-gray-400">
+              Created by:
+            </span>
+            <div className="flex items-center gap-2">
+              <UserAvatar name={reminder.creator.name} size="sm" />
+              <span className="font-semibold text-gray-900 dark:text-white">{reminder.creator.name}</span>
             </div>
           </div>
           
@@ -215,6 +271,59 @@ export function ReminderDisplay({ reminder, onReminderUpdated, onReminderDeleted
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-500" />
+              </div>
+              <DialogTitle className="text-xl">Delete Reminder</DialogTitle>
+            </div>
+            <DialogDescription className="text-base pt-2">
+              Are you sure you want to delete this reminder? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 my-4 border border-gray-200 dark:border-gray-700">
+            <p className="font-semibold text-gray-900 dark:text-white mb-1">{reminder.title}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{reminder.description}</p>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={loading}
+              className="cursor-pointer"
+            >
+              No, Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={loading}
+              className="cursor-pointer bg-red-600 hover:bg-red-700"
+            >
+              {loading ? (
+                <>
+                  <CircleAlert className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Yes, Delete
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

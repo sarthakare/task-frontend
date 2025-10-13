@@ -1,22 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Loader2, CheckCircle2, CircleAlert, XCircle } from "lucide-react";
+import { Edit, Loader2, CheckCircle2, CircleAlert, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api-service";
-import { User, Task, ReminderCreate } from "@/types";
+import { User, Task, Reminder } from "@/types";
 
-interface ReminderCreateFormProps {
-  onReminderCreated?: () => void;
+interface ReminderEditFormProps {
+  reminder: Reminder;
+  trigger?: React.ReactNode;
+  onReminderUpdated?: () => void;
 }
 
-export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProps) {
+export function ReminderEditForm({ reminder, trigger, onReminderUpdated }: ReminderEditFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -24,24 +26,33 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
   const [isLoadingTasks, setIsLoadingTasks] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState<ReminderCreate & { task_id: number | undefined }>({
-    title: "",
-    description: "",
-    due_date: "",
-    priority: "MEDIUM",
-    user_id: 0,
-    task_id: undefined,
+  const [formData, setFormData] = useState({
+    title: reminder.title,
+    description: reminder.description,
+    due_date: reminder.due_date,
+    priority: reminder.priority,
+    user_id: reminder.user_id,
+    task_id: reminder.task_id || undefined,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Fetch data when component mounts or dialog opens
+  // Fetch data when dialog opens
   useEffect(() => {
     if (isDialogOpen) {
       fetchUsers();
       fetchTasks();
+      // Reset form data to current reminder values
+      setFormData({
+        title: reminder.title,
+        description: reminder.description,
+        due_date: reminder.due_date,
+        priority: reminder.priority,
+        user_id: reminder.user_id,
+        task_id: reminder.task_id || undefined,
+      });
     }
-  }, [isDialogOpen]);
+  }, [isDialogOpen, reminder]);
 
   const fetchUsers = async () => {
     setIsLoadingUsers(true);
@@ -103,15 +114,6 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
       newErrors.user_id = 'Please select a user';
     }
 
-    // Validate due date is today or in the future
-    if (formData.due_date) {
-      const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-      
-      if (formData.due_date < today) {
-        newErrors.due_date = 'Due date cannot be in the past';
-      }
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -126,45 +128,36 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
     setIsSubmitting(true);
 
     try {
-      // Send date in YYYY-MM-DD format (date only, no time component)
-      // The backend now expects date type, not datetime
-      await api.reminders.createReminder({
-        ...formData,
-        due_date: formData.due_date, // Already in correct format from date input
+      await api.reminders.updateReminder(reminder.id, {
+        title: formData.title,
+        description: formData.description,
+        due_date: formData.due_date,
+        priority: formData.priority,
+        user_id: formData.user_id,
+        task_id: formData.task_id,
       });
-      
-      // Reset form
-      setFormData({
-        title: "",
-        description: "",
-        due_date: "",
-        priority: "MEDIUM",
-        user_id: 0,
-        task_id: undefined,
-      });
-      setErrors({});
 
       // Close dialog
       setIsDialogOpen(false);
 
       // Show success toast
-      toast.success("Reminder created successfully!", {
-        description: `${formData.title} has been created and will notify the assigned user.`,
+      toast.success("Reminder updated successfully!", {
+        description: `${formData.title} has been updated.`,
         icon: <CheckCircle2 className="text-green-600" />,
         style: { color: "green" },
       });
 
       // Call callback to refresh parent component
-      if (onReminderCreated) {
-        onReminderCreated();
+      if (onReminderUpdated) {
+        onReminderUpdated();
       }
     } catch (error: unknown) {
-      console.error("Error creating reminder:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to create reminder";
+      console.error("Error updating reminder:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to update reminder";
       setErrors({ submit: errorMessage });
 
       // Show error toast
-      toast.error("Failed to create reminder", {
+      toast.error("Failed to update reminder", {
         description: errorMessage,
         icon: <CircleAlert className="text-red-600" />,
         style: { color: "red" },
@@ -174,49 +167,29 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
     }
   };
 
-  const getCurrentDate = () => {
-    // Get current date in YYYY-MM-DD format (local time)
-    return new Date().toISOString().split('T')[0];
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      description: "",
-      due_date: "",
-      priority: "MEDIUM",
-      user_id: 0,
-      task_id: undefined,
-    });
-    setErrors({});
-  };
-
   const defaultTrigger = (
-    <button 
-      onClick={() => setIsDialogOpen(true)} 
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
-    >
-      <Plus className="h-4 w-4" />
-      <span>Create Reminder</span>
-    </button>
+    <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
+      <Edit className="h-4 w-4 mr-1" />
+      Edit
+    </Button>
   );
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        {defaultTrigger}
+        {trigger || defaultTrigger}
       </DialogTrigger>
       <DialogContent className="min-w-[80vw] min-h-[80vh] overflow-hidden bg-white dark:bg-gray-900">
         <DialogHeader className="pb-6 border-b border-gray-200 dark:border-gray-800">
           <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:gap-3">
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <Plus className="h-5 w-5 text-blue-500" />
+            <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+              <Edit className="h-5 w-5 text-amber-500" />
             </div>
-            Create New Reminder
+            Edit Reminder
           </DialogTitle>
-          <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2">
-            Fill out the form below to create a new reminder with all necessary details and assignments.
-          </DialogDescription>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Update the reminder details below to modify assignments and information.
+          </p>
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
@@ -365,7 +338,6 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
                     type="date"
                     value={formData.due_date}
                     onChange={(e) => handleInputChange('due_date', e.target.value)}
-                    min={getCurrentDate()}
                     className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.due_date ? 'border-red-500 focus:border-red-500' : 'focus:border-green-500'}`}
                   />
                   {errors.due_date && <p className="text-sm text-red-500 flex items-center gap-1">
@@ -389,10 +361,7 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  resetForm();
-                  setIsDialogOpen(false);
-                }}
+                onClick={() => setIsDialogOpen(false)}
                 disabled={isSubmitting}
                 className="px-6 h-10 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
               >
@@ -401,17 +370,17 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 h-10 bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
+                className="px-6 h-10 bg-amber-500 hover:bg-amber-600 text-white font-medium transition-colors"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating...
+                    Updating...
                   </>
                 ) : (
                   <>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Reminder
+                    <Edit className="h-4 w-4 mr-2" />
+                    Update Reminder
                   </>
                 )}
               </Button>
@@ -422,3 +391,4 @@ export function ReminderCreateForm({ onReminderCreated }: ReminderCreateFormProp
     </Dialog>
   );
 }
+

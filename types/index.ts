@@ -280,6 +280,8 @@ export interface Reminder {
   description: string;
   due_date: string;
   priority: string;
+  created_by: number;
+  creator: User;
   user_id: number;
   user: User;
   task_id?: number;
