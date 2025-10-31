@@ -147,6 +147,11 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
   };
 
   const handleInputChange = (field: string, value: string) => {
+    // For mobile field, allow only numbers and limit to 10 digits
+    if (field === 'mobile') {
+      value = value.replace(/[^0-9]/g, '').slice(0, 10);
+    }
+
     setFormData(prev => {
       const newData = {
         ...prev,
@@ -185,7 +190,7 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
 
     if (!formData.mobile) {
       newErrors.mobile = 'Mobile number is required';
-    } else if (!/^\+?[0-9]{10}$/.test(formData.mobile)) {
+    } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
       newErrors.mobile = 'Please enter a valid mobile number (10 digits)';
     }
 
@@ -368,7 +373,8 @@ export function UserCreateForm({ trigger, onUserCreated }: UserCreateFormProps) 
                     type="tel"
                     value={formData.mobile}
                     onChange={(e) => handleInputChange('mobile', e.target.value)}
-                    placeholder="Enter mobile number"
+                    placeholder="Enter 10 digit mobile number"
+                    maxLength={10}
                     className={`h-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${errors.mobile ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
                   />
                   {errors.mobile && <p className="text-sm text-red-500 dark:text-red-400 flex items-center gap-1">
